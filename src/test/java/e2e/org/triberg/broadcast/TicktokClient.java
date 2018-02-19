@@ -28,7 +28,7 @@ public class TicktokClient {
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse();
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.SC_CREATED));
-        
+
     }
 
     private String createClockRequestFor(String timeExpr) {
