@@ -1,4 +1,4 @@
-package e2e.org.triberg.broadcast;
+package e2e.org.ticktok.broadcast;
 
 import org.junit.Test;
 

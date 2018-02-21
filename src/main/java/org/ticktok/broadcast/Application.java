@@ -1,4 +1,4 @@
-package org.triberg.broadcast;
+package org.ticktok.broadcast;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
