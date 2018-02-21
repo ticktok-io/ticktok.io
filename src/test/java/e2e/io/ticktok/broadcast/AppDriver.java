@@ -1,34 +1,30 @@
-package e2e.org.ticktok.broadcast;
+package e2e.io.ticktok.broadcast;
 
+import io.ticktok.broadcast.Application;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-import org.junit.Assert;
 
 import java.io.IOException;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class TicktokClient {
+public class AppDriver {
 
     private static final String CLIENT_ID = "e2e-client";
-    private JSONObject clockDetails; // queue, url, id, schdule, clientId
+
+    public AppDriver() {
+        Application.main();
+    }
 
     public void registeredFor(String timeExpr) throws IOException {
         HttpResponse response = Request.Post("http://localhost:8080/api/v1/clocks")
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse();
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.SC_CREATED));
-        clockDetails = new JSONObject(EntityUtils.toString(response.getEntity()));
     }
 
     private String createClockRequestFor(String timeExpr) {
@@ -38,7 +34,4 @@ public class TicktokClient {
                 .toString();
     }
 
-    public void receivedClock() {
-
-    }
 }
