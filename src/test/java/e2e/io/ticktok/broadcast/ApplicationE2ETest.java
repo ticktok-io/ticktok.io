@@ -8,8 +8,8 @@ public class ApplicationE2ETest {
     private final ClockConsumer client = new ClockConsumer();
 
     @Test
-    public void delegateScheduledMessageToQueue() throws Exception {
+    public void sendScheduledMessage() throws Exception {
         app.registeredFor("once.in.2.second");
-        client.receivedClock();
+        client.receiveClock();
     }
 }
