@@ -16,7 +16,7 @@ public class ClockConsumer {
     private final ClockListener listener = new ClockListener();
 
     public void receiveTheClock(String clockExpr) throws Exception {
-        assertFalse(receivedMessageWithTopic(clockExpr));
+        assertTrue(receivedMessageWithTopic(clockExpr));
     }
 
     private boolean receivedMessageWithTopic(String topic) throws IOException, TimeoutException, InterruptedException {
