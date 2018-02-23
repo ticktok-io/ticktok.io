@@ -2,6 +2,8 @@ package e2e.io.ticktok.broadcast;
 
 import org.junit.Test;
 
+import static io.ticktok.broadcast.ClocksController.CLOCK_EXPR;
+
 public class ApplicationE2ETest {
 
     private final AppDriver app = new AppDriver();
@@ -9,7 +11,7 @@ public class ApplicationE2ETest {
 
     @Test
     public void sendScheduledMessage() throws Exception {
-        app.registeredFor("once.in.2.second");
-        client.receiveClock();
+        app.registeredFor(CLOCK_EXPR);
+        client.receiveTheClock(CLOCK_EXPR);
     }
 }

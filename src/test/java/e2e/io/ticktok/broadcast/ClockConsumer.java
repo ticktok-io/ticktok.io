@@ -1,48 +1,76 @@
 package e2e.io.ticktok.broadcast;
 
 import com.rabbitmq.client.*;
+import org.junit.After;
 
 import java.io.IOException;
 import java.util.concurrent.*;
 
+import static io.ticktok.broadcast.ClocksController.QUEUE;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class ClockConsumer {
 
-    public void receiveClock() throws ExecutionException, InterruptedException, TimeoutException {
-        Executors.newSingleThreadExecutor().submit(new ClockListener()).get(3, TimeUnit.SECONDS);
+
+    private final ClockListener listener = new ClockListener();
+
+    public void receiveTheClock(String clockExpr) throws Exception {
+        assertTrue(receivedMessageWithTopic(clockExpr));
     }
 
-    class ClockListener implements Callable<String> {
+    private boolean receivedMessageWithTopic(String topic) throws IOException, TimeoutException, InterruptedException {
+        CountDownLatch messageWasReceived = new CountDownLatch(1);
+        listener.register(topic, (message) -> messageWasReceived.countDown());
+        return messageWasReceived.await(3, TimeUnit.SECONDS);
+    }
 
-        private static final String EXCHANGE_NAME = "e2e-exchange";
-        public static final String MY_QUEUE = "e2e-clock";
+    @After
+    public void tearDown() throws Exception {
+        listener.stop();
+    }
 
-        private String message;
+    private class ClockListener {
+        private static final String EXCHANGE_NAME = "clock.exchange";
 
-        @Override
-        public String call() throws Exception {
-            Channel channel = createChannel();
+        private Channel channel;
+
+        public void register(String clockExpr, MessageHandler handler) throws IOException, TimeoutException {
+            if (channel == null) {
+                channel = createChannel();
+            }
 
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope,
                                            AMQP.BasicProperties properties, byte[] body) throws IOException {
-                    message = new String(body, "UTF-8");
-                    channel.basicCancel(consumerTag);
+                    handler.consume(new String(body, "UTF-8"));
                 }
             };
-            channel.basicConsume(MY_QUEUE, consumer);
-            return message;
+            channel.basicConsume(QUEUE, consumer);
         }
 
         private Channel createChannel() throws IOException, TimeoutException {
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("localhost");
-            Connection connection = factory.newConnection();
-            Channel channel = connection.createChannel();
-
+            Channel channel = createConnection().createChannel();
             channel.exchangeDeclare(EXCHANGE_NAME, "topic");
-            channel.queueBind(MY_QUEUE, EXCHANGE_NAME, "every.3.minutes");
             return channel;
         }
+
+        private Connection createConnection() throws IOException, TimeoutException {
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost("localhost");
+            return factory.newConnection();
+        }
+
+        public void stop() throws IOException, TimeoutException {
+            if (channel != null) {
+                channel.close();
+            }
+        }
     }
+
+    private interface MessageHandler {
+        void consume(String message);
+    }
+
 }
