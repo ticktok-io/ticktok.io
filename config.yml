@@ -22,8 +22,6 @@ jobs:
       TERM: dumb
 
     steps:
-      - run: docker run -d --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:3.7
-
       - checkout
 
       # Download and cache dependencies
@@ -33,6 +31,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
+      - run: docker run -d --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:3.7
       - run: ./gradlew dependencies
 
       - save_cache:
