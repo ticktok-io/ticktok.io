@@ -12,7 +12,7 @@ jobs:
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: rabbitmq:3.7
+      # - image: rabbitmq:3.7
 
     working_directory: ~/repo
 
@@ -22,6 +22,8 @@ jobs:
       TERM: dumb
 
     steps:
+      - rabbit: docker run -d --hostname my-rabbit --name some-rabbit -p 5672:5672 rabbitmq:3.7
+
       - checkout
 
       # Download and cache dependencies
