@@ -46,7 +46,7 @@ jobs:
           name: Build application Docker image
           command: docker build -t app .
 
-      - publish:
+      - deploy:
           name: Publish application Docker image
           command:
             - >
