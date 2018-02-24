@@ -43,15 +43,15 @@ jobs:
       - run: ./gradlew build
 
       - run:
-        name: Build application Docker image
-        command: docker build -t app .
+          name: Build application Docker image
+          command: docker build -t app .
 
       - publish:
-        name: Publish application Docker image
-        command:
-          - >
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              # docker login
-              # docker tag app "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
-              # docker push "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
-            fi
+          name: Publish application Docker image
+          command:
+            - >
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                # docker login
+                # docker tag app "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
+                # docker push "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
+              fi
