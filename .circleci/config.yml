@@ -48,8 +48,7 @@ jobs:
 
       - deploy:
           name: Publish application Docker image
-          command:
-            - >
+          command: |
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
                 # docker login
                 # docker tag app "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
