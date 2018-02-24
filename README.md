@@ -1,2 +1,2 @@
 # Ticktok.iow
-[![CircleCI](https://circleci.com/gh/rockem/ticktok.io.svg?style=svg)](https://circleci.com/gh/rockem/ticktok.io)
+[![Build Status](https://travis-ci.org/rockem/ticktok.io.svg?branch=master)](https://travis-ci.org/rockem/ticktok.io)
