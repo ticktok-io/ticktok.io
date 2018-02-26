@@ -3,6 +3,7 @@ package io.ticktok.broadcast;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +22,9 @@ import java.util.concurrent.TimeoutException;
 @RestController
 @RequestMapping("/api/v1/clocks")
 public class ClocksController {
+
+    @Value("${rabbit.uri}")
+    private String rabbitUri;
 
     public static final String CLOCK_EXPR = "once.in.4.seconds";
 
@@ -32,7 +39,15 @@ public class ClocksController {
             @Override
             public void run() {
                 ConnectionFactory factory = new ConnectionFactory();
-                factory.setHost("localhost");
+                try {
+                    factory.setUri(rabbitUri);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                } catch (KeyManagementException e) {
+                    e.printStackTrace();
+                }
                 try {
                     Connection connection = factory.newConnection();
                     Channel channel = connection.createChannel();

@@ -1,4 +1,4 @@
-package e2e.io.ticktok.broadcast;
+package e2e.io.ticktok.broadcast.support;
 
 import io.ticktok.broadcast.Application;
 import org.apache.http.HttpResponse;

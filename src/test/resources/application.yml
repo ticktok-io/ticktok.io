@@ -1,0 +1,2 @@
+rabbit:
+  uri: amqp://localhost:5672

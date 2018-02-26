@@ -1,0 +1,2 @@
+rabbit:
+  uri: ${RABBIT_URI}

@@ -1,4 +1,4 @@
-package e2e.io.ticktok.broadcast;
+package e2e.io.ticktok.broadcast.support;
 
 import com.rabbitmq.client.*;
 import org.junit.After;
