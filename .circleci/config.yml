@@ -50,6 +50,7 @@ jobs:
       - deploy:
           name: Publish application Docker image
           command: |
+              echo "${CIRCLE_BRANCH}"
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
                 docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
                 docker tag app ticktok/ticktok:$TAG
