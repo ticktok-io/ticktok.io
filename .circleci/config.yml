@@ -20,6 +20,7 @@ jobs:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
+      TAG: 0.1.0
 
     steps:
       - checkout
@@ -50,8 +51,7 @@ jobs:
           name: Publish application Docker image
           command: |
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                echo pending
-                # docker login
-                # docker tag app "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
-                # docker push "${ECR_ENDPOINT}/app:${CIRCLE_SHA1}"
+                docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+                docker tag app ticktok/ticktok:$TAG
+                docker push ticktok/ticktok:$TAG
               fi
