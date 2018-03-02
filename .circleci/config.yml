@@ -52,9 +52,12 @@ jobs:
           command: |
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
                 TAG=`git describe --tags --abbrev=0`
-                if [[ "$(docker images -q $IMAGE:$TAG 2> /dev/null)" == "" ]]; then
+                if [[ `docker pull $IMAGE:$TAG` ]]; then
+                    echo $IMAGE:$TAG already exists
+                    exit 1
+                else
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
                     docker tag app $IMAGE:$TAG
                     docker push $IMAGE:$TAG
-                  fi
+                fi
               fi
