@@ -27,10 +27,12 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
+    compile("org.springframework.boot:spring-boot-starter-actuator")
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
 
     compile "com.rabbitmq:amqp-client:5.1.2"
+    compile "com.google.code.gson:gson:2.8.2"
 
     testCompile "junit:junit"
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"

@@ -1,2 +1,5 @@
 rabbit:
   uri: ${RABBIT_URI}
+
+management:
+  port: 8081
