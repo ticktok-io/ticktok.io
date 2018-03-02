@@ -43,7 +43,7 @@ public class AppDriver {
     }
 
     private String getHealthStatus() throws IOException {
-        String health = Request.Get(APP_URL + "/health").execute().returnContent().asString();
+        String health = Request.Get("http://localhost:8081/health").execute().returnContent().asString();
         return new Gson().fromJson(health, JsonObject.class).get("status").getAsString();
     }
 }
