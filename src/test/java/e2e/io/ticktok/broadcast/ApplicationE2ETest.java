@@ -19,12 +19,18 @@ public class ApplicationE2ETest {
 
     @Test
     public void sendScheduledMessage() throws Exception {
-        app.registerFor(CLOCK_EXPR);
+        app.startClocking(CLOCK_EXPR);
         client.receivedTheClock(CLOCK_EXPR);
     }
 
     @Test
     public void shouldBeHealthy() throws Exception {
         app.isHealthy();
+    }
+
+    @Test
+    public void failWhenTokenNotProvided() throws Exception{
+        app.isAccessedWithoutAToken();
+        app.retrieveAUserError();
     }
 }

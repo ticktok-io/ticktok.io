@@ -1,5 +1,8 @@
 rabbit:
   uri: amqp://localhost:5672
 
+http:
+  auth-token: 1234
+
 management:
   port: 8081
