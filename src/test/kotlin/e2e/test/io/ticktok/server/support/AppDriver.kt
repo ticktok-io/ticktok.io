@@ -10,12 +10,13 @@ import org.apache.http.entity.ContentType
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
-import java.io.IOException
 
 class AppDriver {
-    private val APP_URL = "http://localhost:8080"
-    private val CLIENT_ID = "e2e-client"
-    private val ACCESS_TOKEN = "1234"
+    companion object {
+        const val APP_URL = "http://localhost:8080"
+        const val CLIENT_ID = "e2e-client"
+        const val ACCESS_TOKEN = "1234"
+    }
 
     private var lastResponse: HttpResponse? = null
 
@@ -23,7 +24,6 @@ class AppDriver {
         Application.main()
     }
 
-    @Throws(IOException::class)
     fun startClocking(timeExpr: String) {
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)

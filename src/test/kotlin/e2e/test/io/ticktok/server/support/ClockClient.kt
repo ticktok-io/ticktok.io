@@ -22,9 +22,7 @@ class ClockClient {
         return messageWasReceived.await(3, TimeUnit.SECONDS)
     }
 
-    @AfterEach
-    @Throws(Exception::class)
-    fun tearDown() {
+    fun stop() {
         listener.stop()
     }
 
@@ -61,14 +59,11 @@ class ClockClient {
         }
 
         fun stop() {
-            if (channel != null) {
+            if (channel != null && channel!!.isOpen) {
                 channel!!.close()
             }
         }
 
     }
 
-    private interface MessageHandler {
-        fun consume(message: String)
-    }
 }
