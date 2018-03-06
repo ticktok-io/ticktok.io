@@ -1,4 +1,4 @@
-package io.ticktok.broadcast.http;
+package io.ticktok.broadcast.auth;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
