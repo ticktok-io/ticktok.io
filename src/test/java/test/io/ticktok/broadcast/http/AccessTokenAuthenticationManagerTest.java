@@ -10,10 +10,10 @@ import static org.mockito.Mockito.*;
 
 public class AccessTokenAuthenticationManagerTest {
 
-    private static final String AUTH_TOKEN = "1313";
+    private static final String SHA1_1313 = "23b36ea4f70670ae377a591fdc03d36a9bebb481";
 
     private Authentication authentication = mock(Authentication.class);
-    private AccessTokenAuthenticationManager authManager = new AccessTokenAuthenticationManager(AUTH_TOKEN);
+    private AccessTokenAuthenticationManager authManager = new AccessTokenAuthenticationManager(SHA1_1313);
 
     @Test
     public void shouldFailToAuthenticateNonMatchedToken() {
@@ -23,7 +23,7 @@ public class AccessTokenAuthenticationManagerTest {
 
     @Test
     public void shouldAuthenticateOnMatchedToken() {
-        when(authentication.getPrincipal()).thenReturn(AUTH_TOKEN);
+        when(authentication.getPrincipal()).thenReturn("1313");
         authManager.authenticate(authentication);
         verify(authentication).setAuthenticated(true);
     }
