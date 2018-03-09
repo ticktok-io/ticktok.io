@@ -2,8 +2,8 @@
 
 set -e
 
-if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then
-    if [ "${CIRCLE_BRANCH}" == "master" ]; then
+if [ "$CIRCLE_BRANCH" == "master" ] || [ "$CIRCLE_BRANCH" == "develop" ]; then
+    if [ "$CIRCLE_BRANCH" == "master" ]; then
         export TAG=$(git describe --tags --abbrev=0)
     else
         export TAG=$(git rev-parse --short HEAD)
