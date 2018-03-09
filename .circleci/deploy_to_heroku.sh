@@ -13,6 +13,7 @@ if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
         IMAGE=$HEROKU/ticktok-io-dev:$TAG
     fi
     docker login --username=_ --password=$(heroku auth:token) $HEROKU
+    echo image: $IMAGE
     docker tag app $IMAGE
     docker push $IMAGE/web
 fi
