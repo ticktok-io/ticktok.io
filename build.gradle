@@ -1,15 +1,20 @@
 buildscript {
+    ext.kotlin_version = '1.2.30'
+
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.10.RELEASE")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
 
 apply plugin: 'java'
+apply plugin: 'kotlin'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+
 
 jar {
     baseName = 'ticktok'
@@ -28,16 +33,35 @@ dependencies {
         exclude module: "spring-boot-starter-tomcat"
     }
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE")
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
 
     compile "com.rabbitmq:amqp-client:5.1.2"
     compile "com.google.code.gson:gson:2.8.2"
 
-    testCompile "junit:junit"
+    testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    testCompile "org.junit.jupiter:junit-jupiter-engine:5.1.0"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.1.0"
+    testCompile "org.junit.platform:junit-platform-launcher:1.1.0"
+
+    testCompile "org.hamcrest:hamcrest-all:1.3"
+    testCompile "org.mockito:mockito-core:2.15.0"
+
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
     testCompile "org.apache.httpcomponents:fluent-hc:4.5.5"
     testCompile "org.json:json:20180130"
 
 
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }

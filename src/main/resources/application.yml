@@ -1,5 +1,8 @@
 rabbit:
   uri: ${RABBIT_URI}
 
+http:
+  auth-token: ${ACCESS_TOKEN}
+
 management:
-  port: 8081
+  context-path: /mgmt

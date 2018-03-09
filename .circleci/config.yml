@@ -47,9 +47,22 @@ jobs:
           name: Build application Docker image
           command: docker build -t app .
 
+
       - deploy:
+          name: Deploy ticktok server to Heroku
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                TAG=`git describe --tags --abbrev=0`
+              else
+                TAG=`git rev-parse --short HEAD`
+              fi
+            fi
+
+      - run:
           name: Publish application Docker image
           command: |
+              echo tag: $TAG
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
                 TAG=`git describe --tags --abbrev=0`
                 if [[ `docker pull $IMAGE:$TAG` ]]; then
@@ -61,3 +74,4 @@ jobs:
                     docker push $IMAGE:$TAG
                 fi
               fi
+
