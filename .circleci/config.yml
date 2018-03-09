@@ -53,6 +53,7 @@ jobs:
       - deploy:
           name: Deploy ticktok server
           command: |
+            heroku login
             .circleci/upload_to_heroku.sh
             echo tag: $TAG
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
