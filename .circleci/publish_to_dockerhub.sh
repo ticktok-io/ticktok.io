@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -e
 
 if [ "${CIRCLE_BRANCH}" == "master" ]; then
     TAG=`git describe --tags --abbrev=0`
