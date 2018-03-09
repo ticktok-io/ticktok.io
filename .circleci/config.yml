@@ -49,15 +49,15 @@ jobs:
 
 
       - deploy:
-        name: Deploy ticktok server to Heroku
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              TAG=`git describe --tags --abbrev=0`
-            else
-              TAG=`git rev-parse --short HEAD`
+          name: Deploy ticktok server to Heroku
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                TAG=`git describe --tags --abbrev=0`
+              else
+                TAG=`git rev-parse --short HEAD`
+              fi
             fi
-          fi
 
       - publish:
           name: Publish application Docker image
