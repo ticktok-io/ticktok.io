@@ -20,7 +20,7 @@ jobs:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-      IMAGE: ticktok/ticktok
+      APP: ticktok
       #GIT_VERSION: `git describe --tags --abbrev=0`
       #SHORT_COMMIT_ID: `git rev-parse --short HEAD`
 
@@ -49,22 +49,10 @@ jobs:
           name: Build application Docker image
           command: docker build -t app .
 
-
       - deploy:
           name: Deploy ticktok server
-          command: |
-            heroku login
-            .circleci/upload_to_heroku.sh
-            echo tag: $TAG
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              TAG=`git describe --tags --abbrev=0`
-              if [[ `docker pull $IMAGE:$TAG` ]]; then
-                  echo $IMAGE:$TAG already exists
-                  exit 1
-              else
-                  echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-                  docker tag app $IMAGE:$TAG
-                  docker push $IMAGE:$TAG
-              fi
-            fi
+          command:
+            - .circleci/heroku_setup.sh
+            - .circleci/upload_to_heroku.sh
+            - .circleci/publish_to_dockerhub.sh
 
