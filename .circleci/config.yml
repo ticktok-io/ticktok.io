@@ -51,30 +51,19 @@ jobs:
 
 
       - deploy:
-          name: Deploy ticktok server to Heroku
+          name: Deploy ticktok server
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then
-              if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                TAG: `git describe --tags --abbrev=0`
+            sh .circleci/upload_to_heroku.sh
+            echo tag: $TAG
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              TAG=`git describe --tags --abbrev=0`
+              if [[ `docker pull $IMAGE:$TAG` ]]; then
+                  echo $IMAGE:$TAG already exists
+                  exit 1
               else
-                TAG: `git rev-parse --short HEAD`
+                  echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+                  docker tag app $IMAGE:$TAG
+                  docker push $IMAGE:$TAG
               fi
             fi
-
-
-      - run:
-          name: Publish application Docker image
-          command: |
-              echo tag: $TAG
-              if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                TAG=`git describe --tags --abbrev=0`
-                if [[ `docker pull $IMAGE:$TAG` ]]; then
-                    echo $IMAGE:$TAG already exists
-                    exit 1
-                else
-                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-                    docker tag app $IMAGE:$TAG
-                    docker push $IMAGE:$TAG
-                fi
-              fi
 
