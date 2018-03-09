@@ -59,7 +59,7 @@ jobs:
               fi
             fi
 
-      - publish:
+      - run:
           name: Publish application Docker image
           command: |
               echo tag: $TAG
