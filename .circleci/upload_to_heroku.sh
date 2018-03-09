@@ -2,9 +2,11 @@
 
 set -e
 
+sh --version
+
 echo ${CIRCLE_BRANCH}
 
-if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
+if [ $ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
     if [ "$CIRCLE_BRANCH" == "master" ]; then
         export TAG=$(git describe --tags --abbrev=0)
     else
