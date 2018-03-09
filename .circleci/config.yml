@@ -21,8 +21,8 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
       IMAGE: ticktok/ticktok
-      GIT_VERSION: `git describe --tags --abbrev=0`
-      SHORT_COMMIT_ID: `git rev-parse --short HEAD`
+      #GIT_VERSION: `git describe --tags --abbrev=0`
+      #SHORT_COMMIT_ID: `git rev-parse --short HEAD`
 
     steps:
       - checkout
@@ -56,16 +56,17 @@ jobs:
             TAG=""
             if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                TAG=`git describe --tags --abbrev=0`
+                export TAG=`git describe --tags --abbrev=0`
               else
-                TAG=`git rev-parse --short HEAD`
+                export TAG=`git rev-parse --short HEAD`
               fi
             fi
+
 
       - run:
           name: Publish application Docker image
           command: |
-              echo tag: $GIT_VERSION
+              echo tag: $TAG
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
                 TAG=`git describe --tags --abbrev=0`
                 if [[ `docker pull $IMAGE:$TAG` ]]; then
