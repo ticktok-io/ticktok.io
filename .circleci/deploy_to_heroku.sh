@@ -12,7 +12,7 @@ if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
         export TAG=$(git rev-parse --short HEAD)
         IMAGE=$HEROKU/ticktok-io-dev:$TAG
     fi
-    heroku container:login
+    docker login --username=_ --password=$(heroku auth:token) $HEROKU
     docker tag app $IMAGE
     docker push $IMAGE/web
 fi
