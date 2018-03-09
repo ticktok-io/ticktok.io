@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == rc_* ]; then
+if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == rc-* ]; then
     TAG=`git describe --tags --abbrev=0`
     IMAGE=ticktok/ticktok:$TAG
     if [[ `docker pull $IMAGE` ]]; then
