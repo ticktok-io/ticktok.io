@@ -49,10 +49,13 @@ jobs:
           name: Build application Docker image
           command: docker build -t app .
 
+      - run:
+        name: Setup heroku
+        command: .circleci/heroku_setup.sh
+
       - deploy:
           name: Deploy ticktok server
           command: |
-            .circleci/heroku_setup.sh > /dev/null
             .circleci/deploy_to_heroku.sh
             .circleci/publish_to_dockerhub.sh
 
