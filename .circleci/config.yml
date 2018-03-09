@@ -53,6 +53,6 @@ jobs:
           name: Deploy ticktok server
           command: |
             .circleci/heroku_setup.sh
-            .circleci/upload_to_heroku.sh
+            .circleci/deploy_to_heroku.sh
             .circleci/publish_to_dockerhub.sh
 
