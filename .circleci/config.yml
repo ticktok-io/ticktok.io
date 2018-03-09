@@ -53,12 +53,11 @@ jobs:
       - deploy:
           name: Deploy ticktok server to Heroku
           command: |
-            TAG=""
             if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then
               if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                export TAG=`git describe --tags --abbrev=0`
+                TAG: `git describe --tags --abbrev=0`
               else
-                export TAG=`git rev-parse --short HEAD`
+                TAG: `git rev-parse --short HEAD`
               fi
             fi
 
