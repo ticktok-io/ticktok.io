@@ -53,8 +53,7 @@ jobs:
       - deploy:
           name: Deploy ticktok server
           command: |
-            sh --version
-            sh .circleci/upload_to_heroku.sh
+            .circleci/upload_to_heroku.sh
             echo tag: $TAG
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               TAG=`git describe --tags --abbrev=0`
