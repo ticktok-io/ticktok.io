@@ -1,4 +1,4 @@
-package io.ticktok.broadcast.auth;
+package io.ticktok.server.auth;
 
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 

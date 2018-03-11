@@ -1,4 +1,4 @@
-package io.ticktok.broadcast;
+package io.ticktok.server;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;

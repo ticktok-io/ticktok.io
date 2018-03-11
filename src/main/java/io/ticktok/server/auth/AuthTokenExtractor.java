@@ -1,4 +1,4 @@
-package io.ticktok.broadcast.auth;
+package io.ticktok.server.auth;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;

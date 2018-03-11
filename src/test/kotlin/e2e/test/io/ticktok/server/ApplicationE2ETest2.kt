@@ -2,7 +2,7 @@ package e2e.test.io.ticktok.server;
 
 import e2e.test.io.ticktok.server.support.AppDriver
 import e2e.test.io.ticktok.server.support.ClockClient
-import io.ticktok.broadcast.ClocksController.CLOCK_EXPR
+import io.ticktok.server.ClocksController.CLOCK_EXPR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

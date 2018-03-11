@@ -1,6 +1,6 @@
 package test.io.ticktok.broadcast.http;
 
-import io.ticktok.broadcast.auth.AccessTokenAuthenticationManager;
+import io.ticktok.server.auth.AccessTokenAuthenticationManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;

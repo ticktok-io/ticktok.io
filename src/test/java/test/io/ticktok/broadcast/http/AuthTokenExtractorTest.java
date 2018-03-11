@@ -1,12 +1,12 @@
 package test.io.ticktok.broadcast.http;
 
-import io.ticktok.broadcast.auth.AuthTokenExtractor;
+import io.ticktok.server.auth.AuthTokenExtractor;
 import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static io.ticktok.broadcast.auth.AuthTokenExtractor.AUTH_HEADER;
-import static io.ticktok.broadcast.auth.AuthTokenExtractor.AUTH_PARAM;
+import static io.ticktok.server.auth.AuthTokenExtractor.AUTH_HEADER;
+import static io.ticktok.server.auth.AuthTokenExtractor.AUTH_PARAM;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;

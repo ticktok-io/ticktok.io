@@ -19,7 +19,7 @@ public class SwaggerConfig {
     public Docket customImplementation(){
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("io.ticktok.broadcast"))
+                .apis(RequestHandlerSelectors.basePackage("io.ticktok.server"))
                 .paths(PathSelectors.any())
                 .build();
     }
@@ -27,12 +27,12 @@ public class SwaggerConfig {
     @Bean
     public static ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Ticktok platform  API")
+                .title("Ticktok platform API")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .termsOfServiceUrl("")
                 .version("1.0.0")
-                .contact(new Contact("", "", "admin@tickto-io.com"))
+                .contact(new Contact("", "", "ticktok.dev@gmail.com"))
                 .build();
     }
 }
