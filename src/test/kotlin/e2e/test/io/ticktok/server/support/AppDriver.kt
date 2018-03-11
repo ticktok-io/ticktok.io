@@ -2,7 +2,7 @@ package e2e.test.io.ticktok.server.support
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import io.ticktok.broadcast.Application
+import io.ticktok.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
 import org.apache.http.client.fluent.Request
