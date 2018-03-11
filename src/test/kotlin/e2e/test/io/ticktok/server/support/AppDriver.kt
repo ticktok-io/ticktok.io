@@ -1,6 +1,7 @@
 package e2e.test.io.ticktok.server.support
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.ticktok.Application
 import org.apache.http.HttpResponse
@@ -24,7 +25,7 @@ class AppDriver {
         Application.main()
     }
 
-    fun startClocking(timeExpr: String) {
+    fun registeredAClock(timeExpr: String) {
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
@@ -59,5 +60,18 @@ class AppDriver {
 
     fun retrieveAuthError() {
         assertThat(lastResponse!!.statusLine.statusCode, `is`(403))
+    }
+
+    fun clocks(): Clocks {
+        val response = Request.Get("$APP_URL/api/v1/clocks").execute().returnContent().asString()
+        return Clocks(Gson().fromJson<JsonArray>(response, JsonArray::class.java))
+    }
+
+    class Clocks {
+        constructor(jsonClocks: JsonArray)
+
+        fun contains(clock: String) {
+
+        }
     }
 }
