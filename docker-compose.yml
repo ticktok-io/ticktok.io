@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - 8888:15672
+      - 5672:5672
+    hostname: ticktok-rabbit
+
+  mongo:
+    image: mongo:3.4
+    ports:
+      - 27017:27017
+
+
+

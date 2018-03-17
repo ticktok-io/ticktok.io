@@ -13,8 +13,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Order(1)
 public class APISecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Value("${http.auth-token}")
-    private String authToken;
+    private final String authToken;
+
+    public APISecurityConfiguration(@Value("${http.auth-token}") String authToken) {
+        this.authToken = authToken;
+    }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
