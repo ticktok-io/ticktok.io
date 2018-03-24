@@ -97,25 +97,25 @@ class AppDriver {
         assertThat(lastResponseBody.get("url").asString, `is`(withoutToken(lastResponseLocation())))
     }
 
-    private fun withoutToken(url: String): String {
-        return url.substring(0, url.indexOf("?"));
-    }
-
-    private fun getAsJson(url: String): JsonObject? {
-        return Gson().fromJson<JsonObject>(
-                Request.Get(url).execute().returnContent().asString(),
-                JsonObject::class.java)
-    }
-
     private fun lastResponseBody(): JsonObject {
         val respBody = EntityUtils.toString(lastResponse!!.entity)
         return Gson().fromJson(respBody, JsonObject::class.java)
+    }
+
+    private fun withoutToken(url: String): String {
+        return url.substring(0, url.indexOf("?"));
     }
 
     private fun lastResponseLocation(): String {
         val location = lastResponse!!.getFirstHeader("Location").value
         Assertions.assertFalse(location.isNullOrEmpty(), "Location header is empty")
         return location
+    }
+
+    private fun getAsJson(url: String): JsonObject? {
+        return Gson().fromJson<JsonObject>(
+                Request.Get(url).execute().returnContent().asString(),
+                JsonObject::class.java)
     }
 
     fun deleteClock(clock: Clock) {

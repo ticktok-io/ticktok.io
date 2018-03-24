@@ -3,8 +3,7 @@ package io.ticktok.server;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.net.URI;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -13,9 +12,11 @@ public class ClockResource extends Clock {
 
     private String url;
 
-    public ClockResource(URI resourceUrl, Clock clock) {
+    public ClockResource(String domain, Clock clock) {
         super(clock.getId(), clock.getSchedule(), null);
-        this.url = resourceUrl.toString();
+        this.url = UriComponentsBuilder.fromHttpUrl(domain)
+                .path("/api/v1/clocks/{id}")
+                .buildAndExpand(clock.getId()).toUriString();
     }
 
 }

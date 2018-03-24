@@ -33,6 +33,7 @@ public class ClocksController {
 
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final String rabbitUri;
+
     private final ClocksRepository clocksRepository;
     private final String domain;
 
@@ -78,28 +79,22 @@ public class ClocksController {
                 }
             }
         });
+        ClockResource clockResource = new ClockResource(domain, savedClock);
         return ResponseEntity.created(
-                createUriFor(savedClock, principal))
-                .body(new ClockResource(createUriFor(savedClock), savedClock));
+                withAuthToken(clockResource.getUrl(), principal))
+                .body(new ClockResource(domain, savedClock));
     }
 
-    private URI createUriFor(Clock clock, Principal principal) {
-        return UriComponentsBuilder.fromHttpUrl(domain)
-                .path("/api/v1/clocks/{id}")
+    private URI withAuthToken(String clockUrl, Principal principal) {
+        return UriComponentsBuilder.fromUriString(clockUrl)
                 .queryParam("access_token", principal.getName())
-                .buildAndExpand(clock.getId()).toUri();
-    }
-
-    private URI createUriFor(Clock clock) {
-        return UriComponentsBuilder.fromHttpUrl(domain)
-                .path("/api/v1/clocks/{id}")
-                .buildAndExpand(clock.getId()).toUri();
+                .build().toUri();
     }
 
     @GetMapping("/{id}")
     public ClockDetails findOne(@PathVariable("id") String id) {
         Clock clock = clocksRepository.findOne(id);
-        return new ClockResource(createUriFor(clock), clock);
+        return new ClockResource(domain, clock);
     }
 
     @DeleteMapping("/{id}")
@@ -111,7 +106,7 @@ public class ClocksController {
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll() {
         return clocksRepository.findAll().stream().map(c ->
-                new ClockResource(createUriFor(c), c)).collect(Collectors.toList());
+                new ClockResource(domain, c)).collect(Collectors.toList());
     }
 
 }

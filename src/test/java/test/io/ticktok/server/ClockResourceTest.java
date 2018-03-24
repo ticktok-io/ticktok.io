@@ -2,6 +2,7 @@ package test.io.ticktok.server;
 
 import io.ticktok.server.Clock;
 import io.ticktok.server.ClockResource;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -13,7 +14,7 @@ class ClockResourceTest {
 
     public static final Clock CLOCK = new Clock("id", "at.schedule", null);
 
-    private final ClockResource resource = new ClockResource(URI.create("http://kuku"), CLOCK);
+    private final ClockResource resource = new ClockResource("http://kuku", CLOCK);
 
     @Test
     void delegateClock() {
@@ -23,6 +24,6 @@ class ClockResourceTest {
 
     @Test
     void retrieveResourceUrl() {
-        assertThat(resource.getUrl(), is("http://kuku"));
+        assertThat(resource.getUrl(), CoreMatchers.startsWith("http://kuku"));
     }
 }
