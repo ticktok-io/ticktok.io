@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @Api(tags = {"clocks"})
 @RestController
@@ -46,10 +47,10 @@ public class ClocksController {
 
     @PostMapping
     @ApiOperation("Create a new clock")
-    public ResponseEntity<Clock> create(@RequestBody Clock clock, Principal principal) {
-        Clock savedClock = clocksRepository.save(clock);
+    public ResponseEntity<ClockResource> create(@RequestBody ClockDetails clockDetails, Principal principal) {
+        Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
         worker.submit(new Runnable() {
-            private static final String EXCHANGE_NAME = "clock.exchange";
+            private static final String EXCHANGE_NAME = "clockRequest.exchange";
 
             @Override
             public void run() {
@@ -79,25 +80,38 @@ public class ClocksController {
         });
         return ResponseEntity.created(
                 createUriFor(savedClock, principal))
-                .body(savedClock);
+                .body(new ClockResource(createUriFor(savedClock), savedClock));
     }
 
-    private URI createUriFor(Clock savedClock, Principal principal) {
+    private URI createUriFor(Clock clock, Principal principal) {
         return UriComponentsBuilder.fromHttpUrl(domain)
                 .path("/api/v1/clocks/{id}")
                 .queryParam("access_token", principal.getName())
-                .buildAndExpand(savedClock.getId()).toUri();
+                .buildAndExpand(clock.getId()).toUri();
+    }
+
+    private URI createUriFor(Clock clock) {
+        return UriComponentsBuilder.fromHttpUrl(domain)
+                .path("/api/v1/clocks/{id}")
+                .buildAndExpand(clock.getId()).toUri();
     }
 
     @GetMapping("/{id}")
-    public Clock findOne(@PathVariable("id") String id) {
-        return clocksRepository.findOne(id);
+    public ClockDetails findOne(@PathVariable("id") String id) {
+        Clock clock = clocksRepository.findOne(id);
+        return new ClockResource(createUriFor(clock), clock);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteOne(@PathVariable("id") String id) {
+        clocksRepository.delete(id);
     }
 
     @GetMapping
     @ApiOperation("Get all defined clocks")
-    public List<Clock> findAll() {
-        return clocksRepository.findAll();
+    public List<ClockResource> findAll() {
+        return clocksRepository.findAll().stream().map(c ->
+                new ClockResource(createUriFor(c), c)).collect(Collectors.toList());
     }
 
 }

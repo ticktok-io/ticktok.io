@@ -40,7 +40,11 @@ class AppDriver {
     }
 
     private fun createAuthenticatedUrlFor(slag: String): String {
-        return "$APP_URL/$slag?access_token=$ACCESS_TOKEN"
+        return withAuthToken("$APP_URL/$slag")
+    }
+
+    private fun withAuthToken(url: String): String {
+        return "$url?access_token=$ACCESS_TOKEN"
     }
 
     private fun createClockRequestFor(timeExpr: String): String {
@@ -49,6 +53,8 @@ class AppDriver {
                 .put("clientId", CLIENT_ID)
                 .toString()
     }
+
+    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
 
     fun isHealthy() {
         assertThat(getHealthStatus(), `is`("UP"))
@@ -69,13 +75,10 @@ class AppDriver {
         assertThat(lastResponse!!.statusLine.statusCode, `is`(403))
     }
 
-    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
-
     fun clocks(matcher: Matcher<List<Clock>>) {
         val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks")).execute().returnContent().asString()
         assertThat(Gson().fromJson(response, Array<Clock>::class.java).asList(), matcher)
     }
-
 
     fun retrievedRegisteredClock(clockExpr: String) {
         validateRetrievedBody(clockExpr)
@@ -90,12 +93,15 @@ class AppDriver {
 
     private fun validateRetrievedBody(clockExpr: String) {
         val lastResponseBody = lastResponseBody()
-        val url = lastResponseLocation()
         assertThat(lastResponseBody.get("schedule").asString, `is`(clockExpr))
-        assertThat(lastResponseBody.get("url").asString, `is`(url))
+        assertThat(lastResponseBody.get("url").asString, `is`(withoutToken(lastResponseLocation())))
     }
 
-    private fun getAsJson(url: String?): JsonObject? {
+    private fun withoutToken(url: String): String {
+        return url.substring(0, url.indexOf("?"));
+    }
+
+    private fun getAsJson(url: String): JsonObject? {
         return Gson().fromJson<JsonObject>(
                 Request.Get(url).execute().returnContent().asString(),
                 JsonObject::class.java)
@@ -106,14 +112,14 @@ class AppDriver {
         return Gson().fromJson(respBody, JsonObject::class.java)
     }
 
-    private fun lastResponseLocation(): String? {
+    private fun lastResponseLocation(): String {
         val location = lastResponse!!.getFirstHeader("Location").value
         Assertions.assertFalse(location.isNullOrEmpty(), "Location header is empty")
         return location
     }
 
     fun deleteClock(clock: Clock) {
-        Request.Delete(clock.url)
+        assertThat(Request.Delete(withAuthToken(clock.url)).execute().returnResponse().statusLine.statusCode, `is`(200))
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
