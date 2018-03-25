@@ -3,9 +3,9 @@ package io.ticktok.server;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -47,7 +47,11 @@ public class ClocksController {
     }
 
     @PostMapping
-    @ApiOperation("Create a new clock")
+    @ApiOperation(value="Create a new clock")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Clock created successfully", responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
+    })
     public ResponseEntity<ClockResource> create(@RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
         worker.submit(new Runnable() {
@@ -92,12 +96,14 @@ public class ClocksController {
     }
 
     @GetMapping("/{id}")
+    @ApiOperation("Retrieve a specific clock")
     public ClockDetails findOne(@PathVariable("id") String id) {
         Clock clock = clocksRepository.findOne(id);
         return new ClockResource(domain, clock);
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation("Delete a specific clock")
     public void deleteOne(@PathVariable("id") String id) {
         clocksRepository.delete(id);
     }
