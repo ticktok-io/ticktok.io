@@ -2,7 +2,9 @@ rabbit:
   uri: amqp://localhost:5672
 
 http:
-  auth-token: 7110eda4d09e062aa5e4a390b0a572ac0d2c0220
+  auth-token: a5f98e2b068ee51f90fd81c530e7fb4e306e7f42
+  domain: http://localhost:8080
+
 
 management:
   port: 8081

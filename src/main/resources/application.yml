@@ -3,6 +3,12 @@ rabbit:
 
 http:
   auth-token: ${ACCESS_TOKEN}
+  domain: ${SELF_DOMAIN}
 
 management:
   context-path: /mgmt
+
+spring:
+  data:
+    mongo:
+      uri: ${MONGO_URI}

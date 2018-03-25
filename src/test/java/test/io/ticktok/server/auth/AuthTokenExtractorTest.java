@@ -1,4 +1,4 @@
-package test.io.ticktok.broadcast.http;
+package test.io.ticktok.server.auth;
 
 import io.ticktok.server.auth.AuthTokenExtractor;
 import org.junit.jupiter.api.Test;

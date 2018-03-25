@@ -1,4 +1,4 @@
-package io.ticktok.config;
+package io.ticktok.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,18 +21,17 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("io.ticktok.server"))
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .apiInfo(apiInfo()).useDefaultResponseMessages(false);
     }
 
-    @Bean
-    public static ApiInfo apiInfo() {
+    private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Ticktok platform API")
+                .title("Ticktok.io server API")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .termsOfServiceUrl("")
                 .version("1.0.0")
-                .contact(new Contact("", "", "ticktok.dev@gmail.com"))
                 .build();
     }
 }
