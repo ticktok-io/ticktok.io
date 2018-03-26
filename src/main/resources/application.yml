@@ -10,5 +10,5 @@ management:
 
 spring:
   data:
-    mongo:
+    mongodb:
       uri: ${MONGO_URI}
