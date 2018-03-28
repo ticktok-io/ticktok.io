@@ -17,5 +17,6 @@ if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == rc-* ]; then
             docker tag app ticktok/ticktok:latest
             docker push ticktok/ticktok:latest
         fi
+        echo $IMAGE uploaded to Dockerhub
     fi
 fi
