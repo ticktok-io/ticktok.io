@@ -56,8 +56,10 @@ jobs:
 
       - deploy:
           name: Deploy ticktok server
-          timeout: 1
+          no_output_timeout: 5s
           command: |
             .circleci/deploy_to_heroku.sh
             .circleci/publish_to_dockerhub.sh
+            .circleci/check_health.sh http://localhost:8080
+
 
