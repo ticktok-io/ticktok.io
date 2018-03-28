@@ -61,8 +61,8 @@ jobs:
             .circleci/publish_to_dockerhub.sh
 
       - run:
-        name: Health check
-        command: .circleci/check_health.sh http://localhost:8080
-        no_output_timeout: 30s
+          name: Health check
+          command: .circleci/check_health.sh http://localhost:8080
+          no_output_timeout: 30s
 
 
