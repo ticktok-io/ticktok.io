@@ -59,7 +59,7 @@ jobs:
           no_output_timeout: 40s
           command: |
             .circleci/deploy_to_heroku.sh
-            .circleci/publish_to_dockerhub.sh:
+            .circleci/publish_to_dockerhub.sh
 
 
 
