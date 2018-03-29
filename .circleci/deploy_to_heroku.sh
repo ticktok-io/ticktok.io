@@ -4,15 +4,26 @@ set -e
 
 HEROKU=registry.heroku.com
 
+check_health() {
+    echo checking health...
+    until [[ $(curl --silent  --fail $1/mgmt/health/ 2>&1 | grep '"UP"') != "" ]]; do
+        sleep 1
+    done
+    echo ticktok.io is healthy!
+}
+
+
 if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
     if [ "$CIRCLE_BRANCH" == "master" ]; then
-        IMAGE=$HEROKU/ticktok-io-demo/web
+        HEROKU_APP=ticktok-io-demo
     else
-        IMAGE=$HEROKU/ticktok-io-dev/web
+        HEROKU_APP=ticktok-io-dev
     fi
+    IMAGE=$HEROKU/$HEROKU_APP/web
     echo $(heroku auth:token) | docker login --username=_ --password-stdin $HEROKU
     echo image: $IMAGE
     docker tag app $IMAGE
     docker push $IMAGE
     echo $IMAGE deployed to heroku
+    check_health https://$HEROKU_APP.herokuapp.com
 fi

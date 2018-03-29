@@ -59,10 +59,11 @@ jobs:
           command: |
             .circleci/deploy_to_heroku.sh
             .circleci/publish_to_dockerhub.sh
+          no_output_timeout: 5s
 
       - run:
           name: Health check
-          command: .circleci/check_health.sh http://localhost:8080
-          no_output_timeout: 1m
+          command: .circleci/check_health.sh
+          no_output_timeout: 40s
 
 
