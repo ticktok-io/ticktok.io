@@ -25,5 +25,5 @@ if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
     docker tag app $IMAGE
     docker push $IMAGE
     echo $IMAGE deployed to heroku
-    check_health https://$HEROKU_APP.herokuapp.com
+    check_health https://$HEROKU_APP.herokuapp321.com
 fi
