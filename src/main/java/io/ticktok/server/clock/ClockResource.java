@@ -1,4 +1,4 @@
-package io.ticktok.server;
+package io.ticktok.server.clock;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

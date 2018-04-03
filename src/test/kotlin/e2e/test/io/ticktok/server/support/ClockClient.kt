@@ -1,7 +1,7 @@
 package e2e.test.io.ticktok.server.support
 
 import com.rabbitmq.client.*
-import io.ticktok.server.ClocksController.QUEUE
+import io.ticktok.server.clock.ClocksController.QUEUE
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.IOException
 import java.nio.charset.Charset

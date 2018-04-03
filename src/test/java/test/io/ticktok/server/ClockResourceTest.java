@@ -1,11 +1,9 @@
 package test.io.ticktok.server;
 
-import io.ticktok.server.Clock;
-import io.ticktok.server.ClockResource;
+import io.ticktok.server.clock.Clock;
+import io.ticktok.server.clock.ClockResource;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
-
-import java.net.URI;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
