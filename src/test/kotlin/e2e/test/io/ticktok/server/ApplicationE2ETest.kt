@@ -5,7 +5,6 @@ import e2e.test.io.ticktok.server.support.AppDriver.ClockMatcher.Companion.conta
 import e2e.test.io.ticktok.server.support.ClockClient
 import io.ticktok.server.clock.ClocksController.CLOCK_EXPR
 import org.hamcrest.Matchers.not
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -26,7 +25,7 @@ class ApplicationE2ETest {
     fun sendScheduledMessage() {
         val clock = app.registeredAClock(CLOCK_EXPR)
         app.retrievedRegisteredClock(CLOCK_EXPR)
-        client.receivedTheClock(clock)
+        client.receivedTickFor(clock)
     }
 
     @Test

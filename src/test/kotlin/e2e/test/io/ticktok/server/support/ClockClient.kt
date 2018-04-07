@@ -12,7 +12,7 @@ class ClockClient {
         const val QUEUE = "tick-client"
     }
 
-    fun receivedTheClock(clock: Clock) {
+    fun receivedTickFor(clock: Clock) {
         SingleTickLatch(clock.channel).await()
     }
 

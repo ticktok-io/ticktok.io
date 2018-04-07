@@ -12,7 +12,7 @@ class ClockResourceTest {
 
     public static final Clock CLOCK = new Clock("id", "at.schedule", null);
 
-    private final ClockResource resource = new ClockResource("http://kuku", CLOCK, null);
+    private final ClockResource resource = new ClockResource("http://kuku", CLOCK, "amqp://queue");
 
     @Test
     void delegateClock() {
