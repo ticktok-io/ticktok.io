@@ -12,7 +12,7 @@ class ClockResourceTest {
 
     public static final Clock CLOCK = new Clock("id", "at.schedule", null);
 
-    private final ClockResource resource = new ClockResource("http://kuku", CLOCK);
+    private final ClockResource resource = new ClockResource("http://kuku", CLOCK, null);
 
     @Test
     void delegateClock() {

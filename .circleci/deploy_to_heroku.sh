@@ -26,4 +26,6 @@ if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
     docker push $IMAGE
     echo $IMAGE deployed to heroku
     check_health https://$HEROKU_APP.herokuapp.com
+else
+    echo No deployment from $CIRCLE_BRANCH branch
 fi

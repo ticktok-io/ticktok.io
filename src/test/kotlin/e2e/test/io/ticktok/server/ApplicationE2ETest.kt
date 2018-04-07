@@ -24,9 +24,9 @@ class ApplicationE2ETest {
 
     @Test
     fun sendScheduledMessage() {
-        app.registeredAClock(CLOCK_EXPR)
+        val clock = app.registeredAClock(CLOCK_EXPR)
         app.retrievedRegisteredClock(CLOCK_EXPR)
-        client.receivedTheClock(CLOCK_EXPR)
+        client.receivedTheClock(clock)
     }
 
     @Test
@@ -54,11 +54,6 @@ class ApplicationE2ETest {
         val clock = app.registeredAClock("every.9.seconds")
         app.deleteClock(clock)
         app.clocks(not(containsClock(clock)))
-    }
-
-    @AfterEach
-    fun stopClient() {
-        client.stop()
     }
 
 }

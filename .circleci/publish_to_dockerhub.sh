@@ -19,4 +19,6 @@ if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == rc-* ]; then
         fi
         echo $IMAGE uploaded to Dockerhub
     fi
+else
+    echo No publishing from $CIRCLE_BRANCH branch
 fi
