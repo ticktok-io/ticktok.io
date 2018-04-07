@@ -26,7 +26,6 @@ class ClockClient {
                 channel = createChannel()
 
                 val consumer = object : DefaultConsumer(channel) {
-                    @Throws(IOException::class)
                     override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
                                                 properties: AMQP.BasicProperties?, body: ByteArray?) {
                         tickReceived.countDown()
@@ -40,10 +39,12 @@ class ClockClient {
         }
 
         private fun closeChannel(channel: Channel?) {
-            if (channel != null && channel.isOpen) {
-                channel.close()
+            if (isOpen(channel)) {
+                channel!!.close()
             }
         }
+
+        private fun isOpen(channel: Channel?) = channel != null && channel.isOpen
 
         private fun createChannel(): Channel {
             val channel = createConnection().createChannel()

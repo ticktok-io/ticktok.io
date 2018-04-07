@@ -4,6 +4,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Api(tags = {"clocks"})
 @RestController
 @RequestMapping("/api/v1/clocks")
@@ -71,7 +73,7 @@ public class ClocksController {
                 channel.basicPublish(ClockChannel.EXCHANGE_NAME, CLOCK_EXPR, null, "".getBytes());
                 connection.close();
             } catch (IOException | TimeoutException e) {
-                e.printStackTrace();
+                log.error("Failed to connect to the queue", e);
             }
         });
         ClockResource clockResource = createClockResourceFor(savedClock);
