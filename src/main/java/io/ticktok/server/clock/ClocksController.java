@@ -57,14 +57,8 @@ public class ClocksController {
     public ResponseEntity<ClockResource> create(@RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
         worker.submit(() -> {
-            ConnectionFactory factory = new ConnectionFactory();
             try {
-                factory.setUri(rabbitUri);
-            } catch (URISyntaxException | KeyManagementException | NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-            try {
-                Connection connection = factory.newConnection();
+                Connection connection = createConnection();
                 Channel channel = connection.createChannel();
                 channel.queueDeclare(CLOCK_QUEUE, false, false, true, new HashMap<>());
                 channel.exchangeDeclare(ClockChannel.EXCHANGE_NAME, "topic");
@@ -72,7 +66,7 @@ public class ClocksController {
 
                 channel.basicPublish(ClockChannel.EXCHANGE_NAME, CLOCK_EXPR, null, "".getBytes());
                 connection.close();
-            } catch (IOException | TimeoutException e) {
+            } catch (IOException | TimeoutException | NoSuchAlgorithmException | KeyManagementException | URISyntaxException e) {
                 log.error("Failed to connect to the queue", e);
             }
         });
@@ -80,6 +74,12 @@ public class ClocksController {
         return ResponseEntity.created(
                 withAuthToken(clockResource.getUrl(), principal))
                 .body(createClockResourceFor(savedClock));
+    }
+
+    private Connection createConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setUri(rabbitUri);
+        return factory.newConnection();
     }
 
     private URI withAuthToken(String clockUrl, Principal principal) {
