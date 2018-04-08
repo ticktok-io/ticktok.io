@@ -22,8 +22,6 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
       APP: ticktok
-      #GIT_VERSION: `git describe --tags --abbrev=0`
-      #SHORT_COMMIT_ID: `git rev-parse --short HEAD`
 
     steps:
       - checkout

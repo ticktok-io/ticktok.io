@@ -11,10 +11,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ClockResource extends Clock {
 
     private String url;
+    private ClockChannel channel;
 
-    public ClockResource(String domain, Clock clock) {
-        super(clock.getId(), clock.getSchedule(), null);
-        this.url = UriComponentsBuilder.fromHttpUrl(domain)
+    public ClockResource(String domain, Clock clock, String uri) {
+        super(clock.getId(), clock.getSchedule());
+        this.channel = new ClockChannel(uri, clock.getSchedule());
+        this.url = createUriFor(domain, clock);
+    }
+
+    private String createUriFor(String domain, Clock clock) {
+        return UriComponentsBuilder.fromHttpUrl(domain)
                 .path("/api/v1/clocks/{id}")
                 .buildAndExpand(clock.getId()).toUriString();
     }
