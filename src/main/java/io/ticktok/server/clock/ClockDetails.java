@@ -11,6 +11,5 @@ import org.springframework.data.annotation.Id;
 public class ClockDetails {
 
     private String schedule;
-    private String consumerId;
 
 }
