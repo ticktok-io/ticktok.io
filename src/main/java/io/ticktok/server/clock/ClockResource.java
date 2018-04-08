@@ -16,7 +16,11 @@ public class ClockResource extends Clock {
     public ClockResource(String domain, Clock clock, String uri) {
         super(clock.getId(), clock.getSchedule(), null);
         this.channel = new ClockChannel(uri, clock.getSchedule());
-        this.url = UriComponentsBuilder.fromHttpUrl(domain)
+        this.url = createUriFor(domain, clock);
+    }
+
+    private String createUriFor(String domain, Clock clock) {
+        return UriComponentsBuilder.fromHttpUrl(domain)
                 .path("/api/v1/clocks/{id}")
                 .buildAndExpand(clock.getId()).toUriString();
     }
