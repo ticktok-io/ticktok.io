@@ -14,7 +14,7 @@ public class ClockResource extends Clock {
     private ClockChannel channel;
 
     public ClockResource(String domain, Clock clock, String uri) {
-        super(clock.getId(), clock.getSchedule(), null);
+        super(clock.getId(), clock.getSchedule());
         this.channel = new ClockChannel(uri, clock.getSchedule());
         this.url = createUriFor(domain, clock);
     }
