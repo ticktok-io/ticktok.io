@@ -9,7 +9,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class ClockChannel {
-    public static final String EXCHANGE_NAME = "clockRequest.exchange";
+    public static final String EXCHANGE_NAME = "ticktok.clock.exchange";
 
     private String uri;
     private String exchange = EXCHANGE_NAME;
