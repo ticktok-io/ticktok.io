@@ -1,8 +1,5 @@
 package io.ticktok.server.clock;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,17 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,22 +19,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/clocks")
 public class ClocksController {
 
-    public static final String CLOCK_EXPR = "once.in.4.seconds";
-    public static final String CLOCK_QUEUE = "ticktok-queue";
-
-    private final ExecutorService worker = Executors.newSingleThreadExecutor();
-
     private final ClocksRepository clocksRepository;
     private final String domain;
-    private final String rabbitUri;
+    private final TickScheduler scheduler;
 
 
-    public ClocksController(@Value("${rabbit.uri}") String rabbitUri,
-                            @Value("${http.domain}") String domain,
-                            ClocksRepository clocksRepository) {
+    public ClocksController(@Value("${http.domain}") String domain,
+                            ClocksRepository clocksRepository,
+                            TickScheduler tickScheduler) {
         this.domain = domain;
-        this.rabbitUri = rabbitUri;
         this.clocksRepository = clocksRepository;
+        this.scheduler = tickScheduler;
     }
 
     @PostMapping
@@ -54,32 +38,17 @@ public class ClocksController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Clock created successfully", responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
     })
-    public ResponseEntity<ClockResource> create(@RequestBody ClockDetails clockDetails, Principal principal) {
+    public ResponseEntity<CreatedClockResource> create(@RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
-        worker.submit(() -> {
-            try {
-                Connection connection = createConnection();
-                Channel channel = connection.createChannel();
-                channel.queueDeclare(CLOCK_QUEUE, false, false, true, new HashMap<>());
-                channel.exchangeDeclare(ClockChannel.EXCHANGE_NAME, "topic");
-                channel.queueBind(CLOCK_QUEUE, ClockChannel.EXCHANGE_NAME, CLOCK_EXPR);
-
-                channel.basicPublish(ClockChannel.EXCHANGE_NAME, CLOCK_EXPR, null, "".getBytes());
-                connection.close();
-            } catch (IOException | TimeoutException | NoSuchAlgorithmException | KeyManagementException | URISyntaxException e) {
-                log.error("Failed to connect to the queue", e);
-            }
-        });
-        ClockResource clockResource = createClockResourceFor(savedClock);
-        return ResponseEntity.created(
-                withAuthToken(clockResource.getUrl(), principal))
-                .body(createClockResourceFor(savedClock));
+        ClockChannel channel = scheduler.scheduleFor(savedClock);
+        return createdClockEntity(savedClock, principal, channel);
     }
 
-    private Connection createConnection() throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setUri(rabbitUri);
-        return factory.newConnection();
+    private ResponseEntity<CreatedClockResource> createdClockEntity(Clock clock, Principal principal, ClockChannel channel) {
+        CreatedClockResource clockResource = new CreatedClockResource(domain, clock, channel);
+        return ResponseEntity.created(
+                withAuthToken(clockResource.getUrl(), principal))
+                .body(clockResource);
     }
 
     private URI withAuthToken(String clockUrl, Principal principal) {
@@ -88,15 +57,15 @@ public class ClocksController {
                 .build().toUri();
     }
 
-    private ClockResource createClockResourceFor(Clock clock) {
-        return new ClockResource(domain, clock, rabbitUri);
-    }
-
     @GetMapping("/{id}")
     @ApiOperation("Retrieve a specific clock")
     public ClockDetails findOne(@PathVariable("id") String id) {
         Clock clock = clocksRepository.findOne(id);
         return createClockResourceFor(clock);
+    }
+
+    private ClockResource createClockResourceFor(Clock clock) {
+        return new ClockResource(domain, clock);
     }
 
     @DeleteMapping("/{id}")

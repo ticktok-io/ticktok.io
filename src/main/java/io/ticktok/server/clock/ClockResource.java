@@ -11,11 +11,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ClockResource extends Clock {
 
     private String url;
-    private ClockChannel channel;
 
-    public ClockResource(String domain, Clock clock, String uri) {
+    public ClockResource(String domain, Clock clock) {
         super(clock.getId(), clock.getSchedule());
-        this.channel = new ClockChannel(uri, clock.getSchedule());
         this.url = createUriFor(domain, clock);
     }
 

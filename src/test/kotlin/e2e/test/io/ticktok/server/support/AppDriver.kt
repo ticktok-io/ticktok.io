@@ -88,18 +88,18 @@ class AppDriver {
     private fun validateRetrievedLocation() {
         val lastResponseBody = lastResponseBody()
         val url = lastResponseLocation()
-        assertThat(getAsJson(url), `is`(lastResponseBody))
+        assertThat(getAsClock(url), `is`(toClock(lastResponseBody)))
+    }
+
+    private fun lastResponseBody(): JsonObject {
+        val respBody = EntityUtils.toString(lastResponse!!.entity)
+        return Gson().fromJson(respBody, JsonObject::class.java)
     }
 
     private fun validateRetrievedBody(clockExpr: String) {
         val lastResponseBody = lastResponseBody()
         assertThat(lastResponseBody.get("schedule").asString, `is`(clockExpr))
         assertThat(lastResponseBody.get("url").asString, `is`(withoutToken(lastResponseLocation())))
-    }
-
-    private fun lastResponseBody(): JsonObject {
-        val respBody = EntityUtils.toString(lastResponse!!.entity)
-        return Gson().fromJson(respBody, JsonObject::class.java)
     }
 
     private fun withoutToken(url: String): String {
@@ -112,10 +112,14 @@ class AppDriver {
         return location
     }
 
-    private fun getAsJson(url: String): JsonObject? {
-        return Gson().fromJson<JsonObject>(
+    private fun getAsClock(url: String) : Clock {
+        return Gson().fromJson<Clock>(
                 Request.Get(url).execute().returnContent().asString(),
-                JsonObject::class.java)
+                Clock::class.java)
+    }
+
+    private fun toClock(clockJson: JsonObject): Clock {
+        return Gson().fromJson(clockJson, Clock::class.java)
     }
 
     fun deleteClock(clock: Clock) {
@@ -128,7 +132,9 @@ class AppDriver {
         }
 
         override fun matches(item: Any?): Boolean {
-            return (item as List<*>).firstOrNull() { it == clock } != null
+            return (item as List<*>).firstOrNull() {
+                it == clock
+            } != null
         }
 
         companion object {

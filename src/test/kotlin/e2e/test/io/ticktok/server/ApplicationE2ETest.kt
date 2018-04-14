@@ -3,7 +3,6 @@ package e2e.test.io.ticktok.server;
 import e2e.test.io.ticktok.server.support.AppDriver
 import e2e.test.io.ticktok.server.support.AppDriver.ClockMatcher.Companion.containsClock
 import e2e.test.io.ticktok.server.support.ClockClient
-import io.ticktok.server.clock.ClocksController.CLOCK_EXPR
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -12,6 +11,10 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 
 @TestInstance(PER_CLASS)
 class ApplicationE2ETest {
+
+    companion object {
+        const val CLOCK_EXPR = "once.in.3.seconds"
+    }
 
     private val app = AppDriver()
     private val client = ClockClient();

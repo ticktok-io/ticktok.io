@@ -13,7 +13,7 @@ class ClockClient {
     }
 
     fun receivedTickFor(clock: Clock) {
-        SingleTickLatch(clock.channel).await()
+        SingleTickLatch(clock.channel!!).await()
     }
 
     private inner class SingleTickLatch(val clockChannel: ClockChannel) {
