@@ -1,5 +1,6 @@
 package io.ticktok.server.clock;
 
+import io.ticktok.server.tick.TickChannel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -9,9 +10,9 @@ import lombok.ToString;
 @ToString
 public class CreatedClockResource extends ClockResource {
 
-    private ClockChannel channel;
+    private TickChannel channel;
 
-    public CreatedClockResource(String domain, Clock clock, ClockChannel channel) {
+    public CreatedClockResource(String domain, Clock clock, TickChannel channel) {
         super(domain, clock);
         this.channel = channel;
     }

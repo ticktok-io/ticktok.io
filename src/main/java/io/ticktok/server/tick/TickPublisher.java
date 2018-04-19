@@ -1,4 +1,4 @@
-package io.ticktok.server.tick.rabbit;
+package io.ticktok.server.tick;
 
 public interface TickPublisher {
 
