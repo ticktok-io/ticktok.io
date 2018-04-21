@@ -1,6 +1,6 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.tick;
 
-import io.ticktok.server.tick.TickPublisher;
+import io.ticktok.server.clock.Clock;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -13,9 +13,10 @@ public class TickScheduler {
     }
 
     public void scheduleFor(Clock clock) {
+        long tickTime = new ScheduleParser(clock.getSchedule()).nextTickTime();
         new Thread(() -> {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(tickTime - System.currentTimeMillis());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

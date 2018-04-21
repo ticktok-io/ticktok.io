@@ -34,9 +34,7 @@ class AppDriver {
         lastResponse = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
-        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_CREATED))
-        val respBody = EntityUtils.toString(lastResponse!!.entity)
-        return Gson().fromJson(respBody)
+        return Gson().fromJson(EntityUtils.toString(lastResponse!!.entity))
     }
 
     private fun createAuthenticatedUrlFor(slag: String): String {
@@ -72,7 +70,7 @@ class AppDriver {
     }
 
     fun retrieveAuthError() {
-        assertThat(lastResponse!!.statusLine.statusCode, `is`(403))
+        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_FORBIDDEN))
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
@@ -81,6 +79,7 @@ class AppDriver {
     }
 
     fun retrievedRegisteredClock(clockExpr: String) {
+        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_CREATED))
         validateRetrievedBody(clockExpr)
         validateRetrievedLocation()
     }
@@ -123,7 +122,11 @@ class AppDriver {
     }
 
     fun deleteClock(clock: Clock) {
-        assertThat(Request.Delete(withAuthToken(clock.url)).execute().returnResponse().statusLine.statusCode, `is`(200))
+        assertThat(Request.Delete(withAuthToken(clock.url)).execute().returnResponse().statusLine.statusCode, `is`(HttpStatus.SC_OK))
+    }
+
+    fun retrievedUserError() {
+        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST));
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {

@@ -1,9 +1,10 @@
 package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
-import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.ScheduleParser;
 import io.ticktok.server.tick.TickChannelFactory;
 import io.ticktok.server.tick.TickPublisher;
+import io.ticktok.server.tick.TickScheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -47,11 +48,12 @@ public class ClocksController {
     public ResponseEntity<CreatedClockResource> create(@RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
         new TickScheduler(tickPublisher).scheduleFor(savedClock);
-        return createdClockEntity(savedClock, principal, tickChannelFactory.createForSchedule(clockDetails.getSchedule()));
+        return createdClockEntity(savedClock, principal);
     }
 
-    private ResponseEntity<CreatedClockResource> createdClockEntity(Clock clock, Principal principal, TickChannel channel) {
-        CreatedClockResource clockResource = new CreatedClockResource(domain, clock, channel);
+    private ResponseEntity<CreatedClockResource> createdClockEntity(Clock clock, Principal principal) {
+        CreatedClockResource clockResource =
+                new CreatedClockResource(domain, clock, tickChannelFactory.createForSchedule(clock.getSchedule()));
         return ResponseEntity.created(
                 withAuthToken(clockResource.getUrl(), principal))
                 .body(clockResource);
@@ -84,6 +86,13 @@ public class ClocksController {
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll() {
         return clocksRepository.findAll().stream().map(this::createClockResourceFor).collect(Collectors.toList());
+    }
+
+    @ResponseStatus(value=HttpStatus.BAD_REQUEST,
+            reason="Non valid schedule expression")
+    @ExceptionHandler(ScheduleParser.ExpressionNotValidException.class)
+    public void badSchedule() {
+        // Nothing to do
     }
 
 }
