@@ -8,11 +8,11 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class CreatedClockResource extends ClockResource {
+public class ClockResourceWithChannel extends ClockResource {
 
     private TickChannel channel;
 
-    public CreatedClockResource(String domain, Clock clock, TickChannel channel) {
+    public ClockResourceWithChannel(String domain, Clock clock, TickChannel channel) {
         super(domain, clock);
         this.channel = channel;
     }

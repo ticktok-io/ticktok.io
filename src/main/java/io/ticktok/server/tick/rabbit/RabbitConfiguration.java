@@ -19,20 +19,10 @@ public class RabbitConfiguration {
     @Value("${rabbit.uri}")
     private String rabbitUri;
 
-    /*@Bean
-    public TopicExchange tickExchange() {
-        return new TopicExchange(EXCHANGE_NAME, false, false);
-    }*/
-
     @Bean
     public ConnectionFactory connectionFactory() {
         return new CachingConnectionFactory(URI.create(rabbitUri));
     }
-
-    /*@Bean
-    public AmqpAdmin amqpAdmin() {
-        return new RabbitAdmin(connectionFactory());
-    }*/
 
     @Bean
     public RabbitTemplate rabbitTemplate() {

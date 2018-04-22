@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class RabbitTickPublisher implements TickPublisher {
 
+    public static final String TICK_MESSAGE = "tick";
+    
     private final RabbitTemplate rabbitTemplate;
     private final TickChannelFactory tickChannelFactory;
 
@@ -22,7 +24,6 @@ public class RabbitTickPublisher implements TickPublisher {
     @Override
     public void publish(String schedule) {
         TickChannel channel = tickChannelFactory.createForSchedule(schedule);
-        rabbitTemplate.convertAndSend(channel.getExchange(), channel.getTopic(), "tick");
-        System.out.println("Tick sent");
+        rabbitTemplate.convertAndSend(channel.getExchange(), channel.getTopic(), TICK_MESSAGE);
     }
 }

@@ -45,15 +45,15 @@ public class ClocksController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Clock created successfully", responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
     })
-    public ResponseEntity<CreatedClockResource> create(@RequestBody ClockDetails clockDetails, Principal principal) {
+    public ResponseEntity<ClockResourceWithChannel> create(@RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
         new TickScheduler(tickPublisher).scheduleFor(savedClock);
         return createdClockEntity(savedClock, principal);
     }
 
-    private ResponseEntity<CreatedClockResource> createdClockEntity(Clock clock, Principal principal) {
-        CreatedClockResource clockResource =
-                new CreatedClockResource(domain, clock, tickChannelFactory.createForSchedule(clock.getSchedule()));
+    private ResponseEntity<ClockResourceWithChannel> createdClockEntity(Clock clock, Principal principal) {
+        ClockResourceWithChannel clockResource =
+                new ClockResourceWithChannel(domain, clock, tickChannelFactory.createForSchedule(clock.getSchedule()));
         return ResponseEntity.created(
                 withAuthToken(clockResource.getUrl(), principal))
                 .body(clockResource);
