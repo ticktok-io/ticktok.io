@@ -41,12 +41,12 @@ dependencies {
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb"
+    compile "org.springframework.boot:spring-boot-starter-amqp"
 
     //Swagger
     compile "io.springfox:springfox-swagger2:2.6.1"
     compile "io.springfox:springfox-swagger-ui:2.6.1"
 
-    compile "com.rabbitmq:amqp-client:5.1.2"
     compile "com.google.code.gson:gson:2.8.2"
 
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
