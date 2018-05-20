@@ -9,7 +9,7 @@ public class AuthTokenExtractor {
     public static final String AUTH_PARAM = "access_token";
     public static final String AUTH_HEADER = "Authorization";
 
-    private static final Pattern AUTH_HEADER_PATTERN = Pattern.compile("token ([a-z0-9]+)");
+    private static final Pattern AUTH_HEADER_PATTERN = Pattern.compile("token ([a-zA-Z0-9]+)");
     private final HttpServletRequest request;
 
     public AuthTokenExtractor(HttpServletRequest request) {

@@ -19,18 +19,28 @@ public class AuthTokenExtractorTest {
     @Test
     void retrieveEmptyStringOnNoToken() {
         when(request.getParameter(AUTH_PARAM)).thenReturn("");
-        assertThat(new AuthTokenExtractor(request).extract(), is(""));
+        assertExtractTokenIs("");
+    }
+
+    private void assertExtractTokenIs(String token) {
+        assertThat(new AuthTokenExtractor(request).extract(), is(token));
     }
 
     @Test
     void retrieveAccessTokenQueryParam() {
         when(request.getParameter(AUTH_PARAM)).thenReturn("1122");
-        assertThat(new AuthTokenExtractor(request).extract(), is("1122"));
+        assertExtractTokenIs("1122");
     }
 
     @Test
     void retrieveTokenFromHeader() {
         when(request.getHeader(AUTH_HEADER)).thenReturn("token 1122");
-        assertThat(new AuthTokenExtractor(request).extract(), is("1122"));
+        assertExtractTokenIs("1122");
+    }
+
+    @Test
+    void supportUpperCaseLetters() {
+        when(request.getHeader(AUTH_HEADER)).thenReturn("token AaSDF");
+        assertExtractTokenIs("AaSDF");
     }
 }
