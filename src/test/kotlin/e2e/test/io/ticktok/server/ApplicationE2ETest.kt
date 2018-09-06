@@ -4,6 +4,7 @@ import e2e.test.io.ticktok.server.support.AppDriver
 import e2e.test.io.ticktok.server.support.AppDriver.ClockMatcher.Companion.containsClock
 import e2e.test.io.ticktok.server.support.ClockClient
 import org.hamcrest.Matchers.not
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -62,6 +63,11 @@ class ApplicationE2ETest {
     fun failOnNonValidSchedule() {
         app.registeredAClock("non-valid")
         app.retrievedUserError();
+    }
+
+    @AfterEach
+    fun resetApp() {
+        app.reset()
     }
 }
 

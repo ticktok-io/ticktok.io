@@ -1,9 +1,9 @@
 package e2e.test.io.ticktok.server.support
 
-data class Clock(val schedule: String, val url: String) {
+data class Clock(val id:String, val schedule: String, val url: String) {
     var channel: ClockChannel? = null
 
-    constructor(schedule: String, url: String, channel: ClockChannel) : this(schedule, url) {
+    constructor(id: String, schedule: String, url: String, channel: ClockChannel) : this(id, schedule, url) {
         this.channel = channel
     }
 
