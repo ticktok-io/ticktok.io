@@ -4,9 +4,11 @@ import io.swagger.annotations.*;
 import io.ticktok.server.tick.ScheduleParser;
 import io.ticktok.server.tick.TickChannelFactory;
 import io.ticktok.server.tick.TickPublisher;
-import io.ticktok.server.tick.TickScheduler;
+import io.ticktok.server.tick.TickScheduler2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,7 +50,7 @@ public class ClocksController {
     })
     public ResponseEntity<ClockResourceWithChannel> create(@RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
-        new TickScheduler(tickPublisher).scheduleFor(savedClock);
+        new TickScheduler2(tickPublisher).scheduleFor(savedClock);
         return createdClockEntity(savedClock, principal);
     }
 
@@ -68,8 +71,8 @@ public class ClocksController {
     @GetMapping("/{id}")
     @ApiOperation("Retrieve a specific clock")
     public ClockDetails findOne(@PathVariable("id") String id) {
-        Clock clock = clocksRepository.findOne(id);
-        return createClockResourceFor(clock);
+        Optional<Clock> clock = clocksRepository.findById(id);
+        return createClockResourceFor(clock.get());
     }
 
     private ClockResource createClockResourceFor(Clock clock) {
@@ -79,7 +82,7 @@ public class ClocksController {
     @DeleteMapping("/{id}")
     @ApiOperation("Delete a specific clock")
     public void deleteOne(@PathVariable("id") String id) {
-        clocksRepository.delete(id);
+        clocksRepository.deleteById(id);
     }
 
     @GetMapping

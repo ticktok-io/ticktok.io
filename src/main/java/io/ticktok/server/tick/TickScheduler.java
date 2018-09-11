@@ -1,28 +1,27 @@
 package io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
-import lombok.extern.slf4j.Slf4j;
+import io.ticktok.server.clock.ClocksRepository;
 
-@Slf4j
+import java.util.List;
+
 public class TickScheduler {
 
-    private final TickPublisher tickPublisher;
+    private final ClocksRepository clocksRepository;
 
-    public TickScheduler(TickPublisher tickPublisher) {
-        this.tickPublisher = tickPublisher;
+    public TickScheduler(ClocksRepository clocksRepository) {
+        this.clocksRepository = clocksRepository;
     }
 
-    public void scheduleFor(Clock clock) {
-        long tickTime = new ScheduleParser(clock.getSchedule()).nextTickTime();
-        new Thread(() -> {
-            try {
-                Thread.sleep(tickTime - System.currentTimeMillis());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            tickPublisher.publish(clock.getSchedule());
 
-        }).start();
+    // 1. get next tick
+    // 2. add it to ticks
+    // 3. save it to clocks
+    public void schedule() {
+        List<Clock> clocks = clocksRepository.findAll();
+        clocks.forEach(clock -> {
+            clocksRepository.updateLatestScheduledTick(clock.getId(), clock.nextTick());
+        });
     }
 
 }

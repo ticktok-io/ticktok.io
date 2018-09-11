@@ -13,13 +13,12 @@ class ScheduleParserTest {
     @Test
     void shouldFailOnInvalidExpression() {
         assertThrows(ExpressionNotValidException.class, () ->
-                new ScheduleParser("invalid schedule").nextTickTime());
+                new ScheduleParser("invalid schedule").interval());
     }
 
     @Test
-    void retrieveTimeForOnceInXSeconds() {
-        long sixSecondsFromNow = (System.currentTimeMillis() + 6000) / 1000;
-        MatcherAssert.assertThat(new ScheduleParser("once.in.6.seconds").nextTickTime() / 1000, is(sixSecondsFromNow));
+    void retrieveIntervalForEveryXSecs() {
+        MatcherAssert.assertThat(new ScheduleParser("every.6.seconds").interval(), is(6));
     }
 
 

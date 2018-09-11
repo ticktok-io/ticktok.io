@@ -74,7 +74,7 @@ class AppDriver {
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("http://localhost:8081/health").execute().returnContent().asString()
+        val health = Request.Get("http://localhost:8081/actuator/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 

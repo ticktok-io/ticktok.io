@@ -10,6 +10,6 @@ import org.springframework.data.annotation.Id;
 @ToString
 public class ClockDetails {
 
-    private String schedule;
+    protected String schedule;
 
 }

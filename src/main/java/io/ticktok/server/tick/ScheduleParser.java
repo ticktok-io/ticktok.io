@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class ScheduleParser {
 
-    public static final Pattern ONCE_IN_PATTERN = Pattern.compile("once\\.in\\.(\\d+)\\.seconds");
+    public static final Pattern EVERY_PATTERN = Pattern.compile("every\\.(\\d+)\\.seconds");
 
     private final String schedule;
 
@@ -14,20 +14,12 @@ public class ScheduleParser {
         this.schedule = schedule;
     }
 
-    public long nextTickTime() {
-        Matcher matcher = ONCE_IN_PATTERN.matcher(schedule);
+    public int interval() {
+        Matcher matcher = EVERY_PATTERN.matcher(schedule);
         if(!matcher.find()) {
             throw new ExpressionNotValidException("I can't understand the schedule: " + schedule);
         }
-        return now() + toMillis(Integer.valueOf(matcher.group(1)));
-    }
-
-    protected long now() {
-        return Clock.systemUTC().millis();
-    }
-
-    private long toMillis(int minutes) {
-        return minutes * 1000;
+        return Integer.valueOf(matcher.group(1));
     }
 
     public static class ExpressionNotValidException extends RuntimeException {
