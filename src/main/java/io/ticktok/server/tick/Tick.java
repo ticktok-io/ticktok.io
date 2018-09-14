@@ -11,12 +11,17 @@ import org.springframework.data.annotation.Id;
 @ToString
 public class Tick {
 
+    public static final String PENDING = "PENDING";
+
     @Id
     private String id;
+
     private String clockId;
     private long time;
+    private String status;
+
 
     public static Tick create(String clockId, long time) {
-        return new Tick(null, clockId, time);
+        return new Tick(null, clockId, time, PENDING);
     }
 }

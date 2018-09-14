@@ -7,6 +7,9 @@ import java.util.List;
 
 public class TickScheduler {
 
+    public static final int SECOND = 1000;
+    public static final int BUFFER = 10 * SECOND;
+
     private final ClocksRepository clocksRepository;
     private final TicksRepository ticksRepository;
 
@@ -15,21 +18,17 @@ public class TickScheduler {
         this.ticksRepository = ticksRepository;
     }
 
-
-    // 1. get next tick
-    // 2. add it to ticks
-    // 3. save it to clocks
     public void schedule() {
-        List<Clock> clocks = clocksRepository.findByLatestScheduledTickLessThanEqual(TenSecondsFromNow());
+        List<Clock> clocks = clocksRepository.findByLatestScheduledTickLessThanEqual(now() + BUFFER);
         clocks.forEach(clock -> {
             long nextTickTime = clock.nextTick();
-            clocksRepository.updateLatestScheduledTick(clock.getId(), nextTickTime);
             ticksRepository.save(Tick.create(clock.getId(), nextTickTime));
+            clocksRepository.updateLatestScheduledTick(clock.getId(), nextTickTime);
         });
     }
 
-    private long TenSecondsFromNow() {
-        return System.currentTimeMillis() + 10 * 1000;
+    protected long now() {
+        return System.currentTimeMillis();
     }
 
 }
