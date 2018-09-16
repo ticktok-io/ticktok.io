@@ -22,7 +22,7 @@ public class TickScheduler {
         List<Clock> clocks = clocksRepository.findByLatestScheduledTickLessThanEqual(now() + BUFFER);
         clocks.forEach(clock -> {
             long nextTickTime = clock.nextTick();
-            ticksRepository.save(Tick.create(clock.getId(), nextTickTime));
+            ticksRepository.save(Tick.create(clock, nextTickTime));
             clocksRepository.updateLatestScheduledTick(clock.getId(), nextTickTime);
         });
     }

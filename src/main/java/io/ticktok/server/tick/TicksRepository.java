@@ -2,5 +2,10 @@ package io.ticktok.server.tick;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface TicksRepository extends MongoRepository<Tick, String> {
+import java.util.List;
+
+public interface TicksRepository extends MongoRepository<Tick, String>, UpdateTicksRepository {
+
+    List<Tick> findByStatusAndTimeLessThanEqual(String status, long time);
+
 }

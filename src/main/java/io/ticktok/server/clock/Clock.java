@@ -23,6 +23,12 @@ public class Clock extends ClockDetails {
         this.latestScheduledTick = latestScheduledTick;
     }
 
+    public Clock(String id, String schedule) {
+        super(schedule);
+        this.id = id;
+    }
+
+
     public static Clock createFrom(ClockDetails clockDetails) {
         return new Clock(null, clockDetails.getSchedule(), System.currentTimeMillis());
     }

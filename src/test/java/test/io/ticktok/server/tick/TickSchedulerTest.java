@@ -8,6 +8,7 @@ import io.ticktok.server.tick.TicksRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -56,13 +57,14 @@ class TickSchedulerTest {
 
     @Test
     void scheduleNewTicks() {
-        when(clocksRepository.findByLatestScheduledTickLessThanEqual(anyLong())).thenReturn(Arrays.asList(
+        List<Clock> clocks = Arrays.asList(
                 new Clock("1", "every.2.seconds", 0L),
                 new Clock("2", "every.3.seconds", 0L)
-        ));
+        );
+        when(clocksRepository.findByLatestScheduledTickLessThanEqual(anyLong())).thenReturn(clocks);
         schedule();
-        verify(ticksRepository).save(Tick.create("1", 2000L));
-        verify(ticksRepository).save(Tick.create("2", 3000L));
+        verify(ticksRepository).save(Tick.create(clocks.get(0), 2000L));
+        verify(ticksRepository).save(Tick.create(clocks.get(1), 3000L));
     }
 
     class FixedTimeTickScheduler extends TickScheduler {

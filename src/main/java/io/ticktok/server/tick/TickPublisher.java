@@ -2,5 +2,5 @@ package io.ticktok.server.tick;
 
 public interface TickPublisher {
 
-    void publish(String name);
+    void publish(String schedule);
 }
