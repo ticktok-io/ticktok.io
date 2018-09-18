@@ -15,9 +15,9 @@ public class ClocksRepositoryImpl implements UpdateClocksRepository {
 
     @Override
     public void updateLatestScheduledTick(String id, long time) {
-        /*mongo.updateFirst(
+        mongo.updateFirst(
                 Query.query(Criteria.where("id").is(id)),
                 Update.update("latestScheduledTick", time),
-                Clock.class);*/
+                Clock.class);
     }
 }

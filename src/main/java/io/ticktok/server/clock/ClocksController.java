@@ -50,7 +50,7 @@ public class ClocksController {
     })
     public ResponseEntity<ClockResourceWithChannel> create(@RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
-        new TickScheduler2(tickPublisher).scheduleFor(savedClock);
+        //new TickScheduler2(tickPublisher).scheduleFor(savedClock);
         return createdClockEntity(savedClock, principal);
     }
 

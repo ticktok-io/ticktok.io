@@ -15,11 +15,15 @@ public class ScheduleParser {
     }
 
     public int interval() {
+        return Integer.valueOf(getMatcher().group(1));
+    }
+
+    private Matcher getMatcher() {
         Matcher matcher = EVERY_PATTERN.matcher(schedule);
         if(!matcher.find()) {
-            throw new ExpressionNotValidException("I can't understand the schedule: " + schedule);
+            throw new ExpressionNotValidException("Unable to understand the schedule: " + schedule);
         }
-        return Integer.valueOf(matcher.group(1));
+        return matcher;
     }
 
     public static class ExpressionNotValidException extends RuntimeException {

@@ -1,7 +1,10 @@
 package io.ticktok.server.tick;
 
-public class TickExecutor {
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
+@EnableScheduling
+public class TickExecutor {
 
     private final TicksRepository ticksRepository;
     private final TickPublisher tickPublisher;
@@ -11,6 +14,7 @@ public class TickExecutor {
         this.tickPublisher = tickPublisher;
     }
 
+    @Scheduled(fixedRate = 1000)
     public void execute() {
         ticksRepository.findByStatusAndTimeLessThanEqual(Tick.PENDING, now()).forEach(t -> {
             ticksRepository.updateTickStatus(t.getId(), Tick.IN_PROGRESS);

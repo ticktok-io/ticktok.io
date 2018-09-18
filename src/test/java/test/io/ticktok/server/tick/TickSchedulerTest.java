@@ -38,7 +38,7 @@ class TickSchedulerTest {
     @Test
     void fetchOnlyClocksWithPastScheduledTicks() {
         schedule();
-        verify(clocksRepository).findByLatestScheduledTickLessThanEqual(NOW + TickScheduler.BUFFER);
+        verify(clocksRepository).findByLatestScheduledTickLessThanEqual(NOW + TickScheduler.LOOK_AHEAD);
     }
 
 
