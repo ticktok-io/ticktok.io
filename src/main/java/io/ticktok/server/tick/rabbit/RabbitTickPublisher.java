@@ -24,7 +24,6 @@ public class RabbitTickPublisher implements TickPublisher {
     @Override
     public void publish(String schedule) {
         TickChannel channel = tickChannelFactory.createForSchedule(schedule);
-        System.out.println("Publish " + channel);
         rabbitTemplate.convertAndSend(channel.getExchange(), channel.getTopic(), TICK_MESSAGE);
     }
 }

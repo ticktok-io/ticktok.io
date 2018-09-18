@@ -32,7 +32,6 @@ public class ClocksController {
 
     public ClocksController(@Value("${http.domain}") String domain,
                             ClocksRepository clocksRepository,
-                            TickPublisher tickPublisher,
                             TickChannelFactory tickChannelFactory) {
         this.domain = domain;
         this.clocksRepository = clocksRepository;
@@ -85,13 +84,6 @@ public class ClocksController {
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll() {
         return clocksRepository.findAll().stream().map(this::createClockResourceFor).collect(Collectors.toList());
-    }
-
-    @ResponseStatus(value=HttpStatus.BAD_REQUEST,
-            reason="Non valid schedule expression")
-    @ExceptionHandler(ScheduleParser.ExpressionNotValidException.class)
-    public void badSchedule() {
-        // Nothing to do
     }
 
 }
