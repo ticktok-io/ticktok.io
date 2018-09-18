@@ -2,6 +2,7 @@ package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
 import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.clock.schedule.ScheduleParser;
 import io.ticktok.server.tick.TickChannelFactory;
 import io.ticktok.server.tick.TickPublisher;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
@@ -26,7 +28,6 @@ public class ClocksController {
     private final ClocksRepository clocksRepository;
     private final String domain;
     private final TickChannelFactory tickChannelFactory;
-    private final TickPublisher tickPublisher;
 
 
     public ClocksController(@Value("${http.domain}") String domain,
@@ -35,7 +36,6 @@ public class ClocksController {
                             TickChannelFactory tickChannelFactory) {
         this.domain = domain;
         this.clocksRepository = clocksRepository;
-        this.tickPublisher = tickPublisher;
         this.tickChannelFactory = tickChannelFactory;
     }
 
@@ -45,9 +45,8 @@ public class ClocksController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Clock created successfully", responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
     })
-    public ResponseEntity<ClockResourceWithChannel> create(@RequestBody ClockDetails clockDetails, Principal principal) {
+    public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
-        //new TickScheduler2(tickPublisher).scheduleFor(savedClock);
         return createdClockEntity(savedClock, principal);
     }
 

@@ -22,14 +22,17 @@ public class TickScheduler {
         this.ticksRepository = ticksRepository;
     }
 
-    @Scheduled(fixedRate = 2500)
+    @Scheduled(fixedRate = 2000)
     public void schedule() {
-        List<Clock> clocks = clocksRepository.findByLatestScheduledTickLessThanEqual(now() + LOOK_AHEAD);
-        clocks.forEach(clock -> {
+        toBeScheduleClocks().forEach(clock -> {
             long nextTickTime = clock.nextTick();
             ticksRepository.save(Tick.create(clock, nextTickTime));
             clocksRepository.updateLatestScheduledTick(clock.getId(), nextTickTime);
         });
+    }
+
+    private List<Clock> toBeScheduleClocks() {
+        return clocksRepository.findByLatestScheduledTickLessThanEqual(now() + LOOK_AHEAD);
     }
 
     protected long now() {

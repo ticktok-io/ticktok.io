@@ -35,6 +35,7 @@ class AppDriver {
         createdClocks.forEach {
             Request.Delete(it)
         }
+        createdClocks.clear()
     }
 
     fun registeredAClock(timeExpr: String): Clock {

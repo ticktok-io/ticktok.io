@@ -1,7 +1,6 @@
 package io.ticktok.server.tick;
 
-import io.ticktok.server.clock.ScheduleParser;
-import io.ticktok.server.clock.ScheduleParser.ExpressionNotValidException;
+import io.ticktok.server.clock.schedule.ScheduleParser;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,7 @@ class ScheduleParserTest {
 
     @Test
     void shouldFailOnInvalidExpression() {
-        assertThrows(ExpressionNotValidException.class, () ->
+        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
                 new ScheduleParser("invalid schedule").interval());
     }
 
