@@ -1,6 +1,5 @@
 package io.ticktok.server.clock;
 
-import io.ticktok.server.tick.ScheduleParser;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;

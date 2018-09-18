@@ -1,4 +1,4 @@
-package io.ticktok.server.tick;
+package io.ticktok.server.clock;
 
 import java.time.Clock;
 import java.util.regex.Matcher;

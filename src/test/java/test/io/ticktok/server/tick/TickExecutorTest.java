@@ -4,7 +4,7 @@ import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickExecutor;
 import io.ticktok.server.tick.TickPublisher;
-import io.ticktok.server.tick.TicksRepository;
+import io.ticktok.server.tick.repository.TicksRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;

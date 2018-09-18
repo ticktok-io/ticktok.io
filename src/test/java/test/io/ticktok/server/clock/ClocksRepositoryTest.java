@@ -1,7 +1,7 @@
 package test.io.ticktok.server.clock;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.ClocksRepository;
+import io.ticktok.server.clock.repository.ClocksRepository;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,4 +1,4 @@
-package io.ticktok.server.tick;
+package io.ticktok.server.tick.repository;
 
 public interface UpdateTicksRepository {
 

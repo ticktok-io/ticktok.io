@@ -1,6 +1,7 @@
-package io.ticktok.server.tick;
+package io.ticktok.server.tick.repository;
 
 import com.mongodb.client.result.UpdateResult;
+import io.ticktok.server.tick.Tick;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

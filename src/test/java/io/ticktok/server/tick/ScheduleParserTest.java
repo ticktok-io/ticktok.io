@@ -1,8 +1,8 @@
 package io.ticktok.server.tick;
 
-import io.ticktok.server.tick.ScheduleParser.ExpressionNotValidException;
+import io.ticktok.server.clock.ScheduleParser;
+import io.ticktok.server.clock.ScheduleParser.ExpressionNotValidException;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.core.Is;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.core.Is.is;

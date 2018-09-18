@@ -1,4 +1,4 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.repository;
 
 public interface UpdateClocksRepository {
 

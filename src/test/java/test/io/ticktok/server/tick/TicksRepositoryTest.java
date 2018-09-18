@@ -2,8 +2,7 @@ package test.io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.Tick;
-import io.ticktok.server.tick.TicksRepository;
-import org.junit.Assert;
+import io.ticktok.server.tick.repository.TicksRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

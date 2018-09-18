@@ -1,5 +1,6 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.repository;
 
+import io.ticktok.server.clock.Clock;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

@@ -1,5 +1,6 @@
-package io.ticktok.server.tick;
+package io.ticktok.server.tick.repository;
 
+import io.ticktok.server.tick.Tick;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

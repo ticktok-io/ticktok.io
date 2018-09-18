@@ -1,14 +1,11 @@
 package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
-import io.ticktok.server.tick.ScheduleParser;
+import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelFactory;
 import io.ticktok.server.tick.TickPublisher;
-import io.ticktok.server.tick.TickScheduler2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

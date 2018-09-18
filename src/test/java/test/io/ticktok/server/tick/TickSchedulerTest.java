@@ -1,10 +1,10 @@
 package test.io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.ClocksRepository;
+import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickScheduler;
-import io.ticktok.server.tick.TicksRepository;
+import io.ticktok.server.tick.repository.TicksRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
