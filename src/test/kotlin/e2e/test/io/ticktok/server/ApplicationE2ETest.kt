@@ -23,7 +23,7 @@ class ApplicationE2ETest {
     }
 
     @Test
-    internal fun registerANewClock() {
+    fun registerANewClock() {
         app.registeredAClock(CLOCK_EXPR)
         app.retrievedRegisteredClock(CLOCK_EXPR)
     }

@@ -65,7 +65,7 @@ public class ClocksController {
 
     @GetMapping("/{id}")
     @ApiOperation("Retrieve a specific clock")
-    public ClockDetails findOne(@PathVariable("id") String id) {
+    public ClockResource findOne(@PathVariable("id") String id) {
         Optional<Clock> clock = clocksRepository.findById(id);
         return createClockResourceFor(clock.get());
     }
