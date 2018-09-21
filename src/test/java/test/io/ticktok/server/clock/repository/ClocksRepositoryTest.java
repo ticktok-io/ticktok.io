@@ -1,8 +1,9 @@
-package test.io.ticktok.server.clock;
+package test.io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,5 +28,10 @@ class ClocksRepositoryTest {
         Clock savedClock = repository.save(new Clock());
         repository.updateLatestScheduledTick(savedClock.getId(), 111222L);
         Assert.assertThat(repository.findById(savedClock.getId()).get().getLatestScheduledTick(), is(111222L));
+    }
+
+    @AfterEach
+    void clearDb() {
+        repository.deleteAll();
     }
 }

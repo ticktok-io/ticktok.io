@@ -1,4 +1,4 @@
-package e2e.test.io.ticktok.server;
+package e2e.test.io.ticktok.server
 
 import e2e.test.io.ticktok.server.support.AppDriver
 import e2e.test.io.ticktok.server.support.AppDriver.ClockMatcher.Companion.containsClock
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 class ApplicationE2ETest {
 
     private val app = AppDriver()
-    private val client = TickListener();
+    private val client = TickListener()
 
     @BeforeAll
     fun setUp() {
@@ -23,7 +23,7 @@ class ApplicationE2ETest {
     }
 
     @Test
-    fun registerANewClock() {
+    fun registerNewClock() {
         app.registeredAClock(CLOCK_EXPR)
         app.retrievedRegisteredClock(CLOCK_EXPR)
     }
@@ -47,8 +47,8 @@ class ApplicationE2ETest {
 
     @Test
     fun retrieveConfiguredClocks() {
-        val clock1 = app.registeredAClock("every.6.seconds");
-        val clock2 = app.registeredAClock("every.10.seconds");
+        val clock1 = app.registeredAClock("every.6.seconds")
+        val clock2 = app.registeredAClock("every.10.seconds")
 
         app.clocks(containsClock(clock1))
         app.clocks(containsClock(clock2))
@@ -64,7 +64,7 @@ class ApplicationE2ETest {
     @Test
     fun failOnNonValidSchedule() {
         app.registeredAClock("non-valid")
-        app.retrievedUserError();
+        app.retrievedUserError()
     }
 
     @AfterEach

@@ -15,7 +15,8 @@ import static org.mockito.Mockito.*;
 
 class TickExecutorTest {
 
-    private static final long NOW = 1111L;
+    static final long NOW = 1111L;
+
     TicksRepository ticksRepository = mock(TicksRepository.class);
     TickPublisher tickPublisher = mock(TickPublisher.class);
 
@@ -25,24 +26,23 @@ class TickExecutorTest {
                 Tick.create(new Clock("1", "every.5.seconds"), 1000L),
                 Tick.create(new Clock("2", "every.4.seconds"), 2000L)
         };
-        stubPendingTicks(ticks);
-        execute();
+        executeGivenTick(ticks);
         Arrays.stream(ticks).forEach(t -> verify(tickPublisher).publish(t.getClock().getSchedule()));
+    }
+
+    private void executeGivenTick(Tick... ticks) {
+        stubPendingTicks(ticks);
+        new FixedTimeTickExecutor(ticksRepository, tickPublisher).execute();
     }
 
     private void stubPendingTicks(Tick... ticks) {
         when(ticksRepository.findByStatusAndTimeLessThanEqual(Tick.PENDING, NOW)).thenReturn(Arrays.asList(ticks));
     }
 
-    private void execute() {
-        new FixedTimeTickExecutor(ticksRepository, tickPublisher).execute();
-    }
-
     @Test
     void updateInProgressTickStatus() {
         Tick tick = new Tick("id", new Clock("1", "every.5.seconds"), 1000L, "PENDING");
-        stubPendingTicks(tick);
-        execute();
+        executeGivenTick(tick);
         InOrder inOrder = Mockito.inOrder(tickPublisher, ticksRepository);
         inOrder.verify(ticksRepository).updateTickStatus(tick.getId(), Tick.IN_PROGRESS);
         inOrder.verify(tickPublisher).publish(any());
@@ -51,8 +51,7 @@ class TickExecutorTest {
     @Test
     void updatePublishedTickStatus() {
         Tick tick = new Tick("id", new Clock("1", "every.5.seconds"), 1000L, "PENDING");
-        stubPendingTicks(tick);
-        execute();
+        executeGivenTick(tick);
         InOrder inOrder = Mockito.inOrder(tickPublisher, ticksRepository);
         inOrder.verify(tickPublisher).publish(any());
         inOrder.verify(ticksRepository).updateTickStatus(tick.getId(), Tick.PUBLISHED);

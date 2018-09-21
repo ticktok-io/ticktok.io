@@ -13,7 +13,7 @@ class ScheduleValidatorTest {
     }
 
     @Test
-    void passForAValidSchedule() {
+    void passGivenValidSchedule() {
         assertTrue(new ScheduleValidator().isValid("every.1.seconds", null));
     }
 }
