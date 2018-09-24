@@ -21,7 +21,7 @@ class DashboardE2ETest {
         ClockListPage(browser).verifyGreetingIs("Hello World")
     }
 
-    @Ignore @Test
+
     fun showConfiguredClocks() {
         App.registeredAClock("every.9.seconds")
         App.registeredAClock("every.4.seconds")
