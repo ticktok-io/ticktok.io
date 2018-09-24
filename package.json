@@ -1,0 +1,44 @@
+{
+  "name": "ticktok-dashboard",
+  "version": "0.1.0",
+  "description": "Dashboard for Ticktok.io server",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ticktok-io/ticktok.io.git"
+  },
+  "keywords": [
+    "rest",
+    "hateoas",
+    "spring",
+    "data",
+    "react"
+  ],
+  "author": "ticktok.io",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ticktok-io/ticktok.io/issues"
+  },
+  "homepage": "",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.4",
+    "redux": "^4.0.0",
+    "redux-form": "^7.4.2",
+    "redux-promise": "^0.6.0",
+    "webpack": "^1.12.2"
+  },
+  "scripts": {
+    "watch": "webpack --watch -d"
+  },
+  "devDependencies": {
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.7",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0"
+  }
+}

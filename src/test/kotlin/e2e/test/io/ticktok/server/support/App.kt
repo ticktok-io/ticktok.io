@@ -9,6 +9,8 @@ import org.apache.http.HttpStatus
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
 import org.apache.http.util.EntityUtils
+import org.awaitility.Awaitility
+import org.awaitility.Duration
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -17,18 +19,24 @@ import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 
-class AppDriver {
-    companion object {
-        const val APP_URL = "http://localhost:8080"
-        const val CLIENT_ID = "e2e-client"
-        const val ACCESS_TOKEN = "ct-auth-token"
-    }
+object App {
+
+    const val APP_URL = "http://localhost:8090"
+    const val CLIENT_ID = "e2e-client"
+    const val ACCESS_TOKEN = "ct-auth-token"
+
 
     private var lastResponse: HttpResponse? = null
     private val createdClocks = mutableListOf<String>()
 
-    fun start() {
+    init {
         Application.main()
+    }
+
+    private fun waitForApplicationToStart() {
+        Awaitility.await().atMost(Duration.ONE_MINUTE).until {
+            getHealthStatus() == "UP"
+        }
     }
 
     fun reset() {
@@ -138,7 +146,7 @@ class AppDriver {
     }
 
     fun deleteClock(clock: Clock) {
-        assertThat(Request.Delete(withAuthToken(clock.url)).execute().returnResponse().statusLine.statusCode, `is`(HttpStatus.SC_OK))
+        assertThat(Request.Delete(withAuthToken(clock.url!!)).execute().returnResponse().statusLine.statusCode, `is`(HttpStatus.SC_OK))
     }
 
     fun retrievedUserError() {

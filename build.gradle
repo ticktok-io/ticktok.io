@@ -38,6 +38,7 @@ dependencies {
         exclude module: "spring-boot-starter-tomcat"
     }
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    //compile "org.springframework.boot:spring-boot-starter-thymeleaf"
     compile("org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE")
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
@@ -70,11 +71,18 @@ dependencies {
     //Spring
     testCompile "org.springframework.boot:spring-boot-starter-test"
 
+    //Selenium
+    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
+    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '3.13.0'
+
+
     //Other
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
     testCompile "org.apache.httpcomponents:fluent-hc:4.5.5"
     testCompile "org.json:json:20180130"
     testCompile "com.beust:klaxon:2.1.13"
+    testCompile 'org.awaitility:awaitility:3.1.2'
+
 
 
 }
