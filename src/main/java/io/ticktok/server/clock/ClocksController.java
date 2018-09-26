@@ -1,10 +1,10 @@
 package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
-import io.ticktok.server.tick.ScheduleParser;
+import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.clock.schedule.ScheduleParser;
 import io.ticktok.server.tick.TickChannelFactory;
 import io.ticktok.server.tick.TickPublisher;
-import io.ticktok.server.tick.TickScheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -12,9 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,16 +28,13 @@ public class ClocksController {
     private final ClocksRepository clocksRepository;
     private final String domain;
     private final TickChannelFactory tickChannelFactory;
-    private final TickPublisher tickPublisher;
 
 
     public ClocksController(@Value("${http.domain}") String domain,
                             ClocksRepository clocksRepository,
-                            TickPublisher tickPublisher,
                             TickChannelFactory tickChannelFactory) {
         this.domain = domain;
         this.clocksRepository = clocksRepository;
-        this.tickPublisher = tickPublisher;
         this.tickChannelFactory = tickChannelFactory;
     }
 
@@ -45,9 +44,8 @@ public class ClocksController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Clock created successfully", responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
     })
-    public ResponseEntity<ClockResourceWithChannel> create(@RequestBody ClockDetails clockDetails, Principal principal) {
+    public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockDetails clockDetails, Principal principal) {
         Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
-        new TickScheduler(tickPublisher).scheduleFor(savedClock);
         return createdClockEntity(savedClock, principal);
     }
 
@@ -67,9 +65,8 @@ public class ClocksController {
 
     @GetMapping("/{id}")
     @ApiOperation("Retrieve a specific clock")
-    public ClockDetails findOne(@PathVariable("id") String id) {
-        Clock clock = clocksRepository.findOne(id);
-        return createClockResourceFor(clock);
+    public ClockResource findOne(@PathVariable("id") String id) {
+        return createClockResourceFor(clocksRepository.findById(id).get());
     }
 
     private ClockResource createClockResourceFor(Clock clock) {
@@ -79,20 +76,13 @@ public class ClocksController {
     @DeleteMapping("/{id}")
     @ApiOperation("Delete a specific clock")
     public void deleteOne(@PathVariable("id") String id) {
-        clocksRepository.delete(id);
+        clocksRepository.deleteById(id);
     }
 
     @GetMapping
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll() {
         return clocksRepository.findAll().stream().map(this::createClockResourceFor).collect(Collectors.toList());
-    }
-
-    @ResponseStatus(value=HttpStatus.BAD_REQUEST,
-            reason="Non valid schedule expression")
-    @ExceptionHandler(ScheduleParser.ExpressionNotValidException.class)
-    public void badSchedule() {
-        // Nothing to do
     }
 
 }

@@ -1,9 +1,11 @@
-package e2e.test.io.ticktok.server;
+package e2e.test.io.ticktok.server
 
 import e2e.test.io.ticktok.server.support.AppDriver
 import e2e.test.io.ticktok.server.support.AppDriver.ClockMatcher.Companion.containsClock
-import e2e.test.io.ticktok.server.support.ClockClient
+import e2e.test.io.ticktok.server.support.TickListener
+import e2e.test.io.ticktok.server.support.TickListener.Companion.CLOCK_EXPR
 import org.hamcrest.Matchers.not
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -12,12 +14,8 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 @TestInstance(PER_CLASS)
 class ApplicationE2ETest {
 
-    companion object {
-        const val CLOCK_EXPR = "once.in.3.seconds"
-    }
-
     private val app = AppDriver()
-    private val client = ClockClient();
+    private val client = TickListener()
 
     @BeforeAll
     fun setUp() {
@@ -25,10 +23,15 @@ class ApplicationE2ETest {
     }
 
     @Test
-    fun sendScheduledMessage() {
-        val clock = app.registeredAClock(CLOCK_EXPR)
+    fun registerNewClock() {
+        app.registeredAClock(CLOCK_EXPR)
         app.retrievedRegisteredClock(CLOCK_EXPR)
-        client.receivedTickFor(clock)
+    }
+
+    @Test
+    fun retrieveScheduledMessage() {
+        val clock = app.registeredAClock(CLOCK_EXPR)
+        client.receivedTicksFor(clock)
     }
 
     @Test
@@ -44,8 +47,8 @@ class ApplicationE2ETest {
 
     @Test
     fun retrieveConfiguredClocks() {
-        val clock1 = app.registeredAClock("once.in.6.seconds");
-        val clock2 = app.registeredAClock("once.in.10.seconds");
+        val clock1 = app.registeredAClock("every.6.seconds")
+        val clock2 = app.registeredAClock("every.10.seconds")
 
         app.clocks(containsClock(clock1))
         app.clocks(containsClock(clock2))
@@ -53,7 +56,7 @@ class ApplicationE2ETest {
 
     @Test
     fun deleteAClock() {
-        val clock = app.registeredAClock("once.in.9.seconds")
+        val clock = app.registeredAClock("every.9.seconds")
         app.deleteClock(clock)
         app.clocks(not(containsClock(clock)))
     }
@@ -61,7 +64,12 @@ class ApplicationE2ETest {
     @Test
     fun failOnNonValidSchedule() {
         app.registeredAClock("non-valid")
-        app.retrievedUserError();
+        app.retrievedUserError()
+    }
+
+    @AfterEach
+    fun resetApp() {
+        app.reset()
     }
 }
 

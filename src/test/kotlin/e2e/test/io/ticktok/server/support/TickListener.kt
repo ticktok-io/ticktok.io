@@ -7,21 +7,23 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 
-class ClockClient {
+class TickListener {
 
     companion object {
+        const val CLOCK_EXPR = "every.3.seconds"
         const val QUEUE = "tick-client"
     }
 
-    fun receivedTickFor(clock: Clock) {
-        SingleTickLatch(clock.channel!!).await()
+    fun receivedTicksFor(clock: Clock) {
+        SingleTickLatch(clock.channel!!).awaitFor(3)
+        SingleTickLatch(clock.channel!!).awaitFor(3)
     }
 
     private inner class SingleTickLatch(val clockChannel: ClockChannel) {
 
         private var tickReceived = CountDownLatch(1)
 
-        fun await() {
+        fun awaitFor(timeout: Long) {
             var channel: Channel? = null
             try {
                 channel = createChannel()
@@ -33,7 +35,7 @@ class ClockClient {
                 }
                 channel!!.basicConsume(QUEUE, true, consumer)
                 println("Listening...")
-                if (!tickReceived.await(4, TimeUnit.SECONDS)) {
+                if (!tickReceived.await(timeout + 1, TimeUnit.SECONDS)) {
                     fail("Failed to receive tick for $clockChannel")
                 }
             } finally {

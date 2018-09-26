@@ -25,16 +25,26 @@ class AppDriver {
     }
 
     private var lastResponse: HttpResponse? = null
+    private val createdClocks = mutableListOf<String>()
 
     fun start() {
         Application.main()
+    }
+
+    fun reset() {
+        createdClocks.forEach {
+            Request.Delete(it)
+        }
+        createdClocks.clear()
     }
 
     fun registeredAClock(timeExpr: String): Clock {
         lastResponse = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
-        return Gson().fromJson(EntityUtils.toString(lastResponse!!.entity))
+        val clock = Gson().fromJson<Clock>(EntityUtils.toString(lastResponse!!.entity))
+        saveClockIfCreated(clock)
+        return clock
     }
 
     private fun createAuthenticatedUrlFor(slag: String): String {
@@ -54,12 +64,18 @@ class AppDriver {
 
     inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
 
+    private fun saveClockIfCreated(clock: Clock) {
+        if (clock.url !== null) {
+            createdClocks.add(clock.url)
+        }
+    }
+
     fun isHealthy() {
         assertThat(getHealthStatus(), `is`("UP"))
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("http://localhost:8081/health").execute().returnContent().asString()
+        val health = Request.Get("http://localhost:8081/actuator/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 
@@ -111,7 +127,7 @@ class AppDriver {
         return location
     }
 
-    private fun getAsClock(url: String) : Clock {
+    private fun getAsClock(url: String): Clock {
         return Gson().fromJson<Clock>(
                 Request.Get(url).execute().returnContent().asString(),
                 Clock::class.java)
