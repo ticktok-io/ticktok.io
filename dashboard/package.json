@@ -1,0 +1,33 @@
+{
+  "name": "ticktok-dashboard",
+  "version": "0.1.0",
+  "description": "Dashboard for Ticktok.io server",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ticktok-io/ticktok.io.git"
+  },
+  "author": "ticktok.io",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ticktok-io/ticktok.io/issues"
+  },
+  "homepage": "${SELF_DOMAIN}",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:8080",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.5",
+    "redux": "^4.0.0",
+    "redux-promise": "^0.6.0"
+  },
+  "devDependencies": {}
+}

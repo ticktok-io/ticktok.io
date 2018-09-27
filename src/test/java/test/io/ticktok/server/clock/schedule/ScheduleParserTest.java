@@ -1,4 +1,4 @@
-package io.ticktok.server.tick;
+package test.io.ticktok.server.clock.schedule;
 
 import io.ticktok.server.clock.schedule.ScheduleParser;
 import org.hamcrest.MatcherAssert;

@@ -26,7 +26,7 @@ class TickListener {
         fun awaitFor(timeout: Long) {
             var channel: Channel? = null
             try {
-                channel = createChannel()
+                channel = createChannelFor()
                 val consumer = object : DefaultConsumer(channel) {
                     override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
                                                 properties: AMQP.BasicProperties?, body: ByteArray?) {
@@ -43,17 +43,17 @@ class TickListener {
             }
         }
 
-        private fun createChannel(): Channel? {
-            val channel = createConnection().createChannel()
+        private fun createChannelFor(): Channel? {
+            val channel = createConnection(clockChannel.uri).createChannel()
             channel.exchangeDeclare(clockChannel.exchange, "topic")
             channel.queueDeclare(QUEUE, false, false, true, HashMap())
             channel.queueBind(QUEUE, clockChannel.exchange, clockChannel.topic)
             return channel
         }
 
-        private fun createConnection(): Connection {
+        private fun createConnection(uri: String): Connection {
             val factory = ConnectionFactory()
-            factory.host = "localhost"
+            factory.setUri(clockChannel.uri)
             return factory.newConnection()
         }
 
