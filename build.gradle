@@ -97,7 +97,7 @@ compileTestKotlin {
 
 task build_dashboard(type: Exec) {
     workingDir "dashboard"
-    commandLine "npm", "run", "build"
+    commandLine "npm", "install"
 }
 
 task copy_dashboard(type: Copy) {
