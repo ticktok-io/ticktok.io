@@ -95,13 +95,21 @@ compileTestKotlin {
     }
 }
 
-
-task webpack(type: Exec, description: 'run webpack') {
-    commandLine "$projectDir/node_modules/.bin/webpack"
+task build_dashboard(type: Exec) {
+    workingDir "dashboard"
+    commandLine "npm", "run", "build"
 }
 
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn webpack
+task copy_dashboard(type: Copy) {
+    from "dashboard/build"
+    into "src/main/resources/public"
 }
+
+compileJava {
+    dependsOn build_dashboard
+    dependsOn copy_dashboard
+
+}
+
 
 

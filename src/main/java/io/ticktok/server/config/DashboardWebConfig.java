@@ -28,7 +28,7 @@ public class DashboardWebConfig implements WebMvcConfigurer {
 
         boolean devMode = this.env.acceptsProfiles("development");
 
-        String location = devMode ? "file:///" + getProjectRootRequired()  + "/src/main/resources/static/" :"classpath:static/";
+        String location = devMode ? "file:///" + getProjectRootRequired()  + "/src/main/resources/public/" :"classpath:public/";
         Integer cachePeriod = devMode ? 0 : null;
 
         registry.addResourceHandler("/**")

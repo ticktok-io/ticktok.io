@@ -5,3 +5,4 @@ out
 build
 node_modules
 built
+src/main/resources/public
