@@ -7,11 +7,17 @@ import java.util.concurrent.TimeUnit
 
 class Browser {
 
+    companion object {
+        val APP_URL = System.getenv("APP_URL")!!
+    }
+
     lateinit var driver: WebDriver
 
     fun start() {
         driver = ChromeDriver()
-        driver.get(URI("http://localhost:8090/").toString())
+        val appUrl = URI("$APP_URL?api_key=${App.ACCESS_TOKEN}").toString()
+        println("Will open browser on: $appUrl")
+        driver.get(appUrl)
         driver.manage()?.timeouts()?.implicitlyWait(10, TimeUnit.SECONDS)
     }
 

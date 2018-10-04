@@ -4,7 +4,7 @@ import ClocksList from "./modules/clocks/clocks_list";
 
 class App extends Component {
   render() {
-    const key = new URLSearchParams(this.props.location.search).get('key');
+    const key = new URLSearchParams(this.props.location.search).get('api_key');
     return (
       <div>
         <div className="pos-f-t">
@@ -12,7 +12,7 @@ class App extends Component {
             <h4>Ticktok.io</h4>
           </nav>
           <div className="main">
-            <ClocksList serverToken={key}/>
+            <ClocksList apiKey={key}/>
           </div>
         </div>
       </div>

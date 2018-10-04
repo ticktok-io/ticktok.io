@@ -97,6 +97,7 @@ compileTestKotlin {
 
 task build_dashboard(type: Exec) {
     workingDir "dashboard"
+    environment "PUBLIC_URL", System.env.SELF_DOMAIN
     commandLine "npm", "install"
 }
 
@@ -109,6 +110,10 @@ compileJava {
     dependsOn build_dashboard
     dependsOn copy_dashboard
 
+}
+
+junitPlatformTest {
+    environment "APP_URL", "http://localhost:8080"
 }
 
 

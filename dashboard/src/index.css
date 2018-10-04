@@ -21,20 +21,18 @@ nav h4 {
 }
 
 
-input {
-    width: 100%;
-}
-
 .main {
     width: 80%;
     margin: auto;
 }
 
-form {
-    margin-top: 30px;
+.table {
+    margin-top: 30px
 }
 
-textarea {
-    width: 100%;
-    height: 500px;
+.noClocksMsg {
+    font-style: italic;
+    color: #BDBDBD;
+    text-align: center;
+    margin: 60px;
 }

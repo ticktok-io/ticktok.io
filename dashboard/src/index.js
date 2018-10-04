@@ -12,10 +12,13 @@ import './index.css';
 const createStoreWithMiddleware = applyMiddleware(ReduxPromise)(createStore);
 
 ReactDOM.render(
-  <Provider store={createStoreWithMiddleware(reducers)}>
+  <Provider store={createAppStore()}>
     <BrowserRouter>
       <Route path="/" component={App}/>
     </BrowserRouter>
   </Provider>
   ,document.querySelector('.container'));
 
+export function createAppStore() {
+  return createStoreWithMiddleware(reducers);
+}

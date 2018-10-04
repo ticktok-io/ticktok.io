@@ -1,28 +1,31 @@
 package e2e.test.io.ticktok.server.pages
 
 import e2e.test.io.ticktok.server.support.Browser
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.core.Is.`is`
-import org.openqa.selenium.WebDriver
+import org.assertj.core.api.Assertions
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 import org.openqa.selenium.support.PageFactory
 
 class ClockListPage(private val browser: Browser) {
 
-    @FindBy(id = "greeting")
-    private val greeting: WebElement? = null
+    @FindBy(className = "clock-row")
+    private val clocks: List<WebElement> = listOf()
 
     init {
         PageFactory.initElements(browser.driver, this)
     }
 
-    fun verifyGreetingIs(greeting: String) {
-        assertThat(this.greeting?.text, `is`(greeting))
+    fun containsClockWith(schedule: String) {
+        clocks.forEach { c ->
+            if (containsScheduleOnce(c.text, schedule)) return
+        }
+        Assertions.fail("$schedule not found")
     }
 
-    fun containsRowFor(schedule: String) {
-
+    private fun containsScheduleOnce(text: String, schedule: String): Boolean {
+        val regex = """\w+\.\d+\.\w+""".toRegex()
+        val matches = regex.findAll(text)
+        return matches.count() == 1 && matches.first().value == schedule
     }
 
 

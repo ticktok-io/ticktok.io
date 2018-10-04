@@ -15,12 +15,14 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postinstall": "npm run build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:8080",
   "dependencies": {
     "axios": "^0.18.0",
+    "lodash": "^4.17.11",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^5.0.7",
@@ -29,5 +31,12 @@
     "redux": "^4.0.0",
     "redux-promise": "^0.6.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "axios-mock-adapter": "^1.15.0",
+    "dom-testing-library": "^3.6.0",
+    "jest": "^23.6.0",
+    "jest-dom": "^1.12.1",
+    "react-testing-library": "^5.1.0",
+    "redux-mock-store": "^1.5.3"
+  }
 }

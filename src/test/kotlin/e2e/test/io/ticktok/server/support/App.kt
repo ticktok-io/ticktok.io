@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Assertions
 
 object App {
 
-    const val APP_URL = "http://localhost:8090"
+    const val APP_URL = "http://localhost:8080"
     const val CLIENT_ID = "e2e-client"
     const val ACCESS_TOKEN = "ct-auth-token"
 
@@ -83,7 +83,7 @@ object App {
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("http://localhost:8081/actuator/health").execute().returnContent().asString()
+        val health = Request.Get("$APP_URL/actuator/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 

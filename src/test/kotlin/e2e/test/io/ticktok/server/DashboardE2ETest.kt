@@ -20,8 +20,8 @@ class DashboardE2ETest {
     fun showConfiguredClocks() {
         App.registeredAClock("every.9.seconds")
         App.registeredAClock("every.4.seconds")
-        ClockListPage(browser).containsRowFor("every.9.seconds")
-        ClockListPage(browser).containsRowFor("every.4.seconds")
+        ClockListPage(browser).containsClockWith("every.9.seconds")
+        ClockListPage(browser).containsClockWith("every.4.seconds")
     }
 
     @AfterEach
