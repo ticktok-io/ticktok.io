@@ -34,7 +34,6 @@ class TickListener {
                     }
                 }
                 channel!!.basicConsume(QUEUE, true, consumer)
-                println("Listening...")
                 if (!tickReceived.await(timeout + 1, TimeUnit.SECONDS)) {
                     fail("Failed to receive tick for $clockChannel")
                 }

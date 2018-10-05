@@ -15,6 +15,7 @@ class ClockListPage(private val browser: Browser) {
     }
 
     fun containsClockWith(schedule: String) {
+        println("clocks: $clocks")
         clocks.forEach { c ->
             if (containsScheduleOnce(c.text, schedule)) return
         }
