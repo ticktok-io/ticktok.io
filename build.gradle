@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.3.RELEASE")
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.2.0'
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
@@ -16,12 +15,11 @@ apply plugin: 'kotlin'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
 
 bootJar {
     baseName = 'ticktok'
-    version =  '0.1.1'
+    version =  '0.1.2'
 }
 
 sourceCompatibility = 1.8
@@ -121,9 +119,10 @@ clean {
     dependsOn cleanDashboard
 }
 
-junitPlatformTest {
+test {
     environment "DASHBOARD_URL", "http://localhost:8080"
     environment "SELF_DOMAIN", "http://localhost:8080"
+    useJUnitPlatform()
 }
 
 
