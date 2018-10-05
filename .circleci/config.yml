@@ -47,6 +47,9 @@ jobs:
       # run tests!
       - run: ./gradlew build
 
+      - store_artifacts:
+          path: /tmp/ticktok-artifacts
+
       - run:
           name: Build application Docker image
           command: docker build -t app .
