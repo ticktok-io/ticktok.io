@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 class Browser {
 
     companion object {
-        val APP_URL = System.getenv("APP_URL")!!
+        val APP_URL = System.getenv("DASHBOARD_URL")!!
     }
 
     lateinit var driver: WebDriver

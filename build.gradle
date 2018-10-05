@@ -40,7 +40,7 @@ dependencies {
         exclude module: "spring-boot-starter-tomcat"
     }
     compile("org.springframework.boot:spring-boot-starter-actuator")
-    //compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
     compile("org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE")
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
@@ -97,7 +97,7 @@ compileTestKotlin {
 
 task build_dashboard(type: Exec) {
     workingDir "dashboard"
-    environment "PUBLIC_URL", System.env.SELF_DOMAIN
+    environment "PUBLIC_URL", ' '
     commandLine "npm", "install"
 }
 
@@ -112,8 +112,17 @@ compileJava {
 
 }
 
+task cleanDashboard(type: Delete) {
+    delete "$projectDir/src/main/resources/public"
+}
+
+clean {
+    dependsOn cleanDashboard
+}
+
 junitPlatformTest {
-    environment "APP_URL", "http://localhost:8080"
+    environment "DASHBOARD_URL", "http://localhost:8080"
+    environment "SELF_DOMAIN", "http://localhost:8080"
 }
 
 
