@@ -1,5 +1,6 @@
-package e2e.test.io.ticktok.server.support
+package e2e.test.io.ticktok.server.pages
 
+import e2e.test.io.ticktok.server.support.App
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import java.net.URI

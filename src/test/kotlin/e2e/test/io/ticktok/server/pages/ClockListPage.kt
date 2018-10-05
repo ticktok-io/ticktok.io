@@ -1,6 +1,5 @@
 package e2e.test.io.ticktok.server.pages
 
-import e2e.test.io.ticktok.server.support.Browser
 import org.assertj.core.api.Assertions
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy

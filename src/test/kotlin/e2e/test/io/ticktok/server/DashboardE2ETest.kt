@@ -2,8 +2,7 @@ package e2e.test.io.ticktok.server
 
 import e2e.test.io.ticktok.server.pages.ClockListPage
 import e2e.test.io.ticktok.server.support.App
-import e2e.test.io.ticktok.server.support.Browser
-import org.junit.Ignore
+import e2e.test.io.ticktok.server.pages.Browser
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

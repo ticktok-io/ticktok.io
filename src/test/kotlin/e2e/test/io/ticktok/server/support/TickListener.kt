@@ -2,7 +2,7 @@ package e2e.test.io.ticktok.server.support
 
 import com.rabbitmq.client.*
 import org.junit.jupiter.api.fail
-import java.util.HashMap
+import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 

@@ -9,8 +9,6 @@ import org.apache.http.HttpStatus
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
 import org.apache.http.util.EntityUtils
-import org.awaitility.Awaitility
-import org.awaitility.Duration
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -33,24 +31,25 @@ object App {
         Application.main()
     }
 
-    private fun waitForApplicationToStart() {
-        Awaitility.await().atMost(Duration.ONE_MINUTE).until {
-            getHealthStatus() == "UP"
-        }
-    }
-
     fun reset() {
         createdClocks.forEach {
-            Request.Delete(it)
+            deleteClock(it)
         }
         createdClocks.clear()
     }
+
+    private fun deleteClock(url: String) {
+        val response = Request.Delete(withAuthToken(url)).execute().returnResponse()
+        assert(response.statusLine.statusCode in 200..299) { "Failed to delete with error: ${bodyOf(response)}" }
+    }
+
+    private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
 
     fun registeredAClock(timeExpr: String): Clock {
         lastResponse = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
-        val clock = Gson().fromJson<Clock>(EntityUtils.toString(lastResponse!!.entity))
+        val clock = Gson().fromJson<Clock>(bodyOf(lastResponse!!))
         saveClockIfCreated(clock)
         return clock
     }
@@ -70,7 +69,7 @@ object App {
                 .toString()
     }
 
-    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
+    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
     private fun saveClockIfCreated(clock: Clock) {
         if (clock.url !== null) {
@@ -126,7 +125,7 @@ object App {
     }
 
     private fun withoutToken(url: String): String {
-        return url.substring(0, url.indexOf("?"));
+        return url.substring(0, url.indexOf("?"))
     }
 
     private fun lastResponseLocation(): String {
@@ -146,11 +145,11 @@ object App {
     }
 
     fun deleteClock(clock: Clock) {
-        assertThat(Request.Delete(withAuthToken(clock.url!!)).execute().returnResponse().statusLine.statusCode, `is`(HttpStatus.SC_OK))
+        assertThat(Request.Delete(withAuthToken(clock.url)).execute().returnResponse().statusLine.statusCode, `is`(HttpStatus.SC_OK))
     }
 
     fun retrievedUserError() {
-        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST));
+        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
@@ -159,7 +158,7 @@ object App {
         }
 
         override fun matches(item: Any?): Boolean {
-            return (item as List<*>).firstOrNull() {
+            return (item as List<*>).firstOrNull {
                 it == clock
             } != null
         }
