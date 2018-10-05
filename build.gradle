@@ -19,9 +19,9 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.junit.platform.gradle.plugin'
 
 
-bootJar {
+jar {
     baseName = 'ticktok'
-    version = '0.1.1'
+    version =  '0.1.1'
 }
 
 sourceCompatibility = 1.8
@@ -58,7 +58,8 @@ dependencies {
     compile "io.springfox:springfox-swagger2:2.6.1"
     compile "io.springfox:springfox-swagger-ui:2.6.1"
 
-    //Tests
+    compile "com.google.code.gson:gson:2.8.2"
+
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // JUnit 5
@@ -81,9 +82,9 @@ dependencies {
     testCompile "org.apache.httpcomponents:fluent-hc:4.5.5"
     testCompile "org.json:json:20180130"
     testCompile "com.beust:klaxon:2.1.13"
-    testCompile 'org.awaitility:awaitility:3.1.2'
-}
 
+
+}
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"

@@ -1,6 +1,3 @@
-resources:
-  projectroot:
-
 rabbit:
   uri: amqp://localhost:5672
 
