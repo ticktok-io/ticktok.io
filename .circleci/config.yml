@@ -45,8 +45,6 @@ jobs:
 
       - run: ./gradlew dependencies
 
-      - run: npm install
-
       - save_cache:
           paths:
             - ~/.gradle
