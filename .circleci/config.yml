@@ -50,8 +50,13 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
+      - run:
+          name: Dashboard tests
+          command: cd dashboard && CI=true npm test
+
       # run tests!
-      - run: ./gradlew build
+      - run: ./gradlew builds
+
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts

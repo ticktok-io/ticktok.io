@@ -4,10 +4,11 @@ import {cleanup, render, wait} from "react-testing-library";
 import "jest-dom/extend-expect"
 import axios from 'axios';
 import MockAdapter from "axios-mock-adapter";
-import {createAppStore} from "../../../index";
+import {createAppStore} from "../../../store";
 
 const store = createAppStore();
 const backend = new MockAdapter(axios);
+const apiKey = '121234';
 
 beforeEach(() => {
   backend.reset()
@@ -21,11 +22,11 @@ test("Show no clocks message", () => {
 });
 
 function givenTheClocks(clocks) {
-  backend.onGet('/api/v1/clocks').reply(200, clocks);
+  backend.onGet(`/api/v1/clocks?access_token=${apiKey}`).reply(200, clocks);
 }
 
 let renderClockList = function () {
-  return render(<ClocksList store={store}/>);
+  return render(<ClocksList store={store} apiKey={apiKey}/>);
 };
 
 test("Show fetched clocks", async () => {
