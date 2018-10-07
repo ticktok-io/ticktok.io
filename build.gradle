@@ -100,6 +100,12 @@ task build_dashboard(type: Exec) {
     commandLine "npm", "install"
 }
 
+task test_dashboard(type: Exec) {
+    workingDir "dashboard"
+    environment "CI", "true"
+    commandLine "npm", "test"
+}
+
 task copy_dashboard(type: Copy) {
     from "dashboard/build"
     into "src/main/resources/public"
@@ -107,6 +113,7 @@ task copy_dashboard(type: Copy) {
 
 compileJava {
     dependsOn build_dashboard
+    dependsOn test_dashboard
     dependsOn copy_dashboard
 
 }
