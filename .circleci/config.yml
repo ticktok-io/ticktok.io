@@ -51,7 +51,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: ./gradlew build
+      - run: ./gradlew build --info
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts
