@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.70'
+    ext.kotlin_version = '1.2.71'
 
     repositories {
         mavenCentral()
@@ -32,14 +32,14 @@ repositories {
 
 dependencies {
     compileOnly "org.projectlombok:lombok:1.16.20"
+    annotationProcessor "org.projectlombok:lombok:1.16.20"
 
     // Spring
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
-    compile("org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE")
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE"
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb"
@@ -47,8 +47,6 @@ dependencies {
 
     compile "org.hibernate.validator:hibernate-validator:6.0.13.Final"
     compile "javax.validation:validation-api:2.0.1.Final"
-
-
 
     compile "com.google.code.gson:gson:2.8.2"
 

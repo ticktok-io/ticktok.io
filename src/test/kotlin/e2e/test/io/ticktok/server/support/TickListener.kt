@@ -43,14 +43,14 @@ class TickListener {
         }
 
         private fun createChannelFor(): Channel? {
-            val channel = createConnection(clockChannel.uri).createChannel()
+            val channel = createConnection().createChannel()
             channel.exchangeDeclare(clockChannel.exchange, "topic")
             channel.queueDeclare(QUEUE, false, false, true, HashMap())
             channel.queueBind(QUEUE, clockChannel.exchange, clockChannel.topic)
             return channel
         }
 
-        private fun createConnection(uri: String): Connection {
+        private fun createConnection(): Connection {
             val factory = ConnectionFactory()
             factory.setUri(clockChannel.uri)
             return factory.newConnection()
