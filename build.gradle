@@ -70,8 +70,8 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test"
 
     //Selenium
-    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
-    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '3.13.0'
+    testCompile 'org.seleniumhq.selenium:selenium-java:3.14.0'
+    testCompile 'org.seleniumhq.selenium:selenium-support:3.13.0'
 
     //Other
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
