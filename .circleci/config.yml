@@ -36,9 +36,6 @@ jobs:
           command: java -jar selenium-server-standalone-3.14.0.jar -log test-reports/selenium.log
           background: true
 
-      - store_artifacts:
-          path: test-reports
-
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -58,6 +55,9 @@ jobs:
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts
+
+      - store_artifacts:
+          path: test-reports
 
       - run:
           name: Build application Docker image
