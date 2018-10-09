@@ -76,6 +76,9 @@ jobs:
       - store_artifacts:
           path: test-reports
 
+      - store_artifacts:
+          path: build/reports/tests/test
+
       - run:
           name: Build application Docker image
           command: docker build -t app .
