@@ -43,7 +43,7 @@ jobs:
             - node-v1-{{ .Branch }}-
             - node-v1-
 
-      run: npm install --prefix dashboard
+      - run: npm install --prefix dashboard
 
       - save_cache:
           paths:
