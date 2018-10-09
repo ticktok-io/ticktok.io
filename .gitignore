@@ -3,4 +3,6 @@
 out
 .gradle
 build
-
+node_modules
+built
+src/main/resources/public

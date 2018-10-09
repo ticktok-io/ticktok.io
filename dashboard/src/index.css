@@ -1,0 +1,38 @@
+.container {
+    margin: 0;
+    width: 100%;
+    max-width: unset;
+    padding: 0;
+}
+
+.nav {
+    display:table;
+    width:100%;
+    margin: 0;
+}
+
+nav h4 {
+    color: #BDBDBD;
+}
+
+.form-inline {
+    margin-top: 30px;
+    justify-content: center;
+}
+
+
+.main {
+    width: 80%;
+    margin: auto;
+}
+
+.table {
+    margin-top: 30px
+}
+
+.noClocksMsg {
+    font-style: italic;
+    color: #BDBDBD;
+    text-align: center;
+    margin: 60px;
+}

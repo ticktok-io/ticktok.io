@@ -17,32 +17,39 @@ import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 
-class AppDriver {
-    companion object {
-        const val APP_URL = "http://localhost:8080"
-        const val CLIENT_ID = "e2e-client"
-        const val ACCESS_TOKEN = "ct-auth-token"
-    }
+object App {
+
+    const val APP_URL = "http://localhost:8080"
+    const val CLIENT_ID = "e2e-client"
+    const val ACCESS_TOKEN = "ct-auth-token"
+
 
     private var lastResponse: HttpResponse? = null
     private val createdClocks = mutableListOf<String>()
 
-    fun start() {
+    init {
         Application.main()
     }
 
     fun reset() {
         createdClocks.forEach {
-            Request.Delete(it)
+            deleteClock(it)
         }
         createdClocks.clear()
     }
+
+    private fun deleteClock(url: String) {
+        val response = Request.Delete(withAuthToken(url)).execute().returnResponse()
+        assert(response.statusLine.statusCode in 200..299) { "Failed to delete with error: ${bodyOf(response)}" }
+    }
+
+    private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
 
     fun registeredAClock(timeExpr: String): Clock {
         lastResponse = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
-        val clock = Gson().fromJson<Clock>(EntityUtils.toString(lastResponse!!.entity))
+        val clock = Gson().fromJson<Clock>(bodyOf(lastResponse!!))
         saveClockIfCreated(clock)
         return clock
     }
@@ -62,7 +69,7 @@ class AppDriver {
                 .toString()
     }
 
-    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)
+    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
     private fun saveClockIfCreated(clock: Clock) {
         if (clock.url !== null) {
@@ -75,7 +82,7 @@ class AppDriver {
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("http://localhost:8081/actuator/health").execute().returnContent().asString()
+        val health = Request.Get("$APP_URL/actuator/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 
@@ -118,7 +125,7 @@ class AppDriver {
     }
 
     private fun withoutToken(url: String): String {
-        return url.substring(0, url.indexOf("?"));
+        return url.substring(0, url.indexOf("?"))
     }
 
     private fun lastResponseLocation(): String {
@@ -142,7 +149,7 @@ class AppDriver {
     }
 
     fun retrievedUserError() {
-        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST));
+        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
@@ -151,7 +158,7 @@ class AppDriver {
         }
 
         override fun matches(item: Any?): Boolean {
-            return (item as List<*>).firstOrNull() {
+            return (item as List<*>).firstOrNull {
                 it == clock
             } != null
         }

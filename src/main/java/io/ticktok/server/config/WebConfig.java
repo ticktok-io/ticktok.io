@@ -3,10 +3,10 @@ package io.ticktok.server.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig extends WebMvcConfigurerAdapter {
+public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -20,7 +20,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         }
         registry.addResourceHandler("/docs/**").addResourceLocations("classpath:/META-INF/resources/");
     }
-
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {

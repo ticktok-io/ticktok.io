@@ -7,14 +7,13 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:8-jdk-node-browsers-legacy
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       - image: rabbitmq:3.7
       - image: mongo:3.4
-
     working_directory: ~/repo
 
     environment:
@@ -25,9 +24,33 @@ jobs:
 
     steps:
       - checkout
+
+      - run: mkdir test-reports
+      - run:
+          name: Download Selenium
+          command: curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
+      - run:
+          name: Start Selenium
+          command: java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
+          background: true
+
       - setup_remote_docker
 
-      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            # when lock file changes, use increasingly general patterns to restore cache
+            - node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
+            - node-v1-{{ .Branch }}-
+            - node-v1-
+
+      - run: npm install --prefix dashboard
+
+      - save_cache:
+          paths:
+            - dashboard/node_modules  # location depends on npm version
+          key: node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
+
+
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
@@ -41,8 +64,17 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      # run tests!
-      - run: ./gradlew build
+      - run:
+          name: Build Dashboard
+          command: PUBLIC_URL=' ' npm run build --prefix dashboard
+
+      - run: ./gradlew build --info
+
+      - store_artifacts:
+          path: /tmp/ticktok-artifacts
+
+      - store_artifacts:
+          path: test-reports
 
       - run:
           name: Build application Docker image

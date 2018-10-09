@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.61'
+    ext.kotlin_version = '1.2.71'
 
     repositories {
         mavenCentral()
@@ -19,7 +19,7 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     baseName = 'ticktok'
-    version =  '0.1.1'
+    version =  '0.1.2'
 }
 
 sourceCompatibility = 1.8
@@ -32,13 +32,14 @@ repositories {
 
 dependencies {
     compileOnly "org.projectlombok:lombok:1.16.20"
+    annotationProcessor "org.projectlombok:lombok:1.16.20"
 
     // Spring
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile("org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE")
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE"
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb"
@@ -47,16 +48,14 @@ dependencies {
     compile "org.hibernate.validator:hibernate-validator:6.0.13.Final"
     compile "javax.validation:validation-api:2.0.1.Final"
 
-
-
     compile "com.google.code.gson:gson:2.8.2"
 
     //Swagger
     compile "io.springfox:springfox-swagger2:2.6.1"
     compile "io.springfox:springfox-swagger-ui:2.6.1"
 
+    compile "com.google.code.gson:gson:2.8.2"
 
-    //Tests
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // JUnit 5
@@ -69,6 +68,10 @@ dependencies {
 
     //Spring
     testCompile "org.springframework.boot:spring-boot-starter-test"
+
+    //Selenium
+    testCompile 'org.seleniumhq.selenium:selenium-java:3.14.0'
+    testCompile 'org.seleniumhq.selenium:selenium-support:3.13.0'
 
     //Other
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
@@ -88,3 +91,29 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
+
+task copy_dashboard(type: Copy) {
+    from "dashboard/build"
+    into "src/main/resources/public"
+}
+
+compileJava {
+    dependsOn copy_dashboard
+}
+
+task cleanDashboard(type: Delete) {
+    delete "$projectDir/src/main/resources/public"
+}
+
+clean {
+    dependsOn cleanDashboard
+}
+
+test {
+    environment "DASHBOARD_URL", "http://localhost:8080"
+    environment "SELF_DOMAIN", "http://localhost:8080"
+    useJUnitPlatform()
+}
+
+
+

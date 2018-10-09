@@ -4,8 +4,3 @@ rabbit:
 http:
   auth-token: a5f98e2b068ee51f90fd81c530e7fb4e306e7f42
   domain: http://localhost:8080
-
-
-management:
-  server:
-    port: 8081
