@@ -68,16 +68,13 @@ jobs:
           name: Build Dashboard
           command: PUBLIC_URL=' ' npm run build --prefix dashboard
 
-      - run: ./gradlew build
+      - run: ./gradlew build --info
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts
 
       - store_artifacts:
           path: test-reports
-
-      - store_artifacts:
-          path: build/reports/tests/test
 
       - run:
           name: Build application Docker image
