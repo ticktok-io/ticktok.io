@@ -36,7 +36,21 @@ jobs:
 
       - setup_remote_docker
 
-      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            # when lock file changes, use increasingly general patterns to restore cache
+            - node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
+            - node-v1-{{ .Branch }}-
+            - node-v1-
+
+      run: npm install --prefix dashboard
+
+      - save_cache:
+          paths:
+            - dashboard/node_modules  # location depends on npm version
+          key: node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
+
+
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
@@ -50,8 +64,11 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      # run tests!
-      - run: ./gradlew build --info
+      - run:
+          name: Build Dashboard
+          command: PUBLIC_URL=' ' npm run build --prefix dashboard
+
+      - run: ./gradlew build
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts

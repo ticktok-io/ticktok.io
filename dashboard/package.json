@@ -13,8 +13,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "prebuild": "CI=test npm run test",
     "build": "react-scripts build",
-    "postinstall": "npm run build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
