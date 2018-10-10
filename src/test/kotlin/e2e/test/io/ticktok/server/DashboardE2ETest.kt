@@ -10,8 +10,9 @@ class DashboardE2ETest {
 
     private val browser = Browser()
 
-    @BeforeEach
-    fun startBrowser() {
+    @BeforeAll
+    fun setup() {
+        App.start()
         browser.start()
     }
 
@@ -26,6 +27,10 @@ class DashboardE2ETest {
     @AfterEach
     fun resetApp() {
         App.reset()
+    }
+
+    @AfterAll
+    fun stopBrowser() {
         browser.stop()
     }
 

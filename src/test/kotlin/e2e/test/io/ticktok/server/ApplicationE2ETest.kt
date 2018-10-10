@@ -6,6 +6,7 @@ import e2e.test.io.ticktok.server.support.TickListener
 import e2e.test.io.ticktok.server.support.TickListener.Companion.CLOCK_EXPR
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -14,6 +15,11 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 class ApplicationE2ETest {
 
     private val client = TickListener()
+
+    @BeforeAll
+    fun startApp() {
+        App.start()
+    }
 
     @Test
     fun registerNewClock() {

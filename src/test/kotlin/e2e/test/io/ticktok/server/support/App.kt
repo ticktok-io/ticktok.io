@@ -26,9 +26,13 @@ object App {
 
     private var lastResponse: HttpResponse? = null
     private val createdClocks = mutableListOf<String>()
+    private var started = false;
 
-    init {
-        Application.main()
+    fun start() {
+        if(!started) {
+            Application.main()
+            started = true
+        }
     }
 
     fun reset() {
