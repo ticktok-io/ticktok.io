@@ -11,4 +11,4 @@ spring:
       uri: ${MONGO_URI}
 
 server:
-  port: ${PORT:5000}
+  port: ${PORT:8080}
