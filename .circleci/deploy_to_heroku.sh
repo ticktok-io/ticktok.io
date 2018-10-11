@@ -28,8 +28,9 @@ if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
 #    heroku container:release web --app ticktok-io-dev
 #    echo $IMAGE deployed to heroku
 
-    heroku git:remote -a $HEROKU_APP
-    git push heroku master
+    # heroku git:remote -a $HEROKU_APP
+    git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git master
+    # git push heroku master
 
     check_health https://$HEROKU_APP.herokuapp.com
 else
