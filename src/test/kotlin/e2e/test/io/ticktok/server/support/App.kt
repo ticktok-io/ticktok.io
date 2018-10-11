@@ -86,7 +86,7 @@ object App {
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("$APP_URL/actuator/health").execute().returnContent().asString()
+        val health = Request.Get("$APP_URL/mgmt/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 

@@ -10,5 +10,9 @@ spring:
     mongodb:
       uri: ${MONGO_URI}
 
+endpoints:
+  actuator:
+    path: /mgmt
+
 server:
   port: ${PORT:8080}
