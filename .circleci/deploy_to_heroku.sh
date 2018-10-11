@@ -29,7 +29,7 @@ if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
 #    echo $IMAGE deployed to heroku
 
     # heroku git:remote -a $HEROKU_APP
-    git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git master
+    git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git HEAD:master
     # git push heroku master
 
     check_health https://$HEROKU_APP.herokuapp.com
