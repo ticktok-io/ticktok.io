@@ -39,7 +39,7 @@ dependencies {
         exclude module: "spring-boot-starter-tomcat"
     }
     compile "org.springframework.boot:spring-boot-starter-actuator"
-    compile "org.springframework.boot:spring-boot-starter-security:2.0.0.RELEASE"
+    compile "org.springframework.boot:spring-boot-starter-security:2.0.5.RELEASE"
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb"
