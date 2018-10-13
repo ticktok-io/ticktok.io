@@ -15,5 +15,3 @@ management:
     web:
       base-path: /mgmt
 
-server:
-  port: ${PORT:8080}
