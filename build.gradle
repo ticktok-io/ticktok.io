@@ -113,7 +113,7 @@ task copy_dashboard(type: Copy) {
 }
 
 compileJava {
-    dependsOn build_dashboard
+    //dependsOn build_dashboard
     dependsOn copy_dashboard
 }
 
