@@ -30,7 +30,7 @@ if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
 
     # heroku git:remote -a $HEROKU_APP
     # git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git HEAD:master
-    heroku deploy:jar build/libs/*.jar --app $HEROKU_APP
+    heroku deploy:jar build/libs/*.jar --app $HEROKU_APP -o "--server.port=\$PORT"
     # git push heroku master
 
     check_health https://$HEROKU_APP.herokuapp.com
