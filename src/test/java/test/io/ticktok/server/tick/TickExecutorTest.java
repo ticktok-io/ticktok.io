@@ -5,6 +5,7 @@ import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickExecutor;
 import io.ticktok.server.tick.TickPublisher;
 import io.ticktok.server.tick.repository.TicksRepository;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -23,11 +24,11 @@ class TickExecutorTest {
     @Test
     void publishAllPendingTicks() {
         Tick[] ticks = new Tick[]{
-                Tick.create(new Clock("1", "every.5.seconds"), 1000L),
-                Tick.create(new Clock("2", "every.4.seconds"), 2000L)
+                Tick.create(new Clock("1", "kuku", "every.5.seconds"), 1000L),
+                Tick.create(new Clock("2", "kuku", "every.4.seconds"), 2000L)
         };
         executeGivenTick(ticks);
-        Arrays.stream(ticks).forEach(t -> verify(tickPublisher).publish(t.getClock().getSchedule()));
+        Arrays.stream(ticks).forEach(t -> verify(tickPublisher).publish(t.getSchedule()));
     }
 
     private void executeGivenTick(Tick... ticks) {
@@ -41,16 +42,21 @@ class TickExecutorTest {
 
     @Test
     void updateInProgressTickStatus() {
-        Tick tick = new Tick("id", new Clock("1", "every.5.seconds"), 1000L, "PENDING");
+        Tick tick = createPendingTick();
         executeGivenTick(tick);
         InOrder inOrder = Mockito.inOrder(tickPublisher, ticksRepository);
         inOrder.verify(ticksRepository).updateTickStatus(tick.getId(), Tick.IN_PROGRESS);
         inOrder.verify(tickPublisher).publish(any());
     }
 
+    @NotNull
+    private Tick createPendingTick() {
+        return new Tick("id", "1", "every.5.seconds", 1000L, "PENDING");
+    }
+
     @Test
     void updatePublishedTickStatus() {
-        Tick tick = new Tick("id", new Clock("1", "every.5.seconds"), 1000L, "PENDING");
+        Tick tick = createPendingTick();
         executeGivenTick(tick);
         InOrder inOrder = Mockito.inOrder(tickPublisher, ticksRepository);
         inOrder.verify(tickPublisher).publish(any());

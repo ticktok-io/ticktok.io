@@ -1,6 +1,8 @@
 package io.ticktok.server.tick;
 
+import io.ticktok.server.clock.Clock;
+
 public interface TickChannelFactory {
 
-    TickChannel createForSchedule(String schedule);
+    TickChannel create(Clock clock);
 }

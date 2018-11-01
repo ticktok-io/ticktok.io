@@ -26,14 +26,14 @@ class TicksRepositoryTest {
 
     @Test
     void updateTickStatus() {
-        Tick savedTick = repository.save(Tick.create(new Clock("23", "every.10.seconds"), 1234L));
+        Tick savedTick = repository.save(Tick.create(new Clock("23", "c", "every.10.seconds"), 1234L));
         repository.updateTickStatus(savedTick.getId(), Tick.PUBLISHED);
         assertThat(repository.findById(savedTick.getId()).get().getStatus(), is(Tick.PUBLISHED));
     }
 
     @Test
     void failWhenUpdatingAnAlreadyExistStatus() {
-        Tick savedTick = repository.save(Tick.create(new Clock("23", "every.10.seconds"), 1234L));
+        Tick savedTick = repository.save(Tick.create(new Clock("23", "c", "every.10.seconds"), 1234L));
         assertThrows(TicksRepository.UnableToUpdateStatusException.class,
                 () -> repository.updateTickStatus(savedTick.getId(), Tick.PENDING));
     }

@@ -1,7 +1,8 @@
 package io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.clock.Schedule;
+import io.ticktok.server.clock.repository.SchedulesRepository;
 import io.ticktok.server.tick.repository.TicksRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,25 +15,25 @@ public class TickScheduler {
     public static final int SECOND = 1000;
     public static final int LOOK_AHEAD = 5 * SECOND;
 
-    private final ClocksRepository clocksRepository;
+    private final SchedulesRepository schedulesRepository;
     private final TicksRepository ticksRepository;
 
-    public TickScheduler(ClocksRepository clocksRepository, TicksRepository ticksRepository) {
-        this.clocksRepository = clocksRepository;
+    public TickScheduler(SchedulesRepository schedulesRepository, TicksRepository ticksRepository) {
+        this.schedulesRepository = schedulesRepository;
         this.ticksRepository = ticksRepository;
     }
 
     @Scheduled(fixedRate = 2000)
     public void schedule() {
-        toBeScheduleClocks().forEach(clock -> {
-            long nextTickTime = clock.nextTick();
-            ticksRepository.save(Tick.create(clock, nextTickTime));
-            clocksRepository.updateLatestScheduledTick(clock.getId(), nextTickTime);
+        toBeScheduleClocks().forEach(schedule -> {
+            long nextTickTime = schedule.nextTick();
+            ticksRepository.save(Tick.create(schedule, nextTickTime));
+            schedulesRepository.updateLatestScheduledTick(schedule.getId(), nextTickTime);
         });
     }
 
-    private List<Clock> toBeScheduleClocks() {
-        return clocksRepository.findByLatestScheduledTickLessThanEqual(now() + LOOK_AHEAD);
+    private List<Schedule> toBeScheduleClocks() {
+        return schedulesRepository.findByLatestScheduledTickLessThanEqual(now() + LOOK_AHEAD);
     }
 
     protected long now() {

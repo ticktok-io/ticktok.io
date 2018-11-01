@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 
 class ClockResourceTest {
 
-    public static final Clock CLOCK = new Clock("id", "at.schedule", 0L);
+    public static final Clock CLOCK = new Clock("id", "at.schedule", "kuku");
 
     private final ClockResource resource = new ClockResource("http://kuku", CLOCK);
 

@@ -9,9 +9,11 @@ import org.springframework.data.annotation.Id;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class ClockDetails {
+public class ClockRequest {
 
     @ScheduleConstraint
     protected String schedule;
+
+    protected String consumerId;
 
 }

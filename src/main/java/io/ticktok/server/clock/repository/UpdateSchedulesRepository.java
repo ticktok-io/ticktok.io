@@ -1,6 +1,6 @@
 package io.ticktok.server.clock.repository;
 
-public interface UpdateClocksRepository {
+public interface UpdateSchedulesRepository {
 
     void updateLatestScheduledTick(String id, long time);
 }

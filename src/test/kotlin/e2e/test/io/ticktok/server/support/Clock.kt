@@ -9,4 +9,4 @@ data class Clock(val id:String, val schedule: String, val url: String) {
 
 }
 
-data class ClockChannel(val uri: String, val exchange: String, val topic: String)
+data class ClockChannel(val uri: String, val queue: String, val topic: String)

@@ -4,36 +4,29 @@ import io.ticktok.server.clock.schedule.ScheduleParser;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class Clock extends ClockDetails {
+public class Clock extends ClockRequest {
 
     @Id
     private String id;
-    @Indexed
-    private Long latestScheduledTick;
 
-    public Clock(String id, String schedule, Long latestScheduledTick) {
-        super(schedule);
-        this.id = id;
-        this.latestScheduledTick = latestScheduledTick;
-    }
-
-    public Clock(String id, String schedule) {
-        super(schedule);
+    public Clock(String id, String consumerId, String schedule) {
+        super(schedule, consumerId);
         this.id = id;
     }
 
-
-    public static Clock createFrom(ClockDetails clockDetails) {
-        return new Clock(null, clockDetails.getSchedule(), System.currentTimeMillis());
+    public Clock(String consumerId, String schedule) {
+        this(null, consumerId, schedule);
     }
 
-    public long nextTick() {
-        return latestScheduledTick + new ScheduleParser(schedule).interval() * 1000;
+    public static Clock createFrom(ClockRequest clockRequest) {
+        return new Clock(null, clockRequest.getConsumerId(), clockRequest.getSchedule());
     }
+
 }
