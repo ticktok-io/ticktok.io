@@ -1,10 +1,7 @@
 package io.ticktok.server.clock;
 
-import io.ticktok.server.clock.schedule.ScheduleParser;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @NoArgsConstructor
@@ -26,7 +23,7 @@ public class Clock extends ClockRequest {
     }
 
     public static Clock createFrom(ClockRequest clockRequest) {
-        return new Clock(null, clockRequest.getConsumerId(), clockRequest.getSchedule());
+        return new Clock(null, clockRequest.getName(), clockRequest.getSchedule());
     }
 
 }

@@ -13,8 +13,6 @@ import lombok.ToString;
 public class TickChannel {
 
     private String uri;
-    private String exchange;
-    private String topic;
     private String queue;
 
 }

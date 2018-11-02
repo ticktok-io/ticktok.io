@@ -14,6 +14,6 @@ public class ClockRequest {
     @ScheduleConstraint
     protected String schedule;
 
-    protected String consumerId;
+    protected String name;
 
 }

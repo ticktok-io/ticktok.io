@@ -25,7 +25,7 @@ public class RabbitTickChannelFactory implements TickChannelFactory {
         Queue queue = new Queue(new QueueNameCreator(clock).create());
         rabbitAdmin.declareQueue(queue);
         rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(clock.getSchedule()));
-        return new TickChannel(rabbitUri, exchange.getName(), clock.getSchedule(), queue.getName());
+        return new TickChannel(rabbitUri, queue.getName());
     }
 
 }

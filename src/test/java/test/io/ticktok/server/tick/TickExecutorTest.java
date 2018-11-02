@@ -1,6 +1,7 @@
 package test.io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
+import io.ticktok.server.clock.Schedule;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickExecutor;
 import io.ticktok.server.tick.TickPublisher;
@@ -24,8 +25,8 @@ class TickExecutorTest {
     @Test
     void publishAllPendingTicks() {
         Tick[] ticks = new Tick[]{
-                Tick.create(new Clock("1", "kuku", "every.5.seconds"), 1000L),
-                Tick.create(new Clock("2", "kuku", "every.4.seconds"), 2000L)
+                Tick.create(new Schedule("1", "every.5.seconds", 0L), 1000L),
+                Tick.create(new Schedule("2", "every.4.seconds", 0L), 2000L)
         };
         executeGivenTick(ticks);
         Arrays.stream(ticks).forEach(t -> verify(tickPublisher).publish(t.getSchedule()));

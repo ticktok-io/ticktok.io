@@ -1,6 +1,5 @@
 package io.ticktok.server.tick;
 
-import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.Schedule;
 import io.ticktok.server.clock.repository.SchedulesRepository;
 import io.ticktok.server.tick.repository.TicksRepository;

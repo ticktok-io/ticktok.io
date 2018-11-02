@@ -69,7 +69,7 @@ object App {
     private fun createClockRequestFor(timeExpr: String): String {
         return JSONObject()
                 .put("schedule", timeExpr)
-                .put("consumerId", CLIENT_ID)
+                .put("name", CLIENT_ID)
                 .toString()
     }
 
