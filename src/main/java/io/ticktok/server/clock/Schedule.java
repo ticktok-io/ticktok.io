@@ -20,6 +20,7 @@ public class Schedule {
     private String schedule;
     @Indexed
     private long latestScheduledTick;
+    @Indexed
     private int clockCount;
 
     public Schedule(String schedule, long latestScheduledTick) {
