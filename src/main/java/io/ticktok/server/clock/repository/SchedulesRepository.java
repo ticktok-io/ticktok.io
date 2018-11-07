@@ -13,4 +13,6 @@ public interface SchedulesRepository extends MongoRepository<Schedule, String>, 
     void deleteBySchedule(String schedule);
 
     Optional<Schedule> findBySchedule(String schedule);
+
+    void deleteByClockCount(int clockCount);
 }
