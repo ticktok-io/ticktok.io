@@ -6,11 +6,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
+public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository {
 
     private final MongoOperations mongo;
 
-    public SchedulesRepositoryImpl(MongoOperations mongoOperations) {
+    public UpdateSchedulesRepositoryImpl(MongoOperations mongoOperations) {
         this.mongo = mongoOperations;
     }
 
@@ -20,5 +20,22 @@ public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
                 Query.query(Criteria.where("id").is(id)),
                 Update.update("latestScheduledTick", time),
                 Schedule.class);
+    }
+
+    @Override
+    public void decreaseClockCount(String schedule) {
+        incScheduleClockCountBy(schedule, -1);
+    }
+
+    private void incScheduleClockCountBy(String schedule, int amount) {
+        mongo.updateFirst(
+                Query.query(Criteria.where("schedule").is(schedule)),
+                new Update().inc("clockCount", amount),
+                Schedule.class);
+    }
+
+    @Override
+    public void increaseClockCount(String schedule) {
+        incScheduleClockCountBy(schedule, 1);
     }
 }

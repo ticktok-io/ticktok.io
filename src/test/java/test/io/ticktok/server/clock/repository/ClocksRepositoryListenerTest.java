@@ -6,6 +6,8 @@ import io.ticktok.server.clock.repository.ClocksRepositoryListener;
 import io.ticktok.server.clock.repository.SchedulesRepository;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 
 import java.time.Instant;
@@ -27,11 +29,11 @@ class ClocksRepositoryListenerTest {
             new ClocksRepositoryListener(schedulesRepository, clocksRepository, FIXED_CLOCK);
 
     @Test
-    void deleteSchedule() {
+    void decreaseClockCountOnClockDelete() {
         Clock clock = new Clock("1324", "kuku", "every.44.seconds");
         givenTheClocks(clock);
         onBeforeDelete(clock.getId());
-        verify(schedulesRepository).deleteBySchedule(clock.getSchedule());
+        verify(schedulesRepository).decreaseClockCount("every.44.seconds");
     }
 
     private void givenTheClocks(Clock... clocks) {
@@ -64,12 +66,10 @@ class ClocksRepositoryListenerTest {
     }
 
     @Test
-    void keepScheduleIfThereAreStillClocksDefinedForIt() {
-        givenTheClocks(
-                new Clock("111", "kuku", "every.44.seconds"),
-                new Clock("233", "popov", "every.44.seconds"));
-        onBeforeDelete("111");
-        verifyZeroInteractions(schedulesRepository);
+    void increaseClockCountForExistingSchedule() {
+        Clock clock = new Clock("1", "kuku1", "every.44.seconds");
+        when(schedulesRepository.save(any())).thenThrow(DuplicateKeyException.class);
+        listener.onAfterSave(new AfterSaveEvent<>(clock, new Document(), "clock"));
+        verify(schedulesRepository).increaseClockCount(clock.getSchedule());
     }
-
 }

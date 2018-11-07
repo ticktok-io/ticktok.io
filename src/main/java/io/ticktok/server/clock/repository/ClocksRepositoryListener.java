@@ -29,17 +29,14 @@ public class ClocksRepositoryListener extends AbstractMongoEventListener<Clock> 
             schedulesRepository.save(
                    Schedule.createFrom(event.getSource(), systemClock.instant().toEpochMilli()));
         } catch (DuplicateKeyException e) {
-            // ignore duplicated schedules
+            schedulesRepository.increaseClockCount(event.getSource().getSchedule());
         }
     }
 
     @Override
     public void onBeforeDelete(BeforeDeleteEvent<Clock> event) {
-        Optional<Clock> clock = clocksRepository.findById(event.getSource().get("_id").toString());
-        clock.ifPresent((c) -> {
-            if (clocksRepository.countBySchedule(c.getSchedule()) == 1) {
-                schedulesRepository.deleteBySchedule(c.getSchedule());
-            }
-        });
+        String clockId = event.getSource().get("_id").toString();
+        Optional<Clock> clock = clocksRepository.findById(clockId);
+        clock.ifPresent((c) -> schedulesRepository.decreaseClockCount(clock.get().getSchedule()));
     }
 }

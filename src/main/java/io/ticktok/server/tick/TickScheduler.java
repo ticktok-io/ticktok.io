@@ -32,7 +32,7 @@ public class TickScheduler {
     }
 
     private List<Schedule> toBeScheduleClocks() {
-        return schedulesRepository.findByLatestScheduledTickLessThanEqual(now() + LOOK_AHEAD);
+        return schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(0, now() + LOOK_AHEAD);
     }
 
     protected long now() {

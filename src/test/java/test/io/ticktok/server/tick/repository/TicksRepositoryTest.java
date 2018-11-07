@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ContextConfiguration(classes = {SpringMongoConfiguration.class})
 class TicksRepositoryTest {
 
-    public static final Tick TICK = Tick.create(new Schedule("c", "every.10.seconds", 0L), 1234L);
+    public static final Tick TICK = Tick.create(new Schedule("c", "every.10.seconds", 0L, 1), 1234L);
     @Autowired
     TicksRepository repository;
 

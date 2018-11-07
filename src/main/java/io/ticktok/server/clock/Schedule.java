@@ -20,14 +20,21 @@ public class Schedule {
     private String schedule;
     @Indexed
     private long latestScheduledTick;
+    private int clockCount;
 
     public Schedule(String schedule, long latestScheduledTick) {
         this.schedule = schedule;
         this.latestScheduledTick = latestScheduledTick;
     }
 
+    public Schedule(String schedule, long latestScheduledTick, int clockCount) {
+        this.schedule = schedule;
+        this.latestScheduledTick = latestScheduledTick;
+        this.clockCount = clockCount;
+    }
+
     public static Schedule createFrom(Clock clock, long currentTime) {
-        return new Schedule(clock.getSchedule(), currentTime);
+        return new Schedule(clock.getSchedule(), currentTime, 1);
     }
 
     public long nextTick() {

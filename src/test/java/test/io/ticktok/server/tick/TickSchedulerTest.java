@@ -23,7 +23,7 @@ class TickSchedulerTest {
 
     @Test
     void updateNextTicks() {
-        when(schedulesRepository.findByLatestScheduledTickLessThanEqual(anyLong()))
+        when(schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(anyInt(), anyLong()))
                 .thenReturn(asList(
                         createEverySecondsSchedule("2"),
                         createEverySecondsSchedule("4")
@@ -34,7 +34,7 @@ class TickSchedulerTest {
     }
 
     private Schedule createEverySecondsSchedule(String schedule) {
-        return new Schedule(schedule, "every." + schedule + ".seconds", 0L);
+        return new Schedule(schedule, "every." + schedule + ".seconds", 0L, 1);
     }
 
     private void schedule() {
@@ -44,13 +44,13 @@ class TickSchedulerTest {
     @Test
     void fetchOnlyClocksWithPastScheduledTicks() {
         schedule();
-        verify(schedulesRepository).findByLatestScheduledTickLessThanEqual(NOW + TickScheduler.LOOK_AHEAD);
+        verify(schedulesRepository).findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(0, NOW + TickScheduler.LOOK_AHEAD);
     }
 
 
     @Test
     void shouldNotUpdateClockWhenFailedToScheduleATick() {
-        when(schedulesRepository.findByLatestScheduledTickLessThanEqual(anyLong())).thenReturn(asList(
+        when(schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(anyInt(), anyLong())).thenReturn(asList(
                 createEverySecondsSchedule("1")
         ));
         doThrow(RuntimeException.class).when(ticksRepository).save(any());
@@ -67,7 +67,7 @@ class TickSchedulerTest {
                 createEverySecondsSchedule("2"),
                 createEverySecondsSchedule("3")
         );
-        when(schedulesRepository.findByLatestScheduledTickLessThanEqual(anyLong())).thenReturn(clocks);
+        when(schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(eq(0), anyLong())).thenReturn(clocks);
         schedule();
         verify(ticksRepository).save(Tick.create(clocks.get(0), 2000L));
         verify(ticksRepository).save(Tick.create(clocks.get(1), 3000L));

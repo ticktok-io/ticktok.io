@@ -14,5 +14,6 @@ class ScheduleTest {
         Schedule schedule = Schedule.createFrom(new Clock("1", "kuku", "every.1.seconds"), 111L);
         assertThat(schedule.getSchedule(), is("every.1.seconds"));
         assertThat(schedule.getLatestScheduledTick(), is(111L));
+        assertThat(schedule.getClockCount(), is(1));
     }
 }
