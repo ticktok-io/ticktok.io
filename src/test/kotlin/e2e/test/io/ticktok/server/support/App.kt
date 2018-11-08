@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Assertions
 object App {
 
     const val APP_URL = "http://localhost:8080"
-    const val CLIENT_ID = "e2e-client"
+    const val CLOCK_NAME = "e2e-client:kuku"
     const val ACCESS_TOKEN = "ct-auth-token"
 
 
@@ -69,7 +69,7 @@ object App {
     private fun createClockRequestFor(timeExpr: String): String {
         return JSONObject()
                 .put("schedule", timeExpr)
-                .put("name", CLIENT_ID)
+                .put("name", CLOCK_NAME)
                 .toString()
     }
 
