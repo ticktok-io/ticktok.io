@@ -1,9 +1,11 @@
 package io.ticktok.server.tick.rabbit;
 
 import io.ticktok.server.tick.TickChannelFactory;
+import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +22,11 @@ public class RabbitConfiguration {
     private String rabbitUri;
 
     @Bean
+    public TopicExchange ticktokExchange() {
+        return new TopicExchange(EXCHANGE_NAME);
+    }
+
+    @Bean
     public ConnectionFactory connectionFactory() {
         return new CachingConnectionFactory(URI.create(rabbitUri));
     }
@@ -28,10 +35,15 @@ public class RabbitConfiguration {
     public RabbitTemplate rabbitTemplate() {
         return new RabbitTemplate(connectionFactory());
     }
-    
+
+    @Bean
+    public AmqpAdmin admin() {
+        return new RabbitAdmin(connectionFactory());
+    }
+
     @Bean
     public TickChannelFactory tickChannelFactory() {
-        return new RabbitTickChannelFactory(rabbitUri, EXCHANGE_NAME);
+        return new RabbitTickChannelFactory(admin(), rabbitUri, ticktokExchange());
     }
 
 }

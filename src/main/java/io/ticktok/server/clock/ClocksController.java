@@ -2,9 +2,7 @@ package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.clock.schedule.ScheduleParser;
 import io.ticktok.server.tick.TickChannelFactory;
-import io.ticktok.server.tick.TickPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -16,7 +14,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,16 +39,18 @@ public class ClocksController {
     @ApiOperation(value = "Create a new clock")
     @ResponseStatus(code = HttpStatus.CREATED)
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Clock created successfully", responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
+            @ApiResponse(code = 201,
+                    message = "Clock created successfully",
+                    responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
     })
-    public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockDetails clockDetails, Principal principal) {
-        Clock savedClock = clocksRepository.save(Clock.createFrom(clockDetails));
+    public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest, Principal principal) {
+        Clock savedClock = clocksRepository.save(Clock.createFrom(clockRequest));
         return createdClockEntity(savedClock, principal);
     }
 
     private ResponseEntity<ClockResourceWithChannel> createdClockEntity(Clock clock, Principal principal) {
         ClockResourceWithChannel clockResource =
-                new ClockResourceWithChannel(domain, clock, tickChannelFactory.createForSchedule(clock.getSchedule()));
+                new ClockResourceWithChannel(domain, clock, tickChannelFactory.create(clock));
         return ResponseEntity.created(
                 withAuthToken(clockResource.getUrl(), principal))
                 .body(clockResource);

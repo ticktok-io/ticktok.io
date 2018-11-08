@@ -4,7 +4,9 @@ import e2e.test.io.ticktok.server.pages.ClockListPage
 import e2e.test.io.ticktok.server.support.App
 import e2e.test.io.ticktok.server.pages.Browser
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 
+@DisabledIfSystemProperty(named = "scope", matches = "server")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DashboardE2ETest {
 

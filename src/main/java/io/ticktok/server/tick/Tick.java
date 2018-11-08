@@ -1,8 +1,9 @@
 package io.ticktok.server.tick;
 
-import io.ticktok.server.clock.Clock;
+import io.ticktok.server.clock.Schedule;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 
 @NoArgsConstructor
@@ -19,12 +20,15 @@ public class Tick {
     @Id
     private String id;
 
-    private Clock clock;
+    private String scheduleId;
+    private String schedule;
+    @Indexed
     private long time;
+    @Indexed
     private String status;
 
 
-    public static Tick create(Clock clock, long time) {
-        return new Tick(null, clock, time, PENDING);
+    public static Tick create(Schedule schedule, long time) {
+        return new Tick(null, schedule.getId(), schedule.getSchedule(), time, PENDING);
     }
 }
