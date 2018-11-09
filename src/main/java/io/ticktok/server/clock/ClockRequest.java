@@ -2,7 +2,8 @@ package io.ticktok.server.clock;
 
 import io.ticktok.server.clock.schedule.ScheduleConstraint;
 import lombok.*;
-import org.springframework.data.annotation.Id;
+
+import javax.validation.constraints.NotEmpty;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +14,7 @@ public class ClockRequest {
 
     @ScheduleConstraint
     protected String schedule;
-
+    @NotEmpty
     protected String name;
 
 }
