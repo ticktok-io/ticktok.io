@@ -13,17 +13,17 @@ public class Clock extends ClockRequest {
     @Id
     private String id;
 
-    public Clock(String id, String consumerId, String schedule) {
-        super(schedule, consumerId);
+    public Clock(String id, String name, String schedule) {
+        super(schedule, name);
         this.id = id;
     }
 
-    public Clock(String consumerId, String schedule) {
-        this(null, consumerId, schedule);
+    public Clock(String name, String schedule) {
+        this(null, name, schedule);
     }
 
     public static Clock createFrom(ClockRequest clockRequest) {
-        return new Clock(null, clockRequest.getName(), clockRequest.getSchedule());
+        return new Clock(clockRequest.getName(), clockRequest.getSchedule());
     }
 
 }
