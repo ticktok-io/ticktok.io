@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 
 class ClockResourceTest {
 
-    public static final Clock CLOCK = new Clock("id", "at.schedule", "kuku");
+    public static final Clock CLOCK = new Clock("id", "kuku-clock", "at.schedule");
 
     private final ClockResource resource = new ClockResource("http://kuku", CLOCK);
 
@@ -23,5 +23,10 @@ class ClockResourceTest {
     @Test
     void retrieveResourceUrl() {
         assertThat(resource.getUrl(), CoreMatchers.startsWith("http://kuku"));
+    }
+
+    @Test
+    void retrieveClockName() {
+        assertThat(resource.getName(), is(CLOCK.getName()));
     }
 }

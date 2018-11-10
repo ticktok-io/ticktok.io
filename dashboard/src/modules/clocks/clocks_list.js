@@ -25,7 +25,7 @@ export class ClocksList extends Component {
         <table className="table">
           <thead className="thead-light">
           <tr>
-            <th scope="col">id</th>
+            <th scope="col">Name</th>
             <th scope="col">Schedule</th>
           </tr>
           </thead>
@@ -53,7 +53,7 @@ export class ClocksList extends Component {
     return _.map(this.props.clocks, clock => {
       return (
         <tr data-testid="clock-row" className="clock-row" key={clock.id}>
-          <td>{clock.id}</td>
+          <td>{clock.name}</td>
           <td>{clock.schedule}</td>
         </tr>
       );
