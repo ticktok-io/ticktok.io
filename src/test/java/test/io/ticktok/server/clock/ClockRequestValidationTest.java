@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 
 class ClockRequestValidationTest {
 
-    public static final ClockRequest CLOCK_WITH_NO_NAME = new ClockRequest("every.5.seconds", "");
+    static final ClockRequest CLOCK_WITH_NO_NAME = new ClockRequest("every.5.seconds", "");
 
     @Test
     void validateNameIsNotEmpty() {
