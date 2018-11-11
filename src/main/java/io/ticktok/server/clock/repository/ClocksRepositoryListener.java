@@ -3,9 +3,7 @@ package io.ticktok.server.clock.repository;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.Schedule;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
-import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
-import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
+import org.springframework.data.mongodb.core.mapping.event.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -38,5 +36,15 @@ public class ClocksRepositoryListener extends AbstractMongoEventListener<Clock> 
         String clockId = event.getSource().get("_id").toString();
         Optional<Clock> clock = clocksRepository.findById(clockId);
         clock.ifPresent((c) -> schedulesRepository.decreaseClockCount(clock.get().getSchedule()));
+    }
+
+    @Override
+    public void onApplicationEvent(MongoMappingEvent<?> event) {
+        super.onApplicationEvent(event);
+    }
+
+    @Override
+    public void onAfterConvert(AfterConvertEvent<Clock> event) {
+        super.onAfterConvert(event);
     }
 }

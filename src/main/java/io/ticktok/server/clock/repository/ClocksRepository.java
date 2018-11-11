@@ -8,10 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface ClocksRepository extends MongoRepository<Clock, String> {
+public interface ClocksRepository extends MongoRepository<Clock, String>, UpdateClockRepository {
 
-    List<Clock> findBySchedule(String schedule);
-
-    int countBySchedule(String schedule);
 }
 

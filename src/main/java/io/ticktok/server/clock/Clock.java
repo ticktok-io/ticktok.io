@@ -1,6 +1,7 @@
 package io.ticktok.server.clock;
 
 import lombok.*;
+import org.bson.BsonValue;
 import org.springframework.data.annotation.Id;
 
 
@@ -26,4 +27,7 @@ public class Clock extends ClockRequest {
         return new Clock(clockRequest.getName(), clockRequest.getSchedule());
     }
 
+    public static Clock createFrom(String id, Clock clock) {
+        return new Clock(id, clock.getName(), clock.getSchedule());
+    }
 }

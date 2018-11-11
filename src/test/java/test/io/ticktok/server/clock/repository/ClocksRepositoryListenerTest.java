@@ -38,7 +38,6 @@ class ClocksRepositoryListenerTest {
 
     private void givenTheClocks(Clock... clocks) {
         mockFindByIdFor(clocks);
-        mockCountByScheduleFor(clocks);
     }
 
     private void mockFindByIdFor(Clock[] clocks) {
@@ -46,12 +45,6 @@ class ClocksRepositoryListenerTest {
         for (Clock clock : clocks) {
             when(clocksRepository.findById(clock.getId())).thenReturn(Optional.of(clock));
         }
-    }
-
-    private void mockCountByScheduleFor(Clock[] clocks) {
-        when(clocksRepository.countBySchedule(any())).thenReturn(0);
-        Arrays.stream(clocks).collect(groupingBy(Clock::getSchedule)).forEach((k, v) ->
-                when(clocksRepository.countBySchedule(k)).thenReturn(v.size()));
     }
 
     private void onBeforeDelete(String clockId) {
