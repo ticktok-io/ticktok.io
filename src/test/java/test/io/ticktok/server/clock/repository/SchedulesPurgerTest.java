@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 
 class SchedulesPurgerTest {
 
-
     private final SchedulesRepository repository = mock(SchedulesRepository.class);
 
     @Test

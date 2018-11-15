@@ -38,4 +38,28 @@ public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository 
     public void increaseClockCount(String schedule) {
         incScheduleClockCountBy(schedule, 1);
     }
+
+    @Override
+    public void saveSchedule(Schedule schedule) {
+        mongo.upsert(
+                Query.query(Criteria.where("schedule").is(schedule.getSchedule())),
+                createUpdateFor(schedule),
+                Schedule.class);
+
+    }
+
+    @Override
+    public void addClockFor(String schedule) {
+
+    }
+
+    @Override
+    public void removeClockFor(String schedule) {
+
+    }
+
+    private Update createUpdateFor(Schedule schedule) {
+        return Update.update("latestScheduledTick", schedule.getLatestScheduledTick())
+                .set("clockCount", schedule.getClockCount());
+    }
 }

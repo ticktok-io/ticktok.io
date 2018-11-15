@@ -15,7 +15,7 @@ public class QueueNameCreator {
     public String create() {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update((clock.getName() + ";" + clock.getSchedule()).getBytes());
+            md.update((clock.getName() + ";" + clock.getSchedules()).getBytes());
             return new String(md.digest());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);

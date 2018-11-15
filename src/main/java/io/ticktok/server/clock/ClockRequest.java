@@ -14,9 +14,8 @@ import javax.validation.constraints.NotEmpty;
 public class ClockRequest {
 
     @ScheduleConstraint
-    protected String schedule;
-    @Indexed(unique = true)
+    private String schedule;
     @NotEmpty
-    protected String name;
+    private String name;
 
 }

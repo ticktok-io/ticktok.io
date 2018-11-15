@@ -158,7 +158,7 @@ object App {
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
         override fun describeTo(description: Description?) {
-
+            description?.appendText(clock.toString())
         }
 
         override fun matches(item: Any?): Boolean {

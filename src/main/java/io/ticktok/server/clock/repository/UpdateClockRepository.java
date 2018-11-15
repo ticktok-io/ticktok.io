@@ -4,5 +4,6 @@ import io.ticktok.server.clock.Clock;
 
 public interface UpdateClockRepository {
 
-    Clock saveClock(Clock clock);
+    Clock saveClock(String name, String schedule);
+
 }

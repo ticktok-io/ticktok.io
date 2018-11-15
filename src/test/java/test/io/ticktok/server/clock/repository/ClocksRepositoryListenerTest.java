@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.groupingBy;
