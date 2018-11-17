@@ -6,12 +6,16 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.time.Clock;
+
 public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository {
 
     private final MongoOperations mongo;
+    private final Clock systemTime;
 
-    public UpdateSchedulesRepositoryImpl(MongoOperations mongoOperations) {
+    public UpdateSchedulesRepositoryImpl(MongoOperations mongoOperations, Clock systemTime) {
         this.mongo = mongoOperations;
+        this.systemTime = systemTime;
     }
 
     @Override
@@ -23,43 +27,17 @@ public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository 
     }
 
     @Override
-    public void decreaseClockCount(String schedule) {
-        incScheduleClockCountBy(schedule, -1);
-    }
-
-    private void incScheduleClockCountBy(String schedule, int amount) {
-        mongo.updateFirst(
-                Query.query(Criteria.where("schedule").is(schedule)),
-                new Update().inc("clockCount", amount),
-                Schedule.class);
-    }
-
-    @Override
-    public void increaseClockCount(String schedule) {
-        incScheduleClockCountBy(schedule, 1);
-    }
-
-    @Override
-    public void saveSchedule(Schedule schedule) {
-        mongo.upsert(
-                Query.query(Criteria.where("schedule").is(schedule.getSchedule())),
-                createUpdateFor(schedule),
-                Schedule.class);
-
-    }
-
-    @Override
     public void addClockFor(String schedule) {
-
+        mongo.upsert(
+                Query.query(Criteria.where("schedule").is(schedule)),
+                new Update().setOnInsert("latestScheduledTick", systemTime.millis()).inc("clockCount", 1),
+                Schedule.class);
     }
 
     @Override
-    public void removeClockFor(String schedule) {
-
-    }
-
-    private Update createUpdateFor(Schedule schedule) {
-        return Update.update("latestScheduledTick", schedule.getLatestScheduledTick())
-                .set("clockCount", schedule.getClockCount());
+    public void removeClockFor(String... schedules) {
+        mongo.updateMulti(Query.query(Criteria.where("schedule").in((Object[]) schedules)),
+                new Update().inc("clockCount", -1),
+                Schedule.class);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {RabbitConfiguration.class})
@@ -34,8 +35,7 @@ class RabbitTickChannelFactoryTest {
     void createQueueForConsumer() {
         TickChannel tickChannel = tickChannelFactory.create(new Clock("11", "kuku", SCHEDULE));
         rabbitTemplate.convertAndSend(exchange.getName(), SCHEDULE, "hello");
-        Assert.assertThat(rabbitTemplate.receiveAndConvert(tickChannel.getQueue(), 1000), is("hello"));
+        assertThat(rabbitTemplate.receiveAndConvert(tickChannel.getQueue(), 1000), is("hello"));
     }
-
 
 }

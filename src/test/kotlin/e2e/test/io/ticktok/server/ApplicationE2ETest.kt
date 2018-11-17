@@ -23,13 +23,13 @@ class ApplicationE2ETest {
 
     @Test
     fun registerNewClock() {
-        App.registeredAClock(CLOCK_EXPR)
+        App.registeredAClock("kuku", CLOCK_EXPR)
         App.retrievedRegisteredClock(CLOCK_EXPR)
     }
 
     @Test
     fun retrieveScheduledMessage() {
-        val clock = App.registeredAClock(CLOCK_EXPR)
+        val clock = App.registeredAClock("kuku", CLOCK_EXPR)
         client.receivedTicksFor(clock)
     }
 
@@ -46,8 +46,8 @@ class ApplicationE2ETest {
 
     @Test
     fun retrieveConfiguredClocks() {
-        val clock1 = App.registeredAClock("every.6.seconds")
-        val clock2 = App.registeredAClock("every.10.seconds")
+        val clock1 = App.registeredAClock("kuku6", "every.6.seconds")
+        val clock2 = App.registeredAClock("popo10", "every.10.seconds")
 
         App.clocks(containsClock(clock1))
         App.clocks(containsClock(clock2))
@@ -55,14 +55,14 @@ class ApplicationE2ETest {
 
     @Test
     fun deleteAClock() {
-        val clock = App.registeredAClock("every.9.seconds")
+        val clock = App.registeredAClock("kuku9", "every.9.seconds")
         App.deleteClock(clock)
         App.clocks(not(containsClock(clock)))
     }
 
     @Test
     fun failOnNonValidSchedule() {
-        App.registeredAClock("non-valid")
+        App.registeredAClock("kuku", "non-valid")
         App.retrievedUserError()
     }
 

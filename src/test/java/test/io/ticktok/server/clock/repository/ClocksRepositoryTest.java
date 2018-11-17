@@ -11,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -34,22 +36,29 @@ class ClocksRepositoryTest {
         assertThat(repository.findById(savedClock.getId()).get().getSchedule(), is("every.10.seconds"));
     }
 
-    /*@Test
+    @Test
     void createScheduleOnNewClock() {
-        Clock clock = new Clock("kuku", "every.5.seconds");
-        repository.saveClock(clock);
-        verify(schedulesRepositoryMock).addClockFor(clock.getSchedules());
+        repository.saveClock("kuku", "every.3.seconds");
+        verify(schedulesRepositoryMock).addClockFor("every.3.seconds");
     }
 
     @Test
-    void removeOldClockScheduleWhenUpdatingExistingClock() {
-        Clock oldClock = new Clock("kuku", "every.5.seconds");
-        Clock newClock = new Clock("kuku", "every.11.seconds");
-        repository.saveClock(oldClock);
-        repository.saveClock(newClock);
-        verify(schedulesRepositoryMock).removeClockFor(oldClock.getSchedules());
-        verify(schedulesRepositoryMock).addClockFor(newClock.getSchedules());
-    }*/
+    void removeClockSchedulesOnClockDelete() {
+        repository.saveClock("kuku", "every.4.seconds");
+        Clock savedClock = repository.saveClock("kuku", "every.8.seconds");
+        repository.deleteById(savedClock.getId());
+        verify(schedulesRepositoryMock).removeClockFor(savedClock.getSchedules().toArray(new String[0]));
+    }
+
+    @Test
+    void findClocksWithRedundantSchedules() {
+        repository.saveClock("popov", "every.4.seconds");
+        repository.saveClock("popov", "every.5.seconds");
+        repository.saveClock("kuku", "every.4.seconds");
+        List<Clock> schedules = repository.findByMoreThanOneSchedule();
+        assertThat(schedules, hasSize(1));
+        assertThat(schedules.get(0).getName(), is("popov"));
+    }
 
     @AfterEach
     void clearRepository() {

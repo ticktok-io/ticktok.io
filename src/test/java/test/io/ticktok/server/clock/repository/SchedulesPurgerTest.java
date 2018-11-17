@@ -9,11 +9,12 @@ import static org.mockito.Mockito.verify;
 
 class SchedulesPurgerTest {
 
-    private final SchedulesRepository repository = mock(SchedulesRepository.class);
+    private final SchedulesRepository schedulesRepository = mock(SchedulesRepository.class);
 
     @Test
     void deleteAllSchedulesWithNoClocks() {
-        new SchedulesPurger(repository).purge();
-        verify(repository).deleteByClockCount(0);
+        new SchedulesPurger(schedulesRepository).purge();
+        verify(schedulesRepository).deleteByClockCount(0);
     }
+
 }

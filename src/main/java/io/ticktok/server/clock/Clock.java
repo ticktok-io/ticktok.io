@@ -26,7 +26,7 @@ public class Clock {
     @Indexed(unique = true)
     protected String name;
 
-    public Clock(String id, String name, String schedules) {
+    public Clock(String id, String name, String... schedules) {
         this.name = name;
         this.schedules = Arrays.asList(schedules);
         this.id = id;

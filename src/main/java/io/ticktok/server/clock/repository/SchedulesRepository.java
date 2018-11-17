@@ -10,8 +10,6 @@ public interface SchedulesRepository extends MongoRepository<Schedule, String>, 
 
     List<Schedule> findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(int clocks, long time);
 
-    void deleteBySchedule(String schedule);
-
     Optional<Schedule> findBySchedule(String schedule);
 
     void deleteByClockCount(int clockCount);

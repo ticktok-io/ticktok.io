@@ -12,7 +12,7 @@ import java.time.ZoneId;
 @Configuration
 @EnableMongoRepositories({"io.ticktok.server.clock", "io.ticktok.server.tick"})
 @ComponentScan(basePackages = {"io.ticktok.server.clock.repository"})
-public class SpringMongoConfiguration {
+public class MongoTestConfiguration {
 
     public static final Instant FIXED_INSTANT = Instant.parse("2018-01-01T10:15:00.00Z");
 

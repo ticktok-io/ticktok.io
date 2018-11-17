@@ -15,14 +15,8 @@ import static org.mockito.Mockito.mock;
 @Configuration
 @EnableMongoRepositories(basePackages = {"io.ticktok.server.clock.repository"},
         excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = SchedulesRepository.class)})
+@ComponentScan(basePackages = {"io.ticktok.server.clock.repository"})
 public class ClocksRepositoryTestConfiguration {
-
-    public static final Instant FIXED_INSTANT = Instant.parse("2018-01-01T10:15:00.00Z");
-
-    @Bean
-    public Clock systemClock() {
-        return Clock.fixed(FIXED_INSTANT, ZoneId.of("UTC"));
-    }
 
     @Bean
     @Primary

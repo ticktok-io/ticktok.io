@@ -13,38 +13,17 @@ public class ClocksRepositoryListener extends AbstractMongoEventListener<Clock> 
 
     private final SchedulesRepository schedulesRepository;
     private final ClocksRepository clocksRepository;
-    private final java.time.Clock systemClock;
 
-    public ClocksRepositoryListener(SchedulesRepository schedulesRepository, ClocksRepository clocksRepository, java.time.Clock systemClock) {
+    public ClocksRepositoryListener(SchedulesRepository schedulesRepository, ClocksRepository clocksRepository) {
         this.schedulesRepository = schedulesRepository;
         this.clocksRepository = clocksRepository;
-        this.systemClock = systemClock;
-    }
-
-    @Override
-    public void onAfterSave(AfterSaveEvent<Clock> event) {
-        try {
-            schedulesRepository.save(
-                   Schedule.createFrom(event.getSource(), systemClock.instant().toEpochMilli()));
-        } catch (DuplicateKeyException e) {
-            schedulesRepository.increaseClockCount(event.getSource().getSchedule());
-        }
     }
 
     @Override
     public void onBeforeDelete(BeforeDeleteEvent<Clock> event) {
         String clockId = event.getSource().get("_id").toString();
         Optional<Clock> clock = clocksRepository.findById(clockId);
-        clock.ifPresent((c) -> schedulesRepository.decreaseClockCount(clock.get().getSchedule()));
+        clock.ifPresent((c) -> schedulesRepository.removeClockFor(clock.get().getSchedules().toArray(new String[0])));
     }
 
-    @Override
-    public void onApplicationEvent(MongoMappingEvent<?> event) {
-        super.onApplicationEvent(event);
-    }
-
-    @Override
-    public void onAfterConvert(AfterConvertEvent<Clock> event) {
-        super.onAfterConvert(event);
-    }
 }
