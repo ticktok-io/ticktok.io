@@ -41,7 +41,4 @@ class ClockSchedulesPurgerTest {
         verify(clocksRepository).deleteSchedules("111", Arrays.asList("every.2.seconds", "every.1.seconds"));
     }
 
-    @Test
-    void name() {
-    }
 }
