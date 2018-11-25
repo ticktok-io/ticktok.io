@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import java.util.List;
-
 public class ClocksRepositoryImpl implements UpdateClockRepository {
+
+    public static final String SCHEDULES = "schedules";
 
     private final MongoOperations mongo;
     private final SchedulesRepository schedulesRepository;
@@ -24,7 +24,7 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
     public Clock saveClock(String name, String schedule) {
         Clock clock = mongo.findAndModify(
                 Query.query(Criteria.where("name").is(name)),
-                new Update().push("schedules", schedule),
+                new Update().push(SCHEDULES, schedule),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 Clock.class);
         schedulesRepository.addClockFor(schedule);
@@ -32,7 +32,17 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
     }
 
     @Override
-    public void deleteSchedules(String id, List<String> schedules) {
+    public void deleteScheduleByIndex(String id, int scheduleIndex) {
+        mongo.updateFirst(Query.query(Criteria.where("id").is(id)),
+                new Update().unset(SCHEDULES + "." + scheduleIndex),
+                Clock.class);
+        mongo.updateFirst(Query.query(Criteria.where("id").is(id)),
+                new Update().pull(SCHEDULES, null),
+                Clock.class);
+    }
 
+    @Override
+    public void deleteByNoSchedules() {
+        mongo.remove(Query.query(Criteria.where(SCHEDULES).size(0)), Clock.class);
     }
 }

@@ -2,11 +2,12 @@ package io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
 
-import java.util.List;
-
 public interface UpdateClockRepository {
 
+    //TODO: add pending
     Clock saveClock(String name, String schedule);
 
-    void deleteSchedules(String id, List<String> schedules);
+    void deleteScheduleByIndex(String id, int scheduleIndex);
+
+    void deleteByNoSchedules();
 }

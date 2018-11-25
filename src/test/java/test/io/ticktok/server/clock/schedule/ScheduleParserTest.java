@@ -12,7 +12,7 @@ class ScheduleParserTest {
     @Test
     void shouldFailOnInvalidExpression() {
         assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
-                new ScheduleParser("invalid schedule").interval());
+                new ScheduleParser("invalid schedules").interval());
     }
 
     @Test

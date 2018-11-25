@@ -3,8 +3,7 @@ package test.io.ticktok.server.tick.rabbit;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.rabbit.RabbitConfiguration;
-import io.ticktok.server.tick.rabbit.RabbitTickChannelFactory;
-import org.junit.Assert;
+import io.ticktok.server.tick.rabbit.RabbitTickChannelCreator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.amqp.core.Exchange;
@@ -20,12 +19,12 @@ import static org.junit.Assert.assertThat;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {RabbitConfiguration.class})
 @SpringBootTest
-class RabbitTickChannelFactoryTest {
+class RabbitTickChannelCreatorTest {
 
     public static final String SCHEDULE = "popov-schedule";
 
     @Autowired
-    private RabbitTickChannelFactory tickChannelFactory;
+    private RabbitTickChannelCreator tickChannelFactory;
     @Autowired
     private RabbitTemplate rabbitTemplate;
     @Autowired
@@ -33,7 +32,7 @@ class RabbitTickChannelFactoryTest {
 
     @Test
     void createQueueForConsumer() {
-        TickChannel tickChannel = tickChannelFactory.create(new Clock("11", "kuku", SCHEDULE));
+        TickChannel tickChannel = tickChannelFactory.create("kuku", SCHEDULE);
         rabbitTemplate.convertAndSend(exchange.getName(), SCHEDULE, "hello");
         assertThat(rabbitTemplate.receiveAndConvert(tickChannel.getQueue(), 1000), is("hello"));
     }

@@ -34,8 +34,8 @@ public class Schedule {
         this.clockCount = clockCount;
     }
 
-    public static Schedule createFrom(Clock clock, long currentTime) {
-        return new Schedule(clock.getSchedule(), currentTime, 1);
+    public static Schedule createFrom(String schedule, long currentTime) {
+        return new Schedule(schedule, currentTime, 1);
     }
 
     public long nextTick() {

@@ -9,50 +9,57 @@ import java.util.concurrent.TimeUnit
 class TickListener {
 
     companion object {
-        const val CLOCK_EXPR = "every.3.seconds"
+        const val CLOCK_EXPR = "every.2.seconds"
     }
 
     fun receivedTicksFor(clock: Clock) {
-        SingleTickLatch(clock.channel!!).awaitFor(3)
-        SingleTickLatch(clock.channel!!).awaitFor(3)
+        val connection = createConnection(clock.channel)
+        val channel = connection.createChannel()
+        try {
+            SingleTickLatch(channel, clock.channel?.queue).awaitFor(2)
+        } finally {
+            closeChannel(channel)
+            connection.close()
+        }
     }
 
-    private inner class SingleTickLatch(val clockChannel: ClockChannel) {
+    private fun createConnection(channel: ClockChannel?): Connection {
+        val factory = ConnectionFactory()
+        factory.setUri(channel?.uri)
+        return factory.newConnection()
+    }
 
-        private var tickReceived = CountDownLatch(1)
+    private fun closeChannel(channel: Channel?) {
+        if (isOpen(channel)) {
+            channel!!.close()
+        }
+    }
 
-        fun awaitFor(timeout: Long) {
-            var channel: Channel? = null
+    private fun isOpen(channel: Channel?) = channel != null && channel.isOpen
+
+    private inner class SingleTickLatch(val channel: Channel, val queue: String?) {
+
+
+        fun awaitFor(times: Int) {
+            val tickReceived = CountDownLatch(times)
+            var consumerTag = ""
             try {
-                channel = createConnection().createChannel()
                 val consumer = object : DefaultConsumer(channel) {
                     override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
                                                 properties: AMQP.BasicProperties?, body: ByteArray?) {
                         tickReceived.countDown()
                     }
                 }
-                channel!!.basicConsume(clockChannel.queue, true, consumer)
-                if (!tickReceived.await(timeout + 1, TimeUnit.SECONDS)) {
-                    fail("Failed to receive tick for $clockChannel")
+                consumerTag = channel.basicConsume(queue, true, consumer)
+                if (!tickReceived.await((2 * times).toLong() + times, TimeUnit.SECONDS)) {
+                    fail("Failed to receive ticks for $queue")
                 }
             } finally {
-                closeChannel(channel)
+                if(!consumerTag.isEmpty()) {
+                    channel.basicCancel(consumerTag)
+                }
             }
         }
-
-        private fun createConnection(): Connection {
-            val factory = ConnectionFactory()
-            factory.setUri(clockChannel.uri)
-            return factory.newConnection()
-        }
-
-        private fun closeChannel(channel: Channel?) {
-            if (isOpen(channel)) {
-                channel!!.close()
-            }
-        }
-
-        private fun isOpen(channel: Channel?) = channel != null && channel.isOpen
 
     }
 

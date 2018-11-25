@@ -13,5 +13,6 @@ public interface ClocksRepository extends MongoRepository<Clock, String>, Update
 
     @Query("{ 'schedules.1' : { $exists: true } }")
     List<Clock> findByMoreThanOneSchedule();
+
 }
 

@@ -4,6 +4,7 @@ import io.ticktok.server.clock.Schedule;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.clock.repository.SchedulesRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,21 @@ class SchedulesRepositoryTest {
 
     public static final int SECOND = 1000;
     @Autowired
-    ClocksRepository clocksRepository;
-    @Autowired
     SchedulesRepository schedulesRepository;
+
+    @BeforeEach
+    void setUp() {
+        clearDBs();
+    }
+
+    void clearDBs() {
+        schedulesRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        clearDBs();
+    }
 
     @Test
     void addANewSchedule() {
@@ -79,12 +92,6 @@ class SchedulesRepositoryTest {
 
     private long now() {
         return System.currentTimeMillis();
-    }
-
-    @AfterEach
-    void clearDBs() {
-        clocksRepository.deleteAll();
-        schedulesRepository.deleteAll();
     }
 
 }

@@ -6,17 +6,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class QueueNameCreator {
-    private final Clock clock;
+    private final String name;
+    private final String schedule;
 
-    public QueueNameCreator(Clock clock) {
-        this.clock = clock;
+    public QueueNameCreator(String name, String schedule) {
+        this.name= name;
+        this.schedule = schedule;
     }
 
     public String create() {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update((clock.getName() + ";" + clock.getSchedules()).getBytes());
-            return new String(md.digest());
+            md.update((name + ";" + schedule).getBytes());
+            //return new String(md.digest());
+            return name + ";" + schedule;
+
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

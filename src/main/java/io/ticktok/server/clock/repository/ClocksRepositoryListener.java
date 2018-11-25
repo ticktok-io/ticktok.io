@@ -21,9 +21,9 @@ public class ClocksRepositoryListener extends AbstractMongoEventListener<Clock> 
 
     @Override
     public void onBeforeDelete(BeforeDeleteEvent<Clock> event) {
-        String clockId = event.getSource().get("_id").toString();
+        /*String clockId = event.getSource().get("_id").toString();
         Optional<Clock> clock = clocksRepository.findById(clockId);
-        clock.ifPresent((c) -> schedulesRepository.removeClockFor(clock.get().getSchedules().toArray(new String[0])));
+        clock.ifPresent((c) -> schedulesRepository.removeClockFor(clock.get().getSchedules().toArray(new String[0])));*/
     }
 
 }

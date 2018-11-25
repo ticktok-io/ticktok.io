@@ -21,7 +21,6 @@ public class Clock {
 
     @Id
     private String id;
-    @JsonIgnore
     private List<String> schedules;
     @Indexed(unique = true)
     protected String name;
@@ -36,16 +35,4 @@ public class Clock {
         this(null, name, schedules);
     }
 
-    public static Clock createFrom(ClockRequest clockRequest) {
-        return new Clock(clockRequest.getName(), clockRequest.getSchedule());
-    }
-
-    public static Clock createFrom(String id, Clock clock) {
-        return new Clock(id, clock.getName(), clock.getSchedule());
-    }
-
-    @JsonProperty
-    public String getSchedule() {
-        return schedules.get(schedules.size() - 1);
-    }
 }

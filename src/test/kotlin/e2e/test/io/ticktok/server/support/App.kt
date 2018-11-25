@@ -123,7 +123,7 @@ object App {
 
     private fun validateRetrievedBody(clockExpr: String) {
         val lastResponseBody = lastResponseBody()
-        assertThat(lastResponseBody.get("schedule").asString, `is`(clockExpr))
+        assertThat(lastResponseBody.get("schedules").asJsonArray.get(0).asString, `is`(clockExpr))
         assertThat(lastResponseBody.get("url").asString, `is`(withoutToken(lastResponseLocation())))
     }
 
@@ -153,6 +153,11 @@ object App {
 
     fun retrievedUserError() {
         assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
+    }
+
+    fun purgeClocks() {
+        val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
+        assertThat(response.statusLine.statusCode, `is`(204))
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {

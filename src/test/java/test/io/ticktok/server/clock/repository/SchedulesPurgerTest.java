@@ -1,6 +1,6 @@
 package test.io.ticktok.server.clock.repository;
 
-import io.ticktok.server.clock.repository.SchedulesPurger;
+import io.ticktok.server.clock.schedule.SchedulesPurger;
 import io.ticktok.server.clock.repository.SchedulesRepository;
 import org.junit.jupiter.api.Test;
 

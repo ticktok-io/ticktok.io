@@ -54,6 +54,14 @@ class ApplicationE2ETest {
     }
 
     @Test
+    fun purgeClocks() {
+        val clock = App.registeredAClock("purger", CLOCK_EXPR)
+        client.receivedTicksFor(clock)
+        App.purgeClocks()
+        App.clocks(not(containsClock(clock)))
+    }
+
+    @Test
     fun deleteAClock() {
         val clock = App.registeredAClock("kuku9", "every.9.seconds")
         App.deleteClock(clock)

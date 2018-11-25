@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.verify;
@@ -30,34 +31,54 @@ class ClocksRepositoryTest {
 
     @Test
     void updateClockIfAlreadyExistsByName() {
-        Clock savedClock = repository.saveClock("kuku", "every.5.seconds");
-        repository.saveClock("kuku", "every.10.seconds");
+        Clock savedClock = saveClock("kuku", "every.5.seconds");
+        saveClock("kuku", "every.10.seconds");
         assertThat(repository.findAll(), hasSize(1));
-        assertThat(repository.findById(savedClock.getId()).get().getSchedule(), is("every.10.seconds"));
+        assertThat(repository.findById(savedClock.getId()).get().getSchedules(),
+                containsInAnyOrder("every.10.seconds", "every.5.seconds"));
+    }
+
+    private Clock saveClock(String name, String... schedules) {
+        Clock clock = null;
+        for (String schedule : schedules) {
+            clock = repository.saveClock(name, schedule);
+        }
+        return clock;
     }
 
     @Test
     void createScheduleOnNewClock() {
-        repository.saveClock("kuku", "every.3.seconds");
+        saveClock("kuku", "every.3.seconds");
         verify(schedulesRepositoryMock).addClockFor("every.3.seconds");
     }
 
     @Test
-    void removeClockSchedulesOnClockDelete() {
-        repository.saveClock("kuku", "every.4.seconds");
-        Clock savedClock = repository.saveClock("kuku", "every.8.seconds");
-        repository.deleteById(savedClock.getId());
-        verify(schedulesRepositoryMock).removeClockFor(savedClock.getSchedules().toArray(new String[0]));
-    }
-
-    @Test
     void findClocksWithRedundantSchedules() {
-        repository.saveClock("popov", "every.4.seconds");
-        repository.saveClock("popov", "every.5.seconds");
-        repository.saveClock("kuku", "every.4.seconds");
+        saveClock("popov", "every.4.seconds", "every.5.seconds");
+        saveClock("kuku", "every.4.seconds");
         List<Clock> schedules = repository.findByMoreThanOneSchedule();
         assertThat(schedules, hasSize(1));
         assertThat(schedules.get(0).getName(), is("popov"));
+    }
+
+    @Test
+    void removeSchedule() {
+        Clock clock = saveClock("popov", "every.6.seconds", "every.8.seconds");
+        repository.deleteScheduleByIndex(clock.getId(), 0);
+        Clock newClock = repository.findById(clock.getId()).get();
+        assertThat(newClock.getSchedules(), hasSize(1));
+        assertThat(newClock.getSchedules().get(0), is(clock.getSchedules().get(1)));
+    }
+
+    @Test
+    void deleteAllClocksWithoutSchedules() {
+        Clock popov = repository.saveClock("popov", "every.4.seconds");
+        repository.saveClock("kuku", "every.4.seconds");
+        repository.deleteScheduleByIndex(popov.getId(), 0);
+        repository.deleteByNoSchedules();
+        assertThat(repository.count(), is(1L));
+        assertThat(repository.findAll().get(0).getName(), is("kuku"));
+
     }
 
     @AfterEach

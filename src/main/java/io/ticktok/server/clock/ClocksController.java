@@ -2,7 +2,8 @@ package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.tick.TickChannelFactory;
+import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.TickChannelCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -24,15 +25,18 @@ public class ClocksController {
 
     private final ClocksRepository clocksRepository;
     private final String domain;
-    private final TickChannelFactory tickChannelFactory;
+    private final TickChannelCreator tickChannelCreator;
+    private final ClocksPurger clocksPurger;
 
 
     public ClocksController(@Value("${http.domain}") String domain,
                             ClocksRepository clocksRepository,
-                            TickChannelFactory tickChannelFactory) {
+                            TickChannelCreator tickChannelCreator,
+                            ClocksPurger clocksPurger) {
         this.domain = domain;
         this.clocksRepository = clocksRepository;
-        this.tickChannelFactory = tickChannelFactory;
+        this.tickChannelCreator = tickChannelCreator;
+        this.clocksPurger = clocksPurger;
     }
 
     @PostMapping
@@ -45,12 +49,13 @@ public class ClocksController {
     })
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest, Principal principal) {
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
-        return createdClockEntity(savedClock, principal);
+        TickChannel channel = tickChannelCreator.create(clockRequest.getName(), clockRequest.getSchedule());
+        return createdClockEntity(savedClock, channel, principal);
     }
 
-    private ResponseEntity<ClockResourceWithChannel> createdClockEntity(Clock clock, Principal principal) {
+    private ResponseEntity<ClockResourceWithChannel> createdClockEntity(Clock clock, TickChannel channel, Principal principal) {
         ClockResourceWithChannel clockResource =
-                new ClockResourceWithChannel(domain, clock, tickChannelFactory.create(clock));
+                new ClockResourceWithChannel(domain, clock, channel);
         return ResponseEntity.created(
                 withAuthToken(clockResource.getUrl(), principal))
                 .body(clockResource);
@@ -82,6 +87,13 @@ public class ClocksController {
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll() {
         return clocksRepository.findAll().stream().map(this::createClockResourceFor).collect(Collectors.toList());
+    }
+
+    @PostMapping("/purge")
+    @ApiOperation("Purge clocks with no active schedules")
+    public ResponseEntity<Void> purge() {
+        clocksPurger.purge();
+        return ResponseEntity.noContent().build();
     }
 
 }
