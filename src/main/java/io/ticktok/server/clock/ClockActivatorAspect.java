@@ -6,8 +6,6 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Aspect
 @Component
 public class ClockActivatorAspect {
@@ -18,11 +16,9 @@ public class ClockActivatorAspect {
         this.clocksRepository = clocksRepository;
     }
 
-    @After("execution(* io.ticktok.server.tick.TickChannelCreator.create(..)) && args(name, schedule)")
-    public void activateClock(JoinPoint joinPoint, String name, String schedule) {
-        Optional<Clock> clock = clocksRepository.findByNameAndSchedule(name, schedule);
-        clock.ifPresent(c -> clocksRepository.updateStatus(c.getId(), Clock.ACTIVE));
-
+    @After("execution(* io.ticktok.server.tick.TickChannelCreator.create(..)) && args(clock)")
+    public void activateClock(JoinPoint joinPoint, Clock clock) {
+        clocksRepository.updateStatus(clock.getId(), Clock.ACTIVE);
     }
 
 }

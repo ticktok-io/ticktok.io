@@ -21,8 +21,6 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest
 class RabbitTickChannelCreatorTest {
 
-    public static final String SCHEDULE = "popov-schedule";
-
     @Autowired
     private RabbitTickChannelCreator tickChannelFactory;
     @Autowired
@@ -32,8 +30,9 @@ class RabbitTickChannelCreatorTest {
 
     @Test
     void createQueueForConsumer() {
-        TickChannel tickChannel = tickChannelFactory.create("kuku", SCHEDULE);
-        rabbitTemplate.convertAndSend(exchange.getName(), SCHEDULE, "hello");
+        Clock clock = new Clock("kuku", "popov-schedule");
+        TickChannel tickChannel = tickChannelFactory.create(clock);
+        rabbitTemplate.convertAndSend(exchange.getName(), clock.getSchedule(), "hello");
         assertThat(rabbitTemplate.receiveAndConvert(tickChannel.getQueue(), 1000), is("hello"));
     }
 

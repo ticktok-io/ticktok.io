@@ -2,11 +2,11 @@ package io.ticktok.server.clock;
 
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelExplorer;
-import io.ticktok.server.tick.rabbit.QueueNameCreator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-
+@Slf4j
 @Component
 public class ClocksPurger {
 
@@ -27,12 +27,12 @@ public class ClocksPurger {
     private void deleteRedundantSchedules(Clock clock) {
         if (isChannelNotExistsFor(clock)) {
             clocksRepository.deleteClock(clock);
+            log.info("Purged the clock: {} with schedule: {}", clock.getName(), clock.getSchedule());
         }
     }
 
     private boolean isChannelNotExistsFor(Clock clock) {
-        return !tickChannelExplorer.isExists(
-                new QueueNameCreator(clock.getName(), clock.getSchedule()).create());
+        return !tickChannelExplorer.isExists(clock);
     }
 
 }

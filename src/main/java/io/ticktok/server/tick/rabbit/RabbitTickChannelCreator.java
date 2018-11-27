@@ -7,14 +7,12 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.core.RabbitManagementTemplate;
 
 public class RabbitTickChannelCreator implements TickChannelCreator {
 
     private final AmqpAdmin rabbitAdmin;
     private final String rabbitUri;
     private final TopicExchange exchange;
-    private RabbitManagementTemplate rabbitManagementTemplate;
 
     public RabbitTickChannelCreator(AmqpAdmin rabbitAdmin, String rabbitUri, TopicExchange topicExchange) {
         this.rabbitAdmin = rabbitAdmin;
@@ -23,10 +21,10 @@ public class RabbitTickChannelCreator implements TickChannelCreator {
     }
 
     @Override
-    public TickChannel create(String name, String schedule) {
-        Queue queue = new Queue(new QueueNameCreator(name, schedule).create(), true, false, true);
+    public TickChannel create(Clock clock) {
+        Queue queue = new Queue(new QueueNameCreator(clock).create(), true, false, true);
         rabbitAdmin.declareQueue(queue);
-        rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(schedule));
+        rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(clock.getSchedule()));
         return new TickChannel(rabbitUri, queue.getName());
     }
 

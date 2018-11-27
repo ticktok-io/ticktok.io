@@ -49,7 +49,7 @@ public class ClocksController {
     })
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest, Principal principal) {
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
-        TickChannel channel = tickChannelCreator.create(clockRequest.getName(), clockRequest.getSchedule());
+        TickChannel channel = tickChannelCreator.create(savedClock);
         return createdClockEntity(savedClock, channel, principal);
     }
 

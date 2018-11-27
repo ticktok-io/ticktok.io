@@ -1,5 +1,6 @@
 package test.io.ticktok.server.tick.rabbit;
 
+import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.rabbit.RabbitConfiguration;
 import io.ticktok.server.tick.rabbit.RabbitTickChannelCreator;
@@ -23,7 +24,7 @@ class RabbitTickChannelExplorerTest {
     @Autowired
     private AmqpAdmin amqpAdmin;
     @Autowired
-    private RabbitTickChannelCreator tickChannelFactory;
+    private RabbitTickChannelCreator tickChannelCreator;
     @Autowired
     private RabbitTickChannelExplorer tickChannelExplorer;
 
@@ -31,8 +32,9 @@ class RabbitTickChannelExplorerTest {
 
     @Test
     void retrieveTrueWhenQueueExists() {
-        channel = tickChannelFactory.create("kuku", "every.111.seconds");
-        assertTrue(tickChannelExplorer.isExists(channel.getQueue()));
+        Clock clock = new Clock("kuku", "every.111.seconds");
+        channel = tickChannelCreator.create(clock);
+        assertTrue(tickChannelExplorer.isExists(clock));
     }
 
     @AfterEach
