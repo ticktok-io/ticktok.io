@@ -3,7 +3,7 @@ package io.ticktok.server.clock;
 import io.swagger.annotations.*;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
-import io.ticktok.server.tick.TickChannelCreator;
+import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -25,17 +25,17 @@ public class ClocksController {
 
     private final ClocksRepository clocksRepository;
     private final String domain;
-    private final TickChannelCreator tickChannelCreator;
+    private final TickChannelExplorer tickChannelExplorer;
     private final ClocksPurger clocksPurger;
 
 
     public ClocksController(@Value("${http.domain}") String domain,
                             ClocksRepository clocksRepository,
-                            TickChannelCreator tickChannelCreator,
+                            TickChannelExplorer tickChannelExplorer,
                             ClocksPurger clocksPurger) {
         this.domain = domain;
         this.clocksRepository = clocksRepository;
-        this.tickChannelCreator = tickChannelCreator;
+        this.tickChannelExplorer = tickChannelExplorer;
         this.clocksPurger = clocksPurger;
     }
 
@@ -49,7 +49,7 @@ public class ClocksController {
     })
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest, Principal principal) {
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
-        TickChannel channel = tickChannelCreator.create(savedClock);
+        TickChannel channel = tickChannelExplorer.create(savedClock);
         return createdClockEntity(savedClock, channel, principal);
     }
 

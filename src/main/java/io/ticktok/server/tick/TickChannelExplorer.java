@@ -4,4 +4,6 @@ import io.ticktok.server.clock.Clock;
 
 public interface TickChannelExplorer {
     boolean isExists(Clock clock);
+
+    TickChannel create(Clock clock);
 }

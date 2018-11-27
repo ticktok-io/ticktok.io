@@ -3,7 +3,7 @@ package test.io.ticktok.server.clock;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.ClockActivatorAspect;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.tick.TickChannelCreator;
+import io.ticktok.server.tick.TickChannelExplorer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,8 @@ class ClockActivatorAspectTest {
     static class TestConfiguration {
 
         @Bean
-        public TickChannelCreator tickChannelCreator() {
-            return mock(TickChannelCreator.class);
+        public TickChannelExplorer tickChannelExplorer() {
+            return mock(TickChannelExplorer.class);
         }
 
         @Bean
@@ -39,7 +39,7 @@ class ClockActivatorAspectTest {
     }
 
     @Autowired
-    TickChannelCreator tickChannelCreator;
+    TickChannelExplorer tickChannelExplorer;
     @Autowired
     ClocksRepository clocksRepository;
 
@@ -52,7 +52,7 @@ class ClockActivatorAspectTest {
                 .schedule("every.1.seconds")
                 .status(Clock.PENDING)
                 .build();
-        tickChannelCreator.create(clock);
+        tickChannelExplorer.create(clock);
         verify(clocksRepository).updateStatus(clock.getId(), Clock.ACTIVE);
     }
 

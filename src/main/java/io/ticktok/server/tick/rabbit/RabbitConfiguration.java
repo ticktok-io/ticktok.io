@@ -1,6 +1,5 @@
 package io.ticktok.server.tick.rabbit;
 
-import io.ticktok.server.tick.TickChannelCreator;
 import io.ticktok.server.tick.TickChannelExplorer;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.TopicExchange;
@@ -43,13 +42,8 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public TickChannelCreator tickChannelFactory(AmqpAdmin amqpAdmin, TopicExchange topicExchange) {
-        return new RabbitTickChannelCreator(amqpAdmin, rabbitUri, topicExchange);
-    }
-
-    @Bean
-    public TickChannelExplorer tickChannelExplorer(AmqpAdmin amqpAdmin) {
-        return new RabbitTickChannelExplorer(amqpAdmin);
+    public TickChannelExplorer tickChannelExplorer(AmqpAdmin amqpAdmin, TopicExchange topicExchange) {
+        return new RabbitTickChannelExplorer(amqpAdmin, rabbitUri, topicExchange);
     }
 
 }
