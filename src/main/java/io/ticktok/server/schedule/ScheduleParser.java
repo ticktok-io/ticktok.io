@@ -1,6 +1,5 @@
-package io.ticktok.server.clock.schedule;
+package io.ticktok.server.schedule;
 
-import java.time.Clock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

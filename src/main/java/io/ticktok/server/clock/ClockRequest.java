@@ -1,8 +1,7 @@
 package io.ticktok.server.clock;
 
-import io.ticktok.server.clock.schedule.ScheduleConstraint;
+import io.ticktok.server.schedule.ScheduleConstraint;
 import lombok.*;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
 

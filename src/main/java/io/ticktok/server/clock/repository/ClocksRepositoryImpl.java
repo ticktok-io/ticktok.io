@@ -1,6 +1,7 @@
 package io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
+import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -9,40 +10,43 @@ import org.springframework.data.mongodb.core.query.Update;
 
 public class ClocksRepositoryImpl implements UpdateClockRepository {
 
-    public static final String SCHEDULES = "schedules";
-
     private final MongoOperations mongo;
     private final SchedulesRepository schedulesRepository;
+    private final java.time.Clock systemClock;
 
     public ClocksRepositoryImpl(MongoOperations mongo,
-                                SchedulesRepository schedulesRepository) {
+                                SchedulesRepository schedulesRepository, java.time.Clock systemClock) {
         this.mongo = mongo;
         this.schedulesRepository = schedulesRepository;
+        this.systemClock = systemClock;
     }
 
     @Override
     public Clock saveClock(String name, String schedule) {
         Clock clock = mongo.findAndModify(
-                Query.query(Criteria.where("name").is(name)),
-                new Update().push(SCHEDULES, schedule),
+                Query.query(Criteria.where("name").is(name).and("schedule").is(schedule)),
+                new Update().set("lastModifiedDate", systemClock.millis()).set("status", Clock.PENDING),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 Clock.class);
-        schedulesRepository.addClockFor(schedule);
+        schedulesRepository.addSchedule(schedule);
         return clock;
     }
 
     @Override
-    public void deleteScheduleByIndex(String id, int scheduleIndex) {
-        mongo.updateFirst(Query.query(Criteria.where("id").is(id)),
-                new Update().unset(SCHEDULES + "." + scheduleIndex),
+    public void deleteClock(Clock clock) {
+        mongo.remove(
+                Query.query(Criteria.where("name").is(clock.getName())
+                        .and("schedule").is(clock.getSchedule())
+                        .and("lastModifiedDate").is(clock.getLastModifiedDate())),
                 Clock.class);
-        mongo.updateFirst(Query.query(Criteria.where("id").is(id)),
-                new Update().pull(SCHEDULES, null),
-                Clock.class);
+        schedulesRepository.removeSchedule(clock.getSchedule());
     }
 
     @Override
-    public void deleteByNoSchedules() {
-        mongo.remove(Query.query(Criteria.where(SCHEDULES).size(0)), Clock.class);
+    public void updateStatus(String id, String status) {
+        mongo.updateFirst(
+                Query.query(Criteria.where("id").is(id)),
+                Update.update("status", status),
+                Clock.class);
     }
 }

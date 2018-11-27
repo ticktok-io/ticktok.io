@@ -1,33 +1,38 @@
 package io.ticktok.server.clock;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @EqualsAndHashCode
 @ToString
 public class Clock {
 
+    public static final String PENDING = "PENDING";
+    public static final String ACTIVE = "ACTIVE";
     @Id
     private String id;
-    private List<String> schedules;
-    @Indexed(unique = true)
-    protected String name;
 
-    public Clock(String id, String name, String... schedules) {
+    protected String name;
+    private String schedule;
+    @Indexed
+    private String status;
+    private long lastModifiedDate;
+
+    public Clock(String id, String name, String schedule) {
         this.name = name;
-        this.schedules = Arrays.asList(schedules);
+        this.schedule = schedule;
         this.id = id;
     }
 

@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 @Configuration
-@EnableMongoRepositories({"io.ticktok.server.clock", "io.ticktok.server.tick"})
+@EnableMongoRepositories({"io.ticktok.server.clock", "io.ticktok.server.schedule", "io.ticktok.server.tick"})
 @ComponentScan(basePackages = {"io.ticktok.server.clock.repository"})
 public class MongoTestConfiguration {
 

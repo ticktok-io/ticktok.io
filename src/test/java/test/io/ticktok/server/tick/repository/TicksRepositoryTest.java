@@ -1,6 +1,6 @@
 package test.io.ticktok.server.tick.repository;
 
-import io.ticktok.server.clock.Schedule;
+import io.ticktok.server.schedule.Schedule;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.repository.TicksRepository;
 import org.junit.jupiter.api.AfterEach;

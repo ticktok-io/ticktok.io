@@ -1,7 +1,7 @@
-package test.io.ticktok.server.clock.repository;
+package test.io.ticktok.server.schedule.repository;
 
-import io.ticktok.server.clock.schedule.SchedulesPurger;
-import io.ticktok.server.clock.repository.SchedulesRepository;
+import io.ticktok.server.schedule.SchedulesPurger;
+import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;

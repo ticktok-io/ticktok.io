@@ -17,7 +17,7 @@ class ClockResourceTest {
     @Test
     void delegateClock() {
         assertThat(resource.getId(), is(CLOCK.getId()));
-        assertThat(resource.getSchedules(), is(CLOCK.getSchedules()));
+        assertThat(resource.getSchedule(), is(CLOCK.getSchedule()));
     }
 
     @Test

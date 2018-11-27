@@ -1,6 +1,6 @@
-package test.io.ticktok.server.clock.schedule;
+package test.io.ticktok.server.schedule;
 
-import io.ticktok.server.clock.schedule.ScheduleValidator;
+import io.ticktok.server.schedule.ScheduleValidator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

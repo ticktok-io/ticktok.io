@@ -1,6 +1,6 @@
-package io.ticktok.server.clock.repository;
+package io.ticktok.server.schedule.repository;
 
-import io.ticktok.server.clock.Schedule;
+import io.ticktok.server.schedule.Schedule;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -27,7 +27,7 @@ public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository 
     }
 
     @Override
-    public void addClockFor(String schedule) {
+    public void addSchedule(String schedule) {
         mongo.upsert(
                 Query.query(Criteria.where("schedule").is(schedule)),
                 new Update().setOnInsert("latestScheduledTick", systemTime.millis()).inc("clockCount", 1),
@@ -35,8 +35,8 @@ public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository 
     }
 
     @Override
-    public void removeClockFor(String... schedules) {
-        mongo.updateMulti(Query.query(Criteria.where("schedule").in((Object[]) schedules)),
+    public void removeSchedule(String schedule) {
+        mongo.updateFirst(Query.query(Criteria.where("schedule").is(schedule)),
                 new Update().inc("clockCount", -1),
                 Schedule.class);
     }

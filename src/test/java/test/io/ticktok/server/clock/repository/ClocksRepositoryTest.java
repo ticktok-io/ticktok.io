@@ -2,7 +2,7 @@ package test.io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.clock.repository.SchedulesRepository;
+import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,13 +11,13 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
@@ -28,57 +28,67 @@ class ClocksRepositoryTest {
     ClocksRepository repository;
     @Autowired
     SchedulesRepository schedulesRepositoryMock;
+    @Autowired
+    java.time.Clock systemClock;
 
     @Test
-    void updateClockIfAlreadyExistsByName() {
-        Clock savedClock = saveClock("kuku", "every.5.seconds");
-        saveClock("kuku", "every.10.seconds");
-        assertThat(repository.findAll(), hasSize(1));
-        assertThat(repository.findById(savedClock.getId()).get().getSchedules(),
-                containsInAnyOrder("every.10.seconds", "every.5.seconds"));
+    void updateModifiedDate() {
+        Clock savedClock = repository.saveClock("eli", "every.30.seconds");
+        assertThat(repository.findById(savedClock.getId()).get().getLastModifiedDate(), is(systemClock.millis()));
     }
 
-    private Clock saveClock(String name, String... schedules) {
-        Clock clock = null;
-        for (String schedule : schedules) {
-            clock = repository.saveClock(name, schedule);
-        }
-        return clock;
+    @Test
+    void updateClockByNameAndSchedule() {
+        String clockName = "kuku";
+        Clock clock = repository.saveClock(clockName, "every.5.seconds");
+        assertThat(clock.getId(), is(repository.saveClock(clockName, "every.5.seconds").getId()));
+        assertThat(clock.getId(), is(not(repository.saveClock(clockName, "every.2.seconds").getId())));
     }
 
     @Test
     void createScheduleOnNewClock() {
-        saveClock("kuku", "every.3.seconds");
-        verify(schedulesRepositoryMock).addClockFor("every.3.seconds");
+        repository.saveClock("kuku", "every.3.seconds");
+        verify(schedulesRepositoryMock).addSchedule("every.3.seconds");
     }
 
     @Test
-    void findClocksWithRedundantSchedules() {
-        saveClock("popov", "every.4.seconds", "every.5.seconds");
-        saveClock("kuku", "every.4.seconds");
-        List<Clock> schedules = repository.findByMoreThanOneSchedule();
-        assertThat(schedules, hasSize(1));
-        assertThat(schedules.get(0).getName(), is("popov"));
+    void deleteClock() {
+        Clock clock = repository.saveClock("popov", "every.6.seconds");
+        repository.deleteClock(clock);
+        assertFalse(repository.findById(clock.getId()).isPresent());
     }
 
     @Test
-    void removeSchedule() {
-        Clock clock = saveClock("popov", "every.6.seconds", "every.8.seconds");
-        repository.deleteScheduleByIndex(clock.getId(), 0);
-        Clock newClock = repository.findById(clock.getId()).get();
-        assertThat(newClock.getSchedules(), hasSize(1));
-        assertThat(newClock.getSchedules().get(0), is(clock.getSchedules().get(1)));
+    void ignoreDeleteIfMoreUpdatedClockExists() {
+        Clock clock = repository.saveClock("popov", "every.6.seconds");
+        repository.save(Clock.builder()
+                .id(clock.getId())
+                .name(clock.getName())
+                .schedule(clock.getSchedule())
+                .lastModifiedDate(clock.getLastModifiedDate() + 10)
+                .build());
+        repository.deleteClock(clock);
+        assertTrue(repository.findById(clock.getId()).isPresent(), "Clock should've not be deleted");
     }
 
     @Test
-    void deleteAllClocksWithoutSchedules() {
-        Clock popov = repository.saveClock("popov", "every.4.seconds");
-        repository.saveClock("kuku", "every.4.seconds");
-        repository.deleteScheduleByIndex(popov.getId(), 0);
-        repository.deleteByNoSchedules();
-        assertThat(repository.count(), is(1L));
-        assertThat(repository.findAll().get(0).getName(), is("kuku"));
+    void removeScheduleOnClockDeletion() {
+        Clock clock = repository.saveClock("kaka", "every.11.seconds");
+        repository.deleteClock(clock);
+        verify(schedulesRepositoryMock).removeSchedule(clock.getSchedule());
+    }
 
+    @Test
+    void clockShouldCreatedAsPending() {
+        Clock clock = repository.saveClock("lili", "every.11.seconds");
+        assertThat(repository.findById(clock.getId()).get(). getStatus(), is(Clock.PENDING));
+    }
+
+    @Test
+    void updateClockStatus() {
+        Clock clock = repository.saveClock("lulu", "every.11.seconds");
+        repository.updateStatus(clock.getId(), Clock.ACTIVE);
+        assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.ACTIVE));
     }
 
     @AfterEach

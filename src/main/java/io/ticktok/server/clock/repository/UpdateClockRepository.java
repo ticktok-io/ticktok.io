@@ -4,10 +4,9 @@ import io.ticktok.server.clock.Clock;
 
 public interface UpdateClockRepository {
 
-    //TODO: add pending
     Clock saveClock(String name, String schedule);
 
-    void deleteScheduleByIndex(String id, int scheduleIndex);
+    void deleteClock(Clock clock);
 
-    void deleteByNoSchedules();
+    void updateStatus(String id, String status);
 }

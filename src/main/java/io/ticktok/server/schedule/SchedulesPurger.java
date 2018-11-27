@@ -1,6 +1,6 @@
-package io.ticktok.server.clock.schedule;
+package io.ticktok.server.schedule;
 
-import io.ticktok.server.clock.repository.SchedulesRepository;
+import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
-package io.ticktok.server.clock.repository;
+package io.ticktok.server.schedule.repository;
 
-import io.ticktok.server.clock.Schedule;
+import io.ticktok.server.schedule.Schedule;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

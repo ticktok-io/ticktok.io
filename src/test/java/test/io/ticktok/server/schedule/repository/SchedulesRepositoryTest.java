@@ -1,8 +1,7 @@
-package test.io.ticktok.server.clock.repository;
+package test.io.ticktok.server.schedule.repository;
 
-import io.ticktok.server.clock.Schedule;
-import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.clock.repository.SchedulesRepository;
+import io.ticktok.server.schedule.Schedule;
+import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.tick.MongoTestConfiguration;
 
+import java.time.Clock;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,12 +20,14 @@ import static org.hamcrest.core.Is.is;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MongoTestConfiguration.class})
+@ContextConfiguration(classes = {SchedulesRepositoryTestConfiguration.class})
 class SchedulesRepositoryTest {
 
     public static final int SECOND = 1000;
     @Autowired
     SchedulesRepository schedulesRepository;
+    @Autowired
+    Clock systemClock;
 
     @BeforeEach
     void setUp() {
@@ -43,15 +45,15 @@ class SchedulesRepositoryTest {
 
     @Test
     void addANewSchedule() {
-        schedulesRepository.addClockFor("every.11.seconds");
+        schedulesRepository.addSchedule("every.11.seconds");
         Schedule createdSchedule = schedulesRepository.findBySchedule("every.11.seconds").get();
         assertThat(createdSchedule.getClockCount(), is(1));
-        assertThat(createdSchedule.getLatestScheduledTick(), is(MongoTestConfiguration.FIXED_INSTANT.toEpochMilli()));
+        assertThat(createdSchedule.getLatestScheduledTick(), is(systemClock.millis()));
     }
 
     @Test
     void updateScheduleLatestScheduledTick() {
-        schedulesRepository.addClockFor("every.30.seconds");
+        schedulesRepository.addSchedule("every.30.seconds");
         String scheduleId = schedulesRepository.findBySchedule("every.30.seconds").get().getId();
         schedulesRepository.updateLatestScheduledTick(scheduleId, 111222L);
         assertThat(schedulesRepository.findById(scheduleId).get().getLatestScheduledTick(), is(111222L));
@@ -59,8 +61,8 @@ class SchedulesRepositoryTest {
 
     @Test
     void increaseClockCountOnAddingExistingSchedule() {
-        schedulesRepository.addClockFor("every.11.seconds");
-        schedulesRepository.addClockFor("every.11.seconds");
+        schedulesRepository.addSchedule("every.11.seconds");
+        schedulesRepository.addSchedule("every.11.seconds");
         List<Schedule> allSchedules = schedulesRepository.findAll();
         assertThat(allSchedules.size(), is(1));
         assertThat(allSchedules.get(0).getClockCount(), is(2));
@@ -68,11 +70,9 @@ class SchedulesRepositoryTest {
 
     @Test
     void decreaseClockCount() {
-        schedulesRepository.addClockFor("every.11.seconds");
-        schedulesRepository.addClockFor("every.20.seconds");
-        schedulesRepository.removeClockFor("every.11.seconds", "every.20.seconds");
+        schedulesRepository.addSchedule("every.11.seconds");
+        schedulesRepository.removeSchedule("every.11.seconds");
         assertThat(schedulesRepository.findBySchedule("every.11.seconds").get().getClockCount(), is(0));
-        assertThat(schedulesRepository.findBySchedule("every.20.seconds").get().getClockCount(), is(0));
     }
 
     @Test

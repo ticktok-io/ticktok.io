@@ -1,6 +1,6 @@
 package test.io.ticktok.server.tick;
 
-import io.ticktok.server.clock.Schedule;
+import io.ticktok.server.schedule.Schedule;
 import io.ticktok.server.tick.Tick;
 import org.junit.jupiter.api.Test;
 

@@ -123,7 +123,7 @@ object App {
 
     private fun validateRetrievedBody(clockExpr: String) {
         val lastResponseBody = lastResponseBody()
-        assertThat(lastResponseBody.get("schedules").asJsonArray.get(0).asString, `is`(clockExpr))
+        assertThat(lastResponseBody.get("schedule").asString, `is`(clockExpr))
         assertThat(lastResponseBody.get("url").asString, `is`(withoutToken(lastResponseLocation())))
     }
 

@@ -1,7 +1,6 @@
-package test.io.ticktok.server.clock;
+package test.io.ticktok.server.schedule;
 
-import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.Schedule;
+import io.ticktok.server.schedule.Schedule;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
