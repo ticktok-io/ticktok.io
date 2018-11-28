@@ -1,7 +1,6 @@
 package io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -11,13 +10,11 @@ import org.springframework.data.mongodb.core.query.Update;
 public class ClocksRepositoryImpl implements UpdateClockRepository {
 
     private final MongoOperations mongo;
-    private final SchedulesRepository schedulesRepository;
     private final java.time.Clock systemClock;
 
     public ClocksRepositoryImpl(MongoOperations mongo,
-                                SchedulesRepository schedulesRepository, java.time.Clock systemClock) {
+                                java.time.Clock systemClock) {
         this.mongo = mongo;
-        this.schedulesRepository = schedulesRepository;
         this.systemClock = systemClock;
     }
 
@@ -28,7 +25,6 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
                 new Update().set("lastModifiedDate", systemClock.millis()).set("status", Clock.PENDING),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 Clock.class);
-        schedulesRepository.addSchedule(schedule);
         return clock;
     }
 
@@ -39,7 +35,7 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
                         .and("schedule").is(clock.getSchedule())
                         .and("lastModifiedDate").is(clock.getLastModifiedDate())),
                 Clock.class);
-        schedulesRepository.removeSchedule(clock.getSchedule());
+
     }
 
     @Override

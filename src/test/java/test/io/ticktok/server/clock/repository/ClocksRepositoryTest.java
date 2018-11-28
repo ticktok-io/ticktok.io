@@ -45,12 +45,6 @@ class ClocksRepositoryTest {
     }
 
     @Test
-    void createScheduleOnNewClock() {
-        repository.saveClock("kuku", "every.3.seconds");
-        verify(schedulesRepositoryMock).addSchedule("every.3.seconds");
-    }
-
-    @Test
     void deleteClock() {
         Clock clock = repository.saveClock("popov", "every.6.seconds");
         repository.deleteClock(clock);
@@ -68,13 +62,6 @@ class ClocksRepositoryTest {
                 .build());
         repository.deleteClock(clock);
         assertTrue(repository.findById(clock.getId()).isPresent(), "Clock should've not be deleted");
-    }
-
-    @Test
-    void removeScheduleOnClockDeletion() {
-        Clock clock = repository.saveClock("kaka", "every.11.seconds");
-        repository.deleteClock(clock);
-        verify(schedulesRepositoryMock).removeSchedule(clock.getSchedule());
     }
 
     @Test
