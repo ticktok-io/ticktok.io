@@ -1,11 +1,14 @@
+import datetime
 import random
 import sys
 import threading
 
 import requests
+import pika
 
 
 class Consumer(threading.Thread):
+    num_of_ticks = 0
 
     def __init__(self, name, schedule):
         threading.Thread.__init__(self)
@@ -13,8 +16,9 @@ class Consumer(threading.Thread):
         self.schedule = schedule
 
     def run(self):
+        self.num_of_ticks = 0
         clock = self.create_clock()
-        self.listen_on_ticks(clock.channel, self.on_tick_listener)
+        self.listen_on_ticks(clock.channel)
         print("Name: %s | schedule: %s" % (self.name, self.schedule))
         sys.stdout.flush()
 
@@ -23,15 +27,19 @@ class Consumer(threading.Thread):
         assert response.status_code == 201
         return response.json()["channel"]
 
-    def listen_on_ticks(self, channel, on_tick_listener):
-        pass
+    def listen_on_ticks(self, clock_channel):
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        channel = connection.channel()
+        channel.basic_consume(self.tick_callback, queue=clock_channel['queue'], no_ack=True)
+        channel.start_consuming()
 
-    def on_tick_listener(self):
-        pass
+    def tick_callback(self, ch, method, properties, body):
+        self.num_of_ticks += 1
+        print("%s, %s, %s" % (str(datetime.datetime.now()), self.name, self.schedule))
+        ch.stop_consuming()
 
 
 class TicktokTester(object):
-
     consumers = []
 
     def test(self, num_of_clocks, consumers_per_clock):
