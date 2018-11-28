@@ -1,6 +1,5 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.schedule;
 
-import io.ticktok.server.clock.schedule.ScheduleParser;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -34,8 +33,8 @@ public class Schedule {
         this.clockCount = clockCount;
     }
 
-    public static Schedule createFrom(Clock clock, long currentTime) {
-        return new Schedule(clock.getSchedule(), currentTime, 1);
+    public static Schedule createFrom(String schedule, long currentTime) {
+        return new Schedule(schedule, currentTime, 1);
     }
 
     public long nextTick() {

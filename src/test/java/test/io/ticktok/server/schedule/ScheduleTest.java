@@ -1,7 +1,6 @@
-package test.io.ticktok.server.clock;
+package test.io.ticktok.server.schedule;
 
-import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.Schedule;
+import io.ticktok.server.schedule.Schedule;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,7 +10,7 @@ class ScheduleTest {
 
     @Test
     void createSchedule() {
-        Schedule schedule = Schedule.createFrom(new Clock("1", "kuku", "every.1.seconds"), 111L);
+        Schedule schedule = Schedule.createFrom("every.1.seconds", 111L);
         assertThat(schedule.getSchedule(), is("every.1.seconds"));
         assertThat(schedule.getLatestScheduledTick(), is(111L));
         assertThat(schedule.getClockCount(), is(1));

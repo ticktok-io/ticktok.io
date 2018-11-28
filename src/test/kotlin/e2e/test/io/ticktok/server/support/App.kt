@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Assertions
 object App {
 
     const val APP_URL = "http://localhost:8080"
-    const val CLOCK_NAME = "e2e-client:kuku"
     const val ACCESS_TOKEN = "ct-auth-token"
 
 
@@ -49,9 +48,9 @@ object App {
 
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
 
-    fun registeredAClock(timeExpr: String): Clock {
+    fun registeredAClock(name: String, timeExpr: String): Clock {
         lastResponse = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
-                .bodyString(createClockRequestFor(timeExpr), ContentType.APPLICATION_JSON)
+                .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
         val clock = Gson().fromJson<Clock>(bodyOf(lastResponse!!))
         saveClockIfCreated(clock)
@@ -66,10 +65,10 @@ object App {
         return "$url?access_token=$ACCESS_TOKEN"
     }
 
-    private fun createClockRequestFor(timeExpr: String): String {
+    private fun createClockRequestFor(name: String, timeExpr: String): String {
         return JSONObject()
                 .put("schedule", timeExpr)
-                .put("name", CLOCK_NAME)
+                .put("name", name)
                 .toString()
     }
 
@@ -92,7 +91,7 @@ object App {
 
     fun isAccessedWithoutAToken() {
         lastResponse = Request.Post("$APP_URL/api/v1/clocks")
-                .bodyString(createClockRequestFor("in.1.minute"), ContentType.APPLICATION_JSON)
+                .bodyString(createClockRequestFor("no-token", "in.1.minute"), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
     }
 
@@ -156,9 +155,14 @@ object App {
         assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
     }
 
+    fun purgeClocks() {
+        val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
+        assertThat(response.statusLine.statusCode, `is`(204))
+    }
+
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
         override fun describeTo(description: Description?) {
-
+            description?.appendText(clock.toString())
         }
 
         override fun matches(item: Any?): Boolean {

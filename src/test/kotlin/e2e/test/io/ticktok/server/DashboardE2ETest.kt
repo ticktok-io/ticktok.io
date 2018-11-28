@@ -1,8 +1,8 @@
 package e2e.test.io.ticktok.server
 
+import e2e.test.io.ticktok.server.pages.Browser
 import e2e.test.io.ticktok.server.pages.ClockListPage
 import e2e.test.io.ticktok.server.support.App
-import e2e.test.io.ticktok.server.pages.Browser
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 
@@ -20,8 +20,8 @@ class DashboardE2ETest {
 
     @Test
     fun showConfiguredClocks() {
-        App.registeredAClock("every.9.seconds")
-        App.registeredAClock("every.4.seconds")
+        App.registeredAClock("row1", "every.9.seconds")
+        App.registeredAClock("row2", "every.4.seconds")
         ClockListPage(browser).containsClockWith("every.9.seconds")
         ClockListPage(browser).containsClockWith("every.4.seconds")
     }

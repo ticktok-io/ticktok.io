@@ -1,13 +1,9 @@
 package e2e.test.io.ticktok.server.pages
 
 import org.assertj.core.api.Assertions
-import org.openqa.selenium.OutputType
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 import org.openqa.selenium.support.PageFactory
-import org.openqa.selenium.TakesScreenshot
-import java.io.File
-
 
 
 class ClockListPage(private val browser: Browser) {

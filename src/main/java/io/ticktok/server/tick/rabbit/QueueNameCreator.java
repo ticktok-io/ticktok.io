@@ -2,9 +2,6 @@ package io.ticktok.server.tick.rabbit;
 
 import io.ticktok.server.clock.Clock;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class QueueNameCreator {
     private final Clock clock;
 
@@ -13,12 +10,6 @@ public class QueueNameCreator {
     }
 
     public String create() {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update((clock.getName() + ";" + clock.getSchedule()).getBytes());
-            return new String(md.digest());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        return clock.getName() + ";" + clock.getSchedule();
     }
 }

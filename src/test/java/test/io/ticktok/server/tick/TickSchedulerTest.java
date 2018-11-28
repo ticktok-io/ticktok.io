@@ -1,7 +1,7 @@
 package test.io.ticktok.server.tick;
 
-import io.ticktok.server.clock.Schedule;
-import io.ticktok.server.clock.repository.SchedulesRepository;
+import io.ticktok.server.schedule.Schedule;
+import io.ticktok.server.schedule.repository.SchedulesRepository;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickScheduler;
 import io.ticktok.server.tick.repository.TicksRepository;

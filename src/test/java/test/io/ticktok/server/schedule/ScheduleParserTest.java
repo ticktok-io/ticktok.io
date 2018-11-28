@@ -1,18 +1,18 @@
-package test.io.ticktok.server.clock.schedule;
+package test.io.ticktok.server.schedule;
 
-import io.ticktok.server.clock.schedule.ScheduleParser;
+import io.ticktok.server.schedule.ScheduleParser;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ScheduleParserTest {
 
     @Test
     void shouldFailOnInvalidExpression() {
         assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
-                new ScheduleParser("invalid schedule").interval());
+                new ScheduleParser("invalid schedules").interval());
     }
 
     @Test

@@ -1,6 +1,6 @@
 package io.ticktok.server.clock;
 
-import io.ticktok.server.clock.schedule.ScheduleConstraint;
+import io.ticktok.server.schedule.ScheduleConstraint;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
@@ -13,8 +13,8 @@ import javax.validation.constraints.NotEmpty;
 public class ClockRequest {
 
     @ScheduleConstraint
-    protected String schedule;
+    private String schedule;
     @NotEmpty
-    protected String name;
+    private String name;
 
 }

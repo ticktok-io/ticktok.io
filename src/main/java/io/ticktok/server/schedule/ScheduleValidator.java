@@ -1,4 +1,4 @@
-package io.ticktok.server.clock.schedule;
+package io.ticktok.server.schedule;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

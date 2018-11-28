@@ -2,7 +2,8 @@ package io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
 
-public interface TickChannelFactory {
+public interface TickChannelExplorer {
+    boolean isExists(Clock clock);
 
     TickChannel create(Clock clock);
 }
