@@ -2,7 +2,6 @@ package test.io.ticktok.server.clock.repository;
 
 import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.springframework.context.annotation.*;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.time.Clock;

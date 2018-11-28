@@ -1,8 +1,8 @@
 package test.io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.clock.ClocksPurger;
+import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelExplorer;
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,8 @@
 package e2e.test.io.ticktok.server
 
+import e2e.test.io.ticktok.server.pages.Browser
 import e2e.test.io.ticktok.server.pages.ClockListPage
 import e2e.test.io.ticktok.server.support.App
-import e2e.test.io.ticktok.server.pages.Browser
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 
