@@ -2,6 +2,8 @@ package io.ticktok.server.clock;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 
@@ -11,6 +13,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 @Getter
 @EqualsAndHashCode
 @ToString
+@CompoundIndexes({
+        @CompoundIndex(name = "clock_schedule", def = "{'name' : 1, 'schedule': 1}", unique = true)
+})
 public class Clock {
 
     public static final String PENDING = "PENDING";
@@ -18,7 +23,7 @@ public class Clock {
     @Id
     private String id;
 
-    protected String name;
+    private String name;
     private String schedule;
     @Indexed
     private String status;
