@@ -24,14 +24,14 @@ public class TickScheduler {
 
     @Scheduled(fixedRate = 2000)
     public void schedule() {
-        toBeScheduleClocks().forEach(schedule -> {
+        toBeExecutedSchedules().forEach(schedule -> {
             long nextTickTime = schedule.nextTick();
             ticksRepository.save(Tick.create(schedule, nextTickTime));
             schedulesRepository.updateLatestScheduledTick(schedule.getId(), nextTickTime);
         });
     }
 
-    private List<Schedule> toBeScheduleClocks() {
+    private List<Schedule> toBeExecutedSchedules() {
         return schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(0, now() + LOOK_AHEAD);
     }
 

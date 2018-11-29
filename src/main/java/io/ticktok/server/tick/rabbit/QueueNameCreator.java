@@ -10,6 +10,6 @@ public class QueueNameCreator {
     }
 
     public String create() {
-        return clock.getName() + ";" + clock.getSchedule();
+        return "ticktok-" + clock.getName() + ";" + clock.getSchedule();
     }
 }
