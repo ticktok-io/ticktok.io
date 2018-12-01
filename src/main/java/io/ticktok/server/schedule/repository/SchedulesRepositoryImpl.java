@@ -8,29 +8,23 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import java.time.Clock;
 
-public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository {
+public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
+
+    private static final String NEXT_TICK = "nextTick";
 
     private final MongoOperations mongo;
     private final Clock systemTime;
 
-    public UpdateSchedulesRepositoryImpl(MongoOperations mongoOperations, Clock systemTime) {
+    public SchedulesRepositoryImpl(MongoOperations mongoOperations, Clock systemTime) {
         this.mongo = mongoOperations;
         this.systemTime = systemTime;
-    }
-
-    @Override
-    public void updateLatestScheduledTick(String id, long time) {
-        mongo.updateFirst(
-                Query.query(Criteria.where("id").is(id)),
-                Update.update("latestScheduledTick", time),
-                Schedule.class);
     }
 
     @Override
     public void addSchedule(String schedule) {
         mongo.upsert(
                 Query.query(Criteria.where("schedule").is(schedule)),
-                new Update().setOnInsert("latestScheduledTick", systemTime.millis()).inc("clockCount", 1),
+                new Update().setOnInsert(NEXT_TICK, systemTime.millis()).inc("clockCount", 1),
                 Schedule.class);
     }
 

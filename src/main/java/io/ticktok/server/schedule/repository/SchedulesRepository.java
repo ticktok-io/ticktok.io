@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface SchedulesRepository extends MongoRepository<Schedule, String>, UpdateSchedulesRepository {
 
-    List<Schedule> findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(int clocks, long time);
+    List<Schedule> findByClockCountGreaterThanAndNextTickLessThanEqual(int clocks, long time);
 
     Optional<Schedule> findBySchedule(String schedule);
 

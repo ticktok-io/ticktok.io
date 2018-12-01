@@ -6,35 +6,41 @@ import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickScheduler;
 import io.ticktok.server.tick.repository.TicksRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static test.io.ticktok.server.tick.TickSchedulerTest.NextTickMatcher.nextTickIsForInterval;
 
 
 class TickSchedulerTest {
 
-    static final long NOW = 1234;
+    static final long NOW = 1000;
+    static final int LOOK_AHEAD_IN_SECS = 2;
 
     SchedulesRepository schedulesRepository = mock(SchedulesRepository.class);
     TicksRepository ticksRepository = mock(TicksRepository.class);
 
     @Test
     void updateNextTicks() {
-        when(schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(anyInt(), anyLong()))
+        Schedule schedule2 = createEverySecondsSchedule("1");
+        Schedule schedule4 = createEverySecondsSchedule("4");
+        when(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(anyInt(), anyLong()))
                 .thenReturn(asList(
-                        createEverySecondsSchedule("2"),
-                        createEverySecondsSchedule("4")
+                        schedule2,
+                        schedule4
                 ));
         schedule();
-        verify(schedulesRepository).updateLatestScheduledTick("2", 2000L);
-        verify(schedulesRepository).updateLatestScheduledTick("4", 4000L);
+
+        verify(schedulesRepository).save(argThat(nextTickIsForInterval(3000)));
+        verify(schedulesRepository).save(argThat(nextTickIsForInterval(5000)));
     }
 
     private Schedule createEverySecondsSchedule(String schedule) {
-        return new Schedule(schedule, "every." + schedule + ".seconds", 0L, 1);
+        return new Schedule(schedule, "every." + schedule + ".seconds", NOW, 1);
     }
 
     private void schedule() {
@@ -44,45 +50,51 @@ class TickSchedulerTest {
     @Test
     void fetchOnlyClocksWithPastScheduledTicks() {
         schedule();
-        verify(schedulesRepository).findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(0, NOW + TickScheduler.LOOK_AHEAD);
-    }
-
-
-    @Test
-    void shouldNotUpdateClockWhenFailedToScheduleATick() {
-        when(schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(anyInt(), anyLong())).thenReturn(asList(
-                createEverySecondsSchedule("1")
-        ));
-        doThrow(RuntimeException.class).when(ticksRepository).save(any());
-        try {
-            schedule();
-        } catch (Throwable e) {
-            verify(schedulesRepository, times(0)).updateLatestScheduledTick(eq("1"), anyLong());
-        }
+        verify(schedulesRepository).findByClockCountGreaterThanAndNextTickLessThanEqual(0, NOW + TickScheduler.LOOK_AHEAD);
     }
 
     @Test
     void scheduleNewTicks() {
-        List<Schedule> clocks = asList(
-                createEverySecondsSchedule("2"),
-                createEverySecondsSchedule("3")
-        );
-        when(schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(eq(0), anyLong())).thenReturn(clocks);
+        Schedule schedule1 = createEverySecondsSchedule("1");
+        Schedule schedule3 = createEverySecondsSchedule("3");
+        List<Schedule> schedules = asList(schedule1, schedule3);
+        when(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(eq(0), anyLong())).thenReturn(schedules);
         schedule();
-        verify(ticksRepository).save(Tick.create(clocks.get(0), 2000L));
-        verify(ticksRepository).save(Tick.create(clocks.get(1), 3000L));
+        verify(ticksRepository).save(Tick.create(schedule1));
+        schedule1 = schedule1.nextTick();
+        verify(ticksRepository).save(Tick.create(schedule1));
+        verify(ticksRepository).save(Tick.create(schedule3));
     }
 
-    class FixedTimeTickScheduler extends TickScheduler {
+    static class FixedTimeTickScheduler extends TickScheduler {
 
         public FixedTimeTickScheduler(SchedulesRepository schedulesRepository, TicksRepository ticksRepository) {
-            super(schedulesRepository, ticksRepository);
+            super(String.valueOf(LOOK_AHEAD_IN_SECS), schedulesRepository, ticksRepository);
         }
 
         @Override
         protected long now() {
             return NOW;
         }
+    }
+
+    static class NextTickMatcher implements ArgumentMatcher<Schedule> {
+
+        private final long expectedNextTick;
+
+        public NextTickMatcher(long expectedNextTick) {
+            this.expectedNextTick = expectedNextTick;
+        }
+
+        public static NextTickMatcher nextTickIsForInterval(long expectedNextTick) {
+            return new NextTickMatcher(expectedNextTick);
+        }
+
+        @Override
+        public boolean matches(Schedule actualSchedule) {
+            return actualSchedule.getNextTick() == expectedNextTick;
+        }
+
     }
 
 

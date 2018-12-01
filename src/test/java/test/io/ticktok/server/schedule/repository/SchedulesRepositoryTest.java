@@ -22,7 +22,8 @@ import static org.hamcrest.core.Is.is;
 @ContextConfiguration(classes = {SchedulesRepositoryTestConfiguration.class})
 class SchedulesRepositoryTest {
 
-    public static final int SECOND = 1000;
+    static final int SECOND = 1000;
+
     @Autowired
     SchedulesRepository schedulesRepository;
     @Autowired
@@ -47,15 +48,7 @@ class SchedulesRepositoryTest {
         schedulesRepository.addSchedule("every.11.seconds");
         Schedule createdSchedule = schedulesRepository.findBySchedule("every.11.seconds").get();
         assertThat(createdSchedule.getClockCount(), is(1));
-        assertThat(createdSchedule.getLatestScheduledTick(), is(systemClock.millis()));
-    }
-
-    @Test
-    void updateScheduleLatestScheduledTick() {
-        schedulesRepository.addSchedule("every.30.seconds");
-        String scheduleId = schedulesRepository.findBySchedule("every.30.seconds").get().getId();
-        schedulesRepository.updateLatestScheduledTick(scheduleId, 111222L);
-        assertThat(schedulesRepository.findById(scheduleId).get().getLatestScheduledTick(), is(111222L));
+        assertThat(createdSchedule.getNextTick(), is(systemClock.millis()));
     }
 
     @Test
@@ -78,19 +71,19 @@ class SchedulesRepositoryTest {
     void findByLatestScheduledTick() {
         schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, 1));
         schedulesRepository.save(new Schedule("every.10.seconds", now() + 10 * SECOND, 1));
-        List<Schedule> schedules = schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(0, now());
+        List<Schedule> schedules = schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(0, now());
         assertThat(schedules.size(), is(1));
         assertThat(schedules.get(0).getSchedule(), is("every.8.seconds"));
+    }
+
+    private long now() {
+        return System.currentTimeMillis();
     }
 
     @Test
     void shouldNotRetrieveNonActiveSchedules() {
         schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, 0));
-        assertThat(schedulesRepository.findByClockCountGreaterThanAndLatestScheduledTickLessThanEqual(0, now()).size(), is(0));
-    }
-
-    private long now() {
-        return System.currentTimeMillis();
+        assertThat(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(0, now()).size(), is(0));
     }
 
 }

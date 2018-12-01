@@ -12,7 +12,7 @@ class ScheduleTest {
     void createSchedule() {
         Schedule schedule = Schedule.createFrom("every.1.seconds", 111L);
         assertThat(schedule.getSchedule(), is("every.1.seconds"));
-        assertThat(schedule.getLatestScheduledTick(), is(111L));
+        assertThat(schedule.getNextTick(), is(111L));
         assertThat(schedule.getClockCount(), is(1));
     }
 }

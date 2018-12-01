@@ -18,18 +18,18 @@ public class Schedule {
     @Indexed(unique = true)
     private String schedule;
     @Indexed
-    private long latestScheduledTick;
+    private long nextTick;
     @Indexed
     private int clockCount;
 
-    public Schedule(String schedule, long latestScheduledTick) {
+    public Schedule(String schedule, long nextTick) {
         this.schedule = schedule;
-        this.latestScheduledTick = latestScheduledTick;
+        this.nextTick = nextTick;
     }
 
-    public Schedule(String schedule, long latestScheduledTick, int clockCount) {
+    public Schedule(String schedule, long nextTick, int clockCount) {
         this.schedule = schedule;
-        this.latestScheduledTick = latestScheduledTick;
+        this.nextTick = nextTick;
         this.clockCount = clockCount;
     }
 
@@ -37,7 +37,8 @@ public class Schedule {
         return new Schedule(schedule, currentTime, 1);
     }
 
-    public long nextTick() {
-        return latestScheduledTick + new ScheduleParser(schedule).interval() * 1000;
+    public Schedule nextTick() {
+        long nextTick = this.nextTick + new ScheduleParser(schedule).interval() * 1000;
+        return new Schedule(id, schedule, nextTick, clockCount);
     }
 }

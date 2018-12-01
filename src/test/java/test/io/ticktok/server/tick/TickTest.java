@@ -11,6 +11,6 @@ class TickTest {
 
     @Test
     void defaultStatusShouldBePending() {
-        assertThat(Tick.create(new Schedule(), 0L).getStatus(), is(Tick.PENDING));
+        assertThat(Tick.create(new Schedule()).getStatus(), is(Tick.PENDING));
     }
 }
