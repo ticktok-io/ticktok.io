@@ -10,6 +10,8 @@ import java.time.Clock;
 
 public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository {
 
+    private static final String NEXT_TICK = "nextTick";
+
     private final MongoOperations mongo;
     private final Clock systemTime;
 
@@ -22,7 +24,7 @@ public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository 
     public void updateLatestScheduledTick(String id, long time) {
         mongo.updateFirst(
                 Query.query(Criteria.where("id").is(id)),
-                Update.update("latestScheduledTick", time),
+                Update.update(NEXT_TICK, time),
                 Schedule.class);
     }
 
@@ -30,7 +32,7 @@ public class UpdateSchedulesRepositoryImpl implements UpdateSchedulesRepository 
     public void addSchedule(String schedule) {
         mongo.upsert(
                 Query.query(Criteria.where("schedule").is(schedule)),
-                new Update().setOnInsert("latestScheduledTick", systemTime.millis()).inc("clockCount", 1),
+                new Update().setOnInsert(NEXT_TICK, systemTime.millis()).inc("clockCount", 1),
                 Schedule.class);
     }
 
