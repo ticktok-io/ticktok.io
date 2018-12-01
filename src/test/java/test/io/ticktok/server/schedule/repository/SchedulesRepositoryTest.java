@@ -22,7 +22,8 @@ import static org.hamcrest.core.Is.is;
 @ContextConfiguration(classes = {SchedulesRepositoryTestConfiguration.class})
 class SchedulesRepositoryTest {
 
-    public static final int SECOND = 1000;
+    static final int SECOND = 1000;
+
     @Autowired
     SchedulesRepository schedulesRepository;
     @Autowired
@@ -51,14 +52,6 @@ class SchedulesRepositoryTest {
     }
 
     @Test
-    void updateScheduleLatestScheduledTick() {
-        schedulesRepository.addSchedule("every.30.seconds");
-        String scheduleId = schedulesRepository.findBySchedule("every.30.seconds").get().getId();
-        schedulesRepository.updateLatestScheduledTick(scheduleId, 111222L);
-        assertThat(schedulesRepository.findById(scheduleId).get().getNextTick(), is(111222L));
-    }
-
-    @Test
     void increaseClockCountOnAddingExistingSchedule() {
         schedulesRepository.addSchedule("every.11.seconds");
         schedulesRepository.addSchedule("every.11.seconds");
@@ -83,14 +76,14 @@ class SchedulesRepositoryTest {
         assertThat(schedules.get(0).getSchedule(), is("every.8.seconds"));
     }
 
+    private long now() {
+        return System.currentTimeMillis();
+    }
+
     @Test
     void shouldNotRetrieveNonActiveSchedules() {
         schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, 0));
         assertThat(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(0, now()).size(), is(0));
-    }
-
-    private long now() {
-        return System.currentTimeMillis();
     }
 
 }

@@ -53,20 +53,6 @@ class TickSchedulerTest {
         verify(schedulesRepository).findByClockCountGreaterThanAndNextTickLessThanEqual(0, NOW + TickScheduler.LOOK_AHEAD);
     }
 
-
-    @Test
-    void shouldNotUpdateClockWhenFailedToScheduleATick() {
-        when(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(anyInt(), anyLong())).thenReturn(asList(
-                createEverySecondsSchedule("1")
-        ));
-        doThrow(RuntimeException.class).when(ticksRepository).save(any());
-        try {
-            schedule();
-        } catch (Throwable e) {
-            verify(schedulesRepository, times(0)).updateLatestScheduledTick(eq("1"), anyLong());
-        }
-    }
-
     @Test
     void scheduleNewTicks() {
         Schedule schedule1 = createEverySecondsSchedule("1");
