@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.*;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -24,8 +25,7 @@ class ScheduleUpdaterAspectTest {
 
     @Configuration
     @ComponentScan(basePackageClasses = {ScheduleUpdaterAspect.class},
-            includeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ScheduleUpdaterAspect.class )},
-            useDefaultFilters = false)
+            excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = MongoRepository.class)})
     @EnableAspectJAutoProxy
     static class TestConfiguration {
 
@@ -51,7 +51,7 @@ class ScheduleUpdaterAspectTest {
     @Test
     void addScheduleOnClockSave() {
         clocksRepository.saveClock("kuku", "every.3.seconds");
-        verify(schedulesRepository).addSchedule("every.3.seconds");
+        verify(schedulesRepository, times(1)).addSchedule("every.3.seconds");
     }
 
     @Test

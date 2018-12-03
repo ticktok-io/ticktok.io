@@ -10,6 +10,5 @@ public interface ClocksRepository extends MongoRepository<Clock, String>, Update
 
     List<Clock> findByStatus(String status);
 
-    Optional<Clock> findByNameAndSchedule(String name, String schedule);
 }
 

@@ -11,8 +11,7 @@ import java.time.ZoneId;
 import static org.mockito.Mockito.mock;
 
 @Configuration
-@EnableMongoRepositories(basePackages = {"io.ticktok.server.clock.repository"},
-        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = SchedulesRepository.class)})
+@EnableMongoRepositories(basePackages = {"io.ticktok.server.clock.repository"})
 @ComponentScan(basePackages = {"io.ticktok.server.clock.repository"})
 public class ClocksRepositoryTestConfiguration {
 
