@@ -9,8 +9,6 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import java.time.Clock;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
-
 @Slf4j
 public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
 
@@ -40,8 +38,8 @@ public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
     }
 
     @Override
-    public void updateNextTick(String id, long nextTick) {
-        mongo.updateFirst(Query.query(Criteria.where("id").is(id)),
+    public void updateNextTick(String schedule, long nextTick) {
+        mongo.updateFirst(Query.query(Criteria.where("schedule").is(schedule)),
                 Update.update("nextTick", nextTick),
                 Schedule.class);
     }

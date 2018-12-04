@@ -96,16 +96,12 @@ class SchedulesRepositoryTest {
     @Test
     void updateNextTick() {
         Schedule schedule = schedulesRepository.save(new Schedule("every.8.seconds", 1111, 1));
-        schedulesRepository.updateNextTick(schedule.getId(), 2222);
-        assertThat(schedulesRepository.findById(schedule.getId()).get().getNextTick(), is(2222L));
+        schedulesRepository.updateNextTick(schedule.getSchedule(), 2222);
+        assertThat(schedulesRepository.findById(schedule.getSchedule()).get().getNextTick(), is(2222L));
     }
 
     @Test
     void name() throws InterruptedException {
-        for (int i = 0; i < 100; i++) {
-            schedulesRepository.addSchedule("every.4.seconds");
-            sleep(100);
-        }
         List<Callable<Boolean>> newClocks = asList(
                 () -> {
                     schedulesRepository.addSchedule("every.4.seconds");
@@ -113,6 +109,12 @@ class SchedulesRepositoryTest {
 
                 },
                 () -> {
+                    schedulesRepository.addSchedule("every.4.seconds");
+                    return true;
+
+                },
+                () -> {
+                    sleep(100);
                     schedulesRepository.addSchedule("every.4.seconds");
                     return true;
 

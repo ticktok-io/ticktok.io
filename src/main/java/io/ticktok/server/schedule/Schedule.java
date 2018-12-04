@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
@@ -14,8 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Schedule {
 
     @Id
-    private String id;
-    @Indexed(unique = true)
     private String schedule;
     @Indexed
     private long nextTick;
@@ -39,6 +36,6 @@ public class Schedule {
 
     public Schedule nextTick() {
         long nextTick = this.nextTick + new ScheduleParser(schedule).interval() * 1000;
-        return new Schedule(id, schedule, nextTick, clockCount);
+        return new Schedule(schedule, nextTick, clockCount);
     }
 }

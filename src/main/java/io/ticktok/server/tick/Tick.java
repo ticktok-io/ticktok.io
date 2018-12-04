@@ -29,6 +29,6 @@ public class Tick {
 
 
     public static Tick create(Schedule schedule) {
-        return new Tick(null, schedule.getId(), schedule.getSchedule(), schedule.getNextTick(), PENDING);
+        return new Tick(null, "", schedule.getSchedule(), schedule.getNextTick(), PENDING);
     }
 }

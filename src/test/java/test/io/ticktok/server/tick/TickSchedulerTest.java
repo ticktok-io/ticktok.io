@@ -35,12 +35,12 @@ class TickSchedulerTest {
                 ));
         schedule();
 
-        verify(schedulesRepository).updateNextTick(schedule2.getId(), 3000);
-        verify(schedulesRepository).updateNextTick(schedule4.getId(), 5000);
+        verify(schedulesRepository).updateNextTick(schedule2.getSchedule(), 3000);
+        verify(schedulesRepository).updateNextTick(schedule4.getSchedule(), 5000);
     }
 
     private Schedule createEverySecondsSchedule(String schedule) {
-        return new Schedule(schedule, "every." + schedule + ".seconds", NOW, 1);
+        return new Schedule("every." + schedule + ".seconds", NOW, 1);
     }
 
     private void schedule() {
