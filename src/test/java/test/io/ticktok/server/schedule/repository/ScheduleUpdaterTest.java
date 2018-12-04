@@ -37,7 +37,7 @@ class ScheduleUpdaterTest {
         }
 
         @Bean
-        @Primary
+        //@Primary
         public SchedulesRepository schedulesRepository() {
             return mock(SchedulesRepository.class);
         }

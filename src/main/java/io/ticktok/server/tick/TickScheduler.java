@@ -40,7 +40,7 @@ public class TickScheduler {
             ticksRepository.save(Tick.create(s));
             s = s.nextTick();
         }
-        schedulesRepository.save(s);
+        schedulesRepository.updateNextTick(s.getId(), s.getNextTick());
     }
 
     private List<Schedule> toBeExecutedSchedules() {

@@ -35,8 +35,8 @@ class TickSchedulerTest {
                 ));
         schedule();
 
-        verify(schedulesRepository).save(argThat(nextTickIsForInterval(3000)));
-        verify(schedulesRepository).save(argThat(nextTickIsForInterval(5000)));
+        verify(schedulesRepository).updateNextTick(schedule2.getId(), 3000);
+        verify(schedulesRepository).updateNextTick(schedule4.getId(), 5000);
     }
 
     private Schedule createEverySecondsSchedule(String schedule) {

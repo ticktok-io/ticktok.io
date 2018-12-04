@@ -3,7 +3,9 @@ package test.io.ticktok.server.clock.repository;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,17 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+
+import static java.lang.Thread.sleep;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataMongoTest
@@ -25,7 +34,7 @@ class ClocksRepositoryTest {
     @Autowired
     ClocksRepository repository;
     @Autowired
-    SchedulesRepository schedulesRepositoryMock;
+    SchedulesRepository schedulesRepository;
     @Autowired
     java.time.Clock systemClock;
 
@@ -66,7 +75,7 @@ class ClocksRepositoryTest {
     @Test
     void clockShouldCreatedAsPending() {
         Clock clock = repository.saveClock("lili", "every.11.seconds");
-        assertThat(repository.findById(clock.getId()).get(). getStatus(), is(Clock.PENDING));
+        assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.PENDING));
     }
 
     @Test
@@ -74,6 +83,37 @@ class ClocksRepositoryTest {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
         repository.updateStatus(clock.getId(), Clock.ACTIVE);
         assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.ACTIVE));
+    }
+
+    @Test
+    void shouldHandleConcurrentClocksAdd() throws InterruptedException {
+        List<Callable<Clock>> newClocks = asList(
+                () -> saveClock("c1", "every.1.seconds"),
+                () -> saveClock("c1", "every.1.seconds"),
+                () -> saveClock("c1", "every.1.seconds"),
+                () -> saveClock("c1", "every.1.seconds"),
+                () -> saveClock("c1", "every.2.seconds"),
+                () -> saveClock("c1", "every.2.seconds"),
+                () -> saveClock("c1", "every.2.seconds"),
+                () -> saveClock("c1", "every.2.seconds")
+        );
+
+        Executors.newFixedThreadPool(8).invokeAll(newClocks).stream().map(future -> {
+            try {
+                return future.get();
+            } catch (Exception e) {
+                Assert.fail();
+            }
+            return null;
+        }).forEach(Assertions::assertNotNull);
+
+        repository.deleteAll();;
+
+    }
+
+    private Clock saveClock(String name, String schedule) throws InterruptedException {
+        System.out.println(System.currentTimeMillis());
+        return repository.saveClock(name, schedule);
     }
 
     @AfterEach
