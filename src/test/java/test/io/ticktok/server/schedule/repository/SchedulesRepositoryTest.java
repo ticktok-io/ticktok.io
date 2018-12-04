@@ -114,7 +114,6 @@ class SchedulesRepositoryTest {
 
                 },
                 () -> {
-                    sleep(100);
                     schedulesRepository.addSchedule("every.4.seconds");
                     return true;
 

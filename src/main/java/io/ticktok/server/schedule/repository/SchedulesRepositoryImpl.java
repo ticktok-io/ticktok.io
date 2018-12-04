@@ -2,6 +2,7 @@ package io.ticktok.server.schedule.repository;
 
 import io.ticktok.server.schedule.Schedule;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,9 +25,10 @@ public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
 
     @Override
     public void addSchedule(String schedule) {
-        mongo.upsert(
+        mongo.findAndModify(
                 Query.query(Criteria.where("schedule").is(schedule)),
                 new Update().setOnInsert(NEXT_TICK, systemTime.millis()).inc("clockCount", 1),
+                FindAndModifyOptions.options().upsert(true),
                 Schedule.class);
     }
 
