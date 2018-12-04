@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 @EnableMongoRepositories(basePackages = {"io.ticktok.server.clock.repository"})
 @ComponentScan(basePackages = {"io.ticktok.server.clock.repository", "io.ticktok.server.schedule.repository"},
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = SchedulesRepository.class))
+@EnableAspectJAutoProxy
 public class ClocksRepositoryTestConfiguration {
 
 

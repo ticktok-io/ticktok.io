@@ -29,10 +29,7 @@ class TickSchedulerTest {
         Schedule schedule2 = createEverySecondsSchedule("1");
         Schedule schedule4 = createEverySecondsSchedule("4");
         when(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(anyInt(), anyLong()))
-                .thenReturn(asList(
-                        schedule2,
-                        schedule4
-                ));
+                .thenReturn(asList(schedule2, schedule4));
         schedule();
 
         verify(schedulesRepository).updateNextTick(schedule2.getId(), 3000);
@@ -40,7 +37,7 @@ class TickSchedulerTest {
     }
 
     private Schedule createEverySecondsSchedule(String schedule) {
-        return new Schedule("every." + schedule + ".seconds", NOW, 1);
+        return new Schedule(schedule, "every." + schedule + ".seconds", NOW, 1);
     }
 
     private void schedule() {

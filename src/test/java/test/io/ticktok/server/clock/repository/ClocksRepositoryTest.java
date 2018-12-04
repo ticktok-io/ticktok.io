@@ -6,8 +6,10 @@ import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,6 +27,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
@@ -37,6 +42,11 @@ class ClocksRepositoryTest {
     SchedulesRepository schedulesRepository;
     @Autowired
     java.time.Clock systemClock;
+
+    @BeforeEach
+    void setUp() {
+        reset(schedulesRepository);
+    }
 
     @Test
     void updateModifiedDate() {
@@ -86,34 +96,16 @@ class ClocksRepositoryTest {
     }
 
     @Test
-    void shouldHandleConcurrentClocksAdd() throws InterruptedException {
-        List<Callable<Clock>> newClocks = asList(
-                () -> saveClock("c1", "every.1.seconds"),
-                () -> saveClock("c1", "every.1.seconds"),
-                () -> saveClock("c1", "every.1.seconds"),
-                () -> saveClock("c1", "every.1.seconds"),
-                () -> saveClock("c1", "every.2.seconds"),
-                () -> saveClock("c1", "every.2.seconds"),
-                () -> saveClock("c1", "every.2.seconds"),
-                () -> saveClock("c1", "every.2.seconds")
-        );
-
-        Executors.newFixedThreadPool(8).invokeAll(newClocks).stream().map(future -> {
-            try {
-                return future.get();
-            } catch (Exception e) {
-                Assert.fail();
-            }
-            return null;
-        }).forEach(Assertions::assertNotNull);
-
-        repository.deleteAll();;
-
+    void addScheduleUponClockSave() {
+        Clock clock = repository.saveClock("lulu", "every.11.seconds");
+        verify(schedulesRepository, times(1)).addSchedule(clock.getSchedule());
     }
 
-    private Clock saveClock(String name, String schedule) throws InterruptedException {
-        System.out.println(System.currentTimeMillis());
-        return repository.saveClock(name, schedule);
+    @Test
+    void removeScheduleUponClockDelete() {
+        Clock clock = repository.saveClock("lulu", "every.11.seconds");
+        repository.deleteClock(clock);
+        verify(schedulesRepository, times(1)).removeSchedule(clock.getSchedule());
     }
 
     @AfterEach

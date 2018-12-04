@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Document
@@ -32,12 +33,8 @@ public class Schedule {
         this.clockCount = clockCount;
     }
 
-    public static Schedule createFrom(String schedule, long currentTime) {
-        return new Schedule(schedule, currentTime, 1);
-    }
-
     public Schedule nextTick() {
         long nextTick = this.nextTick + new ScheduleParser(schedule).interval() * 1000;
-        return new Schedule(schedule, nextTick, clockCount);
+        return new Schedule(id, schedule, nextTick, clockCount);
     }
 }
