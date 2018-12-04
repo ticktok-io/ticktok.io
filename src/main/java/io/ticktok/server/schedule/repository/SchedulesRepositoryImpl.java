@@ -38,8 +38,8 @@ public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
     }
 
     @Override
-    public void updateNextTick(String schedule, long nextTick) {
-        mongo.updateFirst(Query.query(Criteria.where("schedule").is(schedule)),
+    public void updateNextTick(String id, long nextTick) {
+        mongo.updateFirst(Query.query(Criteria.where("id").is(id)),
                 Update.update("nextTick", nextTick),
                 Schedule.class);
     }

@@ -7,6 +7,8 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Slf4j
 @Aspect
 @Component
@@ -14,16 +16,18 @@ public class ScheduleUpdaterAspect {
 
 
     private final SchedulesRepository schedulesRepository;
+    private AtomicInteger counter = new AtomicInteger();
 
     public ScheduleUpdaterAspect(SchedulesRepository schedulesRepository) {
-        log.info("Init aspect");
         this.schedulesRepository = schedulesRepository;
     }
 
-    @AfterReturning("execution(public io.ticktok.server.clock.Clock io.ticktok.server.clock.repository.UpdateClockRepository.saveClock(..)) && args(name, schedule)")
+    @AfterReturning(value = "execution(public io.ticktok.server.clock.Clock io.ticktok.server.clock.repository.UpdateClockRepository.saveClock(..)) && args(name, schedule)", argNames = "joinPoint,name,schedule")
     public void addSchedule(JoinPoint joinPoint, String name, String schedule) {
-        log.info("AFTER saveClock {}", joinPoint.toLongString());
+        int count = counter.incrementAndGet();
+        log.info(count + ". AFTER saveClock {}", joinPoint.toLongString());
         schedulesRepository.addSchedule(schedule);
+        log.info(count + ". AFTER saveClock {}", joinPoint.toLongString());
     }
 
     @AfterReturning("execution(public void io.ticktok.server.clock.repository.UpdateClockRepository.deleteClock(..)) && args(clock)")

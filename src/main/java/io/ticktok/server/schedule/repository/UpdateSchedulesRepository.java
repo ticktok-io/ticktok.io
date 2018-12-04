@@ -6,5 +6,5 @@ public interface UpdateSchedulesRepository {
 
     void removeSchedule(String schedule);
 
-    void updateNextTick(String schedule, long nextTick);
+    void updateNextTick(String id, long nextTick);
 }

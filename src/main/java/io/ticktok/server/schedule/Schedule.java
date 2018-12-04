@@ -13,6 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Schedule {
 
     @Id
+    private String id;
+    @Indexed(unique = true)
     private String schedule;
     @Indexed
     private long nextTick;

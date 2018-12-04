@@ -96,8 +96,8 @@ class SchedulesRepositoryTest {
     @Test
     void updateNextTick() {
         Schedule schedule = schedulesRepository.save(new Schedule("every.8.seconds", 1111, 1));
-        schedulesRepository.updateNextTick(schedule.getSchedule(), 2222);
-        assertThat(schedulesRepository.findById(schedule.getSchedule()).get().getNextTick(), is(2222L));
+        schedulesRepository.updateNextTick(schedule.getId(), 2222);
+        assertThat(schedulesRepository.findById(schedule.getId()).get().getNextTick(), is(2222L));
     }
 
     @Test
