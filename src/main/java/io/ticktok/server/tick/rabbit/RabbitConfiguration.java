@@ -20,6 +20,8 @@ public class RabbitConfiguration {
 
     @Value("${rabbit.uri}")
     private String rabbitUri;
+    @Value("${rabbit.queue.ttl}")
+    private String queueTTL;
 
     @Bean
     public TopicExchange ticktokExchange() {
@@ -43,7 +45,7 @@ public class RabbitConfiguration {
 
     @Bean
     public TickChannelExplorer tickChannelExplorer(AmqpAdmin amqpAdmin, TopicExchange topicExchange) {
-        return new RabbitTickChannelExplorer(amqpAdmin, rabbitUri, topicExchange);
+        return new RabbitTickChannelExplorer(queueTTL, amqpAdmin, rabbitUri, topicExchange);
     }
 
 }

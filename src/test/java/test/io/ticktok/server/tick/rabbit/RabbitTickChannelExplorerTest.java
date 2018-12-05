@@ -4,7 +4,7 @@ import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.rabbit.RabbitConfiguration;
 import io.ticktok.server.tick.rabbit.RabbitTickChannelExplorer;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.amqp.core.AmqpAdmin;
@@ -15,7 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static java.lang.Thread.sleep;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = {RabbitConfiguration.class})
 @SpringBootTest
 class RabbitTickChannelExplorerTest {
+
+    public static final Clock CLOCK = new Clock("kuku", "every.111.seconds");
 
     @Autowired
     private RabbitTickChannelExplorer tickChannelExplorer;
@@ -35,26 +39,26 @@ class RabbitTickChannelExplorerTest {
 
     private TickChannel channel;
 
+    @BeforeEach
+    void createChannel() {
+        channel = tickChannelExplorer.create(CLOCK);
+    }
+
     @Test
     void retrieveTrueWhenQueueExists() {
-        Clock clock = new Clock("kuku", "every.111.seconds");
-        channel = tickChannelExplorer.create(clock);
-        assertTrue(tickChannelExplorer.isExists(clock));
+        assertTrue(tickChannelExplorer.isExists(CLOCK));
     }
 
     @Test
     void createQueueForConsumer() {
-        Clock clock = new Clock("kuku", "popov-schedule");
-        TickChannel tickChannel = tickChannelExplorer.create(clock);
-        rabbitTemplate.convertAndSend(exchange.getName(), clock.getSchedule(), "hello");
-        assertThat(rabbitTemplate.receiveAndConvert(tickChannel.getQueue(), 1000), is("hello"));
+        rabbitTemplate.convertAndSend(exchange.getName(), CLOCK.getSchedule(), "hello");
+        assertThat(rabbitTemplate.receiveAndConvert(channel.getQueue(), 500), is("hello"));
     }
 
-    @AfterEach
-    void deleteQueue() {
-        if(channel != null) {
-            amqpAdmin.deleteQueue(channel.getQueue());
-        }
-
+    @Test
+    void channelShouldDeleteIfUnused() throws InterruptedException {
+        sleep(1000);
+        assertNull(amqpAdmin.getQueueProperties(channel.getQueue()));
     }
+
 }
