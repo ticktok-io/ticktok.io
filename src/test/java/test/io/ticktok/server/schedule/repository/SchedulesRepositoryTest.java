@@ -117,17 +117,22 @@ class SchedulesRepositoryTest {
                     schedulesRepository.addSchedule("every.4.seconds");
                     return true;
 
+                },
+                () -> {
+                    schedulesRepository.addSchedule("every.4.seconds");
+                    return true;
+
                 }
         );
 
-        ExecutorService executorService = Executors.newFixedThreadPool(8);
+        ExecutorService executorService = Executors.newFixedThreadPool(6);
         executorService.invokeAll(newClocks).stream().map(future -> {
             try {
                 return future.get();
             } catch (Exception e) {
                 Assert.fail();
             }
-            return null;
+            return false;
         }).forEach(Assertions::assertTrue);
         executorService.shutdownNow();
 

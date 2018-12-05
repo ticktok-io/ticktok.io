@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Aspect
 @Component
 public class ScheduleUpdaterAspect {
@@ -19,6 +20,7 @@ public class ScheduleUpdaterAspect {
 
     @AfterReturning(value = "execution(* io.ticktok.server.clock.repository.UpdateClockRepository.saveClock(..)) && args(name, schedule) && inTicktok()", argNames = "name,schedule")
     public void addSchedule(String name, String schedule) {
+        log.info("AFTER clockSave");
         schedulesRepository.addSchedule(schedule);
     }
 

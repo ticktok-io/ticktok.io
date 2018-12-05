@@ -25,7 +25,7 @@ object App {
 
     private var lastResponse: HttpResponse? = null
     private val createdClocks = mutableListOf<String>()
-    private var started = false;
+    private var started = false
 
     fun start() {
         if(!started) {
@@ -61,7 +61,7 @@ object App {
         return withAuthToken("$APP_URL/$slag")
     }
 
-    private fun withAuthToken(url: String): String {
+    private fun withAuthToken(url: String?): String {
         return "$url?access_token=$ACCESS_TOKEN"
     }
 
@@ -72,7 +72,7 @@ object App {
                 .toString()
     }
 
-    inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
+    private inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
     private fun saveClockIfCreated(clock: Clock) {
         if (clock.url !== null) {
