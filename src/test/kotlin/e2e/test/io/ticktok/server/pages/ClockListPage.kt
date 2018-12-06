@@ -20,7 +20,7 @@ class ClockListPage(private val browser: Browser) {
             if (containsScheduleOnce(c.text, schedule)) return
         }
         browser.takeScreenshot()
-        Assertions.fail("$schedule not found")
+        Assertions.fail<String>("$schedule not found")
     }
 
     private fun containsScheduleOnce(text: String, schedule: String): Boolean {

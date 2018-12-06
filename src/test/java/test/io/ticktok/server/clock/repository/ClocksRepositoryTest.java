@@ -1,20 +1,16 @@
 package test.io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.ScheduleCount;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.List;
 
 import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -104,16 +100,6 @@ class ClocksRepositoryTest {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
         repository.deleteClock(clock);
         verify(schedulesRepository, times(1)).removeSchedule(clock.getSchedule());
-    }
-
-    @Test
-    void getScheduleCount() {
-        repository.saveClock("lulu", "every.11.seconds");
-        repository.saveClock("kuku", "every.11.seconds");
-        repository.saveClock("popo", "every.33.seconds");
-        assertThat(repository.findByScheduleCount(), containsInAnyOrder(
-                new ScheduleCount("every.11.seconds", 2),
-                new ScheduleCount("every.33.seconds", 1)));
     }
 
     @AfterEach

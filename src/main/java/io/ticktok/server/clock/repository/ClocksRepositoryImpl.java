@@ -1,20 +1,12 @@
 package io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.ScheduleCount;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-
-import java.util.List;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 @Slf4j
 public class ClocksRepositoryImpl implements UpdateClockRepository {
@@ -56,12 +48,5 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
                 Clock.class);
     }
 
-    @Override
-    public List<ScheduleCount> findByScheduleCount() {
-        Aggregation agg = newAggregation(
-                Aggregation.group("schedule").count().as("count"),
-                project("count").andExpression("_id").as("schedule"));
 
-        return mongo.aggregate(agg, Clock.class, ScheduleCount.class).getMappedResults();
-    }
 }

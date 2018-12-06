@@ -1,6 +1,5 @@
 package io.ticktok.server.schedule.repository;
 
-import io.ticktok.server.clock.ScheduleCount;
 import io.ticktok.server.schedule.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -47,8 +46,4 @@ public class SchedulesRepositoryImpl implements UpdateSchedulesRepository {
                 Schedule.class);
     }
 
-    @Override
-    public void saveScheduleGroup(ScheduleCount scheduleCount) {
-
-    }
 }
