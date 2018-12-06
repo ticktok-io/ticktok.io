@@ -1,27 +1,25 @@
 package test.io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
+import io.ticktok.server.clock.ScheduleCount;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.junit.platform.commons.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
 
 import static java.lang.Thread.sleep;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -106,6 +104,16 @@ class ClocksRepositoryTest {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
         repository.deleteClock(clock);
         verify(schedulesRepository, times(1)).removeSchedule(clock.getSchedule());
+    }
+
+    @Test
+    void getScheduleCount() {
+        repository.saveClock("lulu", "every.11.seconds");
+        repository.saveClock("kuku", "every.11.seconds");
+        repository.saveClock("popo", "every.33.seconds");
+        assertThat(repository.findByScheduleCount(), containsInAnyOrder(
+                new ScheduleCount("every.11.seconds", 2),
+                new ScheduleCount("every.33.seconds", 1)));
     }
 
     @AfterEach

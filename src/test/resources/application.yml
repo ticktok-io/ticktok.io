@@ -12,3 +12,6 @@ management:
   endpoints:
     web:
       base-path: /mgmt
+
+purge:
+  schedule: 500

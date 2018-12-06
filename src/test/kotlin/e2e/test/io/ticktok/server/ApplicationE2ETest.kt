@@ -79,7 +79,6 @@ class ApplicationE2ETest {
 
     @Test
     fun handleConcurrentRegisters() {
-        sleep(5000)
         val t = listOf(
             Thread {
                 App.registeredAClock("kuku", "every.1.seconds")
@@ -103,6 +102,8 @@ class ApplicationE2ETest {
     @AfterEach
     fun resetApp() {
         App.reset()
+        App.purgeClocks()
+        sleep(1000)
     }
 
 }

@@ -19,7 +19,7 @@ public class ClocksPurger {
         this.tickChannelExplorer = tickChannelExplorer;
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(fixedDelayString = "${purge.clock:300000}")
     public void purge() {
         clocksRepository.findByStatus(Clock.ACTIVE).forEach(this::deleteRedundantSchedules);
     }

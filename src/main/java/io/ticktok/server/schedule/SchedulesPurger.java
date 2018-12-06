@@ -16,7 +16,7 @@ public class SchedulesPurger {
         this.schedulesRepository = schedulesRepository;
     }
 
-    @Scheduled(cron = "0 0 */12 * * *")
+    @Scheduled(fixedDelayString = "${purge.schedule:3600000}")
     public void purge() {
         schedulesRepository.deleteByClockCount(0);
     }
