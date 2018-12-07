@@ -1,7 +1,7 @@
 rabbit:
   uri: ${RABBIT_URI}
   queue:
-    ttl: 120
+    ttl: 120000
 
 http:
   auth-token: ${ACCESS_TOKEN}

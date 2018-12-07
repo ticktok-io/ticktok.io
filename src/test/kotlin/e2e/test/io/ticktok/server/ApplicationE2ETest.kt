@@ -5,11 +5,10 @@ import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsClo
 import e2e.test.io.ticktok.server.support.TickListener
 import e2e.test.io.ticktok.server.support.TickListener.Companion.CLOCK_EXPR
 import org.hamcrest.Matchers.not
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.FixMethodOrder
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.junit.runners.MethodSorters
 import java.lang.Thread.sleep
 
 @TestInstance(PER_CLASS)
@@ -58,14 +57,7 @@ class ApplicationE2ETest {
     fun purgeClocks() {
         val clock = App.registeredAClock("purger", CLOCK_EXPR)
         client.receivedTicksFor(clock)
-        App.purgeClocks()
-        App.clocks(not(containsClock(clock)))
-    }
-
-    @Test
-    fun deleteAClock() {
-        val clock = App.registeredAClock("kuku9", "every.9.seconds")
-        App.deleteClock(clock)
+        App.purge()
         App.clocks(not(containsClock(clock)))
     }
 
@@ -75,35 +67,31 @@ class ApplicationE2ETest {
         App.retrievedUserError()
     }
 
-    @Test
-    fun handleConcurrentRegisters() {
-        val t = listOf(
-            Thread {
-                App.registeredAClock("kuku", "every.1.seconds")
-            },
-            Thread {
-                App.registeredAClock("kuku", "every.1.seconds")
-            },
-            Thread {
-                App.registeredAClock("kuku", "every.1.seconds")
-            },
-            Thread {
-                App.registeredAClock("kuku", "every.1.seconds")
-            }
-        )
-        t.forEach { it.start() }
-        t.forEach { it.join() }
+    @RepeatedTest(value = 3, name = "handleConcurrentClockRequests {currentRepetition}/{totalRepetitions}")
+    fun handleConcurrentClockRequests() {
+        App.purge()
+        sleep(1000)
+        invokeMultipleClockRequestsInParallel()
+        App.allInteractionsSucceeded()
+    }
 
-
+    private fun invokeMultipleClockRequestsInParallel() {
+        val threads = (0..5).map {
+            Thread { App.registeredAClock("kuku", "every.1.seconds") }
+        }
+        threads.forEach { it.start() }
+        threads.forEach { it.join() }
     }
 
     @AfterEach
-    fun resetApp() {
+    internal fun resetApp() {
         App.reset()
-        App.purgeClocks()
-        sleep(1000)
     }
 
+    @AfterAll
+    fun purgeApp() {
+        App.purge()
+    }
 }
 
 

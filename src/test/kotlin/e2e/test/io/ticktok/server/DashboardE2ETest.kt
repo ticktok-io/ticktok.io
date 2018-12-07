@@ -26,7 +26,7 @@ class DashboardE2ETest {
         ClockListPage(browser).containsClockWith("every.4.seconds")
     }
 
-    @AfterEach
+    @AfterAll
     fun resetApp() {
         App.reset()
     }

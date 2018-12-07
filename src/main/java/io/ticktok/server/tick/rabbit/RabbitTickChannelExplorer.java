@@ -23,7 +23,7 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
             AmqpAdmin rabbitAdmin,
             String rabbitUri,
             TopicExchange topicExchange) {
-        this.queueTTL = Long.valueOf(queueTTL) * SECOND;
+        this.queueTTL = Long.valueOf(queueTTL);
         this.rabbitAdmin = rabbitAdmin;
         this.rabbitUri = rabbitUri;
         this.exchange = topicExchange;

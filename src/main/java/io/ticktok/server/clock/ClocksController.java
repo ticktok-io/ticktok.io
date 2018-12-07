@@ -78,12 +78,6 @@ public class ClocksController {
         return new ClockResource(domain, clock);
     }
 
-    @DeleteMapping("/{id}")
-    @ApiOperation("Delete a specific clock")
-    public void deleteOne(@PathVariable("id") String id) {
-        clocksRepository.deleteById(id);
-    }
-
     @GetMapping
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll() {

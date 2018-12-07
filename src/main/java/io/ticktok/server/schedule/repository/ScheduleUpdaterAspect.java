@@ -29,6 +29,7 @@ public class ScheduleUpdaterAspect {
 
     @AfterReturning(value = "execution(* io.ticktok.server.clock.repository.UpdateClockRepository.deleteClock(..)) && args(clock) && inTicktok()", argNames = "clock")
     public void removeSchedule(Clock clock) {
+        log.info("DELETE clock: {}", clock);
         schedulesRepository.removeClock(clock);
     }
 }

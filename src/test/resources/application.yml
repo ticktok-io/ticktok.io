@@ -1,7 +1,7 @@
 rabbit:
   uri: amqp://localhost:5672
   queue:
-    ttl: 1
+    ttl: 400
 
 http:
   auth-token: a5f98e2b068ee51f90fd81c530e7fb4e306e7f42

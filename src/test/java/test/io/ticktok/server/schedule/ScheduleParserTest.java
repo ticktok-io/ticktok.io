@@ -4,6 +4,7 @@ import io.ticktok.server.schedule.ScheduleParser;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,7 +18,7 @@ class ScheduleParserTest {
 
     @Test
     void retrieveIntervalForEveryXSecs() {
-        MatcherAssert.assertThat(new ScheduleParser("every.6.seconds").interval(), is(6));
+        assertThat(new ScheduleParser("every.6.seconds").interval(), is(6));
     }
 
 

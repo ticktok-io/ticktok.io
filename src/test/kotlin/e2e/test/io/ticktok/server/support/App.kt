@@ -16,6 +16,8 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
+import java.lang.Thread.sleep
+import java.util.*
 
 object App {
 
@@ -23,39 +25,29 @@ object App {
     const val ACCESS_TOKEN = "ct-auth-token"
 
 
-    private var lastResponse: HttpResponse? = null
-    private val createdClocks = mutableListOf<String>()
+    private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList());
     private var started = false
 
     fun start() {
-        if(!started) {
+        if (!started) {
             Application.main()
             started = true
         }
     }
 
     fun reset() {
-        createdClocks.forEach {
-            deleteClock(it)
-        }
-        createdClocks.clear()
+        lastResponses.clear()
     }
 
-    private fun deleteClock(url: String) {
-        val response = Request.Delete(withAuthToken(url)).execute().returnResponse()
-        assert(response.statusLine.statusCode in 200..299) { "Failed to delete with error: ${bodyOf(response)}" }
+    fun registeredAClock(name: String, timeExpr: String): Clock {
+        val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
+                .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
+                .execute().returnResponse()
+        lastResponses.add(response)
+        return Gson().fromJson(bodyOf(response))
     }
 
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
-
-    fun registeredAClock(name: String, timeExpr: String): Clock {
-        lastResponse = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
-                .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
-                .execute().returnResponse()
-        val clock = Gson().fromJson<Clock>(bodyOf(lastResponse!!))
-        saveClockIfCreated(clock)
-        return clock
-    }
 
     private fun createAuthenticatedUrlFor(slag: String): String {
         return withAuthToken("$APP_URL/$slag")
@@ -74,12 +66,6 @@ object App {
 
     private inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
-    private fun saveClockIfCreated(clock: Clock) {
-        if (clock.url !== null) {
-            createdClocks.add(clock.url)
-        }
-    }
-
     fun isHealthy() {
         assertThat(getHealthStatus(), `is`("UP"))
     }
@@ -90,13 +76,13 @@ object App {
     }
 
     fun isAccessedWithoutAToken() {
-        lastResponse = Request.Post("$APP_URL/api/v1/clocks")
+        lastResponses.add(Request.Post("$APP_URL/api/v1/clocks")
                 .bodyString(createClockRequestFor("no-token", "in.1.minute"), ContentType.APPLICATION_JSON)
-                .execute().returnResponse()
+                .execute().returnResponse())
     }
 
     fun retrieveAuthError() {
-        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_FORBIDDEN))
+        assertThat(lastResponses[0].statusLine.statusCode, `is`(HttpStatus.SC_FORBIDDEN))
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
@@ -105,7 +91,7 @@ object App {
     }
 
     fun retrievedRegisteredClock(clockExpr: String) {
-        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_CREATED))
+        assertThat(lastResponses[0].statusLine.statusCode, `is`(HttpStatus.SC_CREATED))
         validateRetrievedBody(clockExpr)
         validateRetrievedLocation()
     }
@@ -117,7 +103,7 @@ object App {
     }
 
     private fun lastResponseBody(): JsonObject {
-        val respBody = EntityUtils.toString(lastResponse!!.entity)
+        val respBody = EntityUtils.toString(lastResponses[0].entity)
         return Gson().fromJson(respBody, JsonObject::class.java)
     }
 
@@ -132,7 +118,7 @@ object App {
     }
 
     private fun lastResponseLocation(): String {
-        val location = lastResponse!!.getFirstHeader("Location").value
+        val location = lastResponses[0].getFirstHeader("Location").value
         Assertions.assertFalse(location.isNullOrEmpty(), "Location header is empty")
         return location
     }
@@ -147,17 +133,23 @@ object App {
         return Gson().fromJson(clockJson, Clock::class.java)
     }
 
-    fun deleteClock(clock: Clock) {
-        assertThat(Request.Delete(withAuthToken(clock.url)).execute().returnResponse().statusLine.statusCode, `is`(HttpStatus.SC_OK))
-    }
-
     fun retrievedUserError() {
-        assertThat(lastResponse!!.statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
+        assertThat(lastResponses[0].statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
     }
 
-    fun purgeClocks() {
+    fun purge() {
+        sleep(1000)
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
+        sleep(1000)
         assertThat(response.statusLine.statusCode, `is`(204))
+    }
+
+    fun allInteractionsSucceeded() {
+        val failedRequestsCount = lastResponses
+                .map { r -> r.statusLine.statusCode }
+                .filter { sc -> sc !in 200..299 }
+                .count()
+        assertThat(failedRequestsCount, `is`(0))
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
