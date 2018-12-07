@@ -44,7 +44,7 @@ public class TickScheduler {
     }
 
     private List<Schedule> toBeExecutedSchedules() {
-        return schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(0, now() + LOOK_AHEAD);
+        return schedulesRepository.findActiveSchedulesByNextTickLesserThan(now() + LOOK_AHEAD);
     }
 
     protected long now() {

@@ -12,18 +12,12 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
@@ -92,14 +86,14 @@ class ClocksRepositoryTest {
     @Test
     void addScheduleUponClockSave() {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
-        verify(schedulesRepository, times(1)).addSchedule(clock.getSchedule());
+        verify(schedulesRepository, times(1)).addClock(clock);
     }
 
     @Test
     void removeScheduleUponClockDelete() {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
         repository.deleteClock(clock);
-        verify(schedulesRepository, times(1)).removeSchedule(clock.getSchedule());
+        verify(schedulesRepository, times(1)).removeClock(clock);
     }
 
     @AfterEach

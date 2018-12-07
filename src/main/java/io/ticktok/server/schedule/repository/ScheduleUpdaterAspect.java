@@ -18,10 +18,9 @@ public class ScheduleUpdaterAspect {
         this.schedulesRepository = schedulesRepository;
     }
 
-    @AfterReturning(value = "execution(* io.ticktok.server.clock.repository.UpdateClockRepository.saveClock(..)) && args(name, schedule) && inTicktok()", argNames = "name,schedule")
-    public void addSchedule(String name, String schedule) {
-        log.info("AFTER clockSave");
-        schedulesRepository.addSchedule(schedule);
+    @AfterReturning(value = "execution(* io.ticktok.server.clock.repository.UpdateClockRepository.saveClock(..)) && inTicktok()", returning = "clock")
+    public void addSchedule(Clock clock) {
+        schedulesRepository.addClock(clock);
     }
 
     @Pointcut("within(io.ticktok.server..*)")
@@ -30,6 +29,6 @@ public class ScheduleUpdaterAspect {
 
     @AfterReturning(value = "execution(* io.ticktok.server.clock.repository.UpdateClockRepository.deleteClock(..)) && args(clock) && inTicktok()", argNames = "clock")
     public void removeSchedule(Clock clock) {
-        schedulesRepository.removeSchedule(clock.getSchedule());
+        schedulesRepository.removeClock(clock);
     }
 }

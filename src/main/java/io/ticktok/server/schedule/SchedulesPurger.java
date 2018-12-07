@@ -18,6 +18,6 @@ public class SchedulesPurger {
 
     @Scheduled(fixedDelayString = "${purge.schedule:3600000}")
     public void purge() {
-        schedulesRepository.deleteByClockCount(0);
+        schedulesRepository.deleteNonActiveClocks();
     }
 }

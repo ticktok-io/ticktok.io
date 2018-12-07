@@ -4,7 +4,6 @@ import e2e.test.io.ticktok.server.support.App
 import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsClock
 import e2e.test.io.ticktok.server.support.TickListener
 import e2e.test.io.ticktok.server.support.TickListener.Companion.CLOCK_EXPR
-import javafx.scene.input.TransferMode
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import java.lang.Thread.sleep
-import kotlin.concurrent.thread
 
 @TestInstance(PER_CLASS)
 class ApplicationE2ETest {

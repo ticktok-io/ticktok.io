@@ -14,7 +14,7 @@ class SchedulesPurgerTest {
     @Test
     void deleteAllSchedulesWithNoClocks() {
         new SchedulesPurger(schedulesRepository).purge();
-        verify(schedulesRepository).deleteByClockCount(0);
+        verify(schedulesRepository).deleteNonActiveClocks();
     }
 
 }

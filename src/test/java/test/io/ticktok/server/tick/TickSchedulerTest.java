@@ -8,12 +8,12 @@ import io.ticktok.server.tick.repository.TicksRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static test.io.ticktok.server.tick.TickSchedulerTest.NextTickMatcher.nextTickIsForInterval;
 
 
 class TickSchedulerTest {
@@ -28,7 +28,7 @@ class TickSchedulerTest {
     void updateNextTicks() {
         Schedule schedule2 = createEverySecondsSchedule("1");
         Schedule schedule4 = createEverySecondsSchedule("4");
-        when(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(anyInt(), anyLong()))
+        when(schedulesRepository.findActiveSchedulesByNextTickLesserThan(anyLong()))
                 .thenReturn(asList(schedule2, schedule4));
         schedule();
 
@@ -37,7 +37,7 @@ class TickSchedulerTest {
     }
 
     private Schedule createEverySecondsSchedule(String schedule) {
-        return new Schedule(schedule, "every." + schedule + ".seconds", NOW, 1);
+        return new Schedule(schedule, "every." + schedule + ".seconds", NOW, new ArrayList<>());
     }
 
     private void schedule() {
@@ -47,7 +47,7 @@ class TickSchedulerTest {
     @Test
     void fetchOnlyClocksWithPastScheduledTicks() {
         schedule();
-        verify(schedulesRepository).findByClockCountGreaterThanAndNextTickLessThanEqual(0, NOW + TickScheduler.LOOK_AHEAD);
+        verify(schedulesRepository).findActiveSchedulesByNextTickLesserThan(NOW + TickScheduler.LOOK_AHEAD);
     }
 
     @Test
@@ -55,7 +55,7 @@ class TickSchedulerTest {
         Schedule schedule1 = createEverySecondsSchedule("1");
         Schedule schedule3 = createEverySecondsSchedule("3");
         List<Schedule> schedules = asList(schedule1, schedule3);
-        when(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(eq(0), anyLong())).thenReturn(schedules);
+        when(schedulesRepository.findActiveSchedulesByNextTickLesserThan(anyLong())).thenReturn(schedules);
         schedule();
         verify(ticksRepository).save(Tick.create(schedule1));
         schedule1 = schedule1.nextTick();
