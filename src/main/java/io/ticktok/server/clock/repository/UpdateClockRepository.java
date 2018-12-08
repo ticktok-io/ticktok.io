@@ -9,4 +9,5 @@ public interface UpdateClockRepository {
     void deleteClock(Clock clock);
 
     void updateStatus(String id, String status);
+
 }

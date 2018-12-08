@@ -1,5 +1,7 @@
 rabbit:
   uri: ${RABBIT_URI}
+  queue:
+    ttl: 120000
 
 http:
   auth-token: ${ACCESS_TOKEN}
@@ -14,4 +16,3 @@ management:
   endpoints:
     web:
       base-path: /mgmt
-

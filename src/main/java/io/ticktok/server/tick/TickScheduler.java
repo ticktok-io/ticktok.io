@@ -40,11 +40,11 @@ public class TickScheduler {
             ticksRepository.save(Tick.create(s));
             s = s.nextTick();
         }
-        schedulesRepository.save(s);
+        schedulesRepository.updateNextTick(s.getId(), s.getNextTick());
     }
 
     private List<Schedule> toBeExecutedSchedules() {
-        return schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(0, now() + LOOK_AHEAD);
+        return schedulesRepository.findActiveSchedulesByNextTickLesserThan(now() + LOOK_AHEAD);
     }
 
     protected long now() {

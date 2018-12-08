@@ -4,6 +4,7 @@ import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
@@ -25,9 +27,14 @@ class ClocksRepositoryTest {
     @Autowired
     ClocksRepository repository;
     @Autowired
-    SchedulesRepository schedulesRepositoryMock;
+    SchedulesRepository schedulesRepository;
     @Autowired
     java.time.Clock systemClock;
+
+    @BeforeEach
+    void setUp() {
+        reset(schedulesRepository);
+    }
 
     @Test
     void updateModifiedDate() {
@@ -66,7 +73,7 @@ class ClocksRepositoryTest {
     @Test
     void clockShouldCreatedAsPending() {
         Clock clock = repository.saveClock("lili", "every.11.seconds");
-        assertThat(repository.findById(clock.getId()).get(). getStatus(), is(Clock.PENDING));
+        assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.PENDING));
     }
 
     @Test
@@ -74,6 +81,19 @@ class ClocksRepositoryTest {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
         repository.updateStatus(clock.getId(), Clock.ACTIVE);
         assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.ACTIVE));
+    }
+
+    @Test
+    void addScheduleUponClockSave() {
+        Clock clock = repository.saveClock("lulu", "every.11.seconds");
+        verify(schedulesRepository, times(1)).addClock(clock);
+    }
+
+    @Test
+    void removeScheduleUponClockDelete() {
+        Clock clock = repository.saveClock("lulu", "every.11.seconds");
+        repository.deleteClock(clock);
+        verify(schedulesRepository, times(1)).removeClock(clock);
     }
 
     @AfterEach

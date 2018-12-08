@@ -14,7 +14,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Clock;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.Is.is;
 
 @DataMongoTest
@@ -23,6 +28,8 @@ import static org.hamcrest.core.Is.is;
 class SchedulesRepositoryTest {
 
     static final int SECOND = 1000;
+    static final io.ticktok.server.clock.Clock CLOCK_11 =
+            new io.ticktok.server.clock.Clock("1423", "kuku11", "every.11.seconds");
 
     @Autowired
     SchedulesRepository schedulesRepository;
@@ -45,45 +52,66 @@ class SchedulesRepositoryTest {
 
     @Test
     void addANewSchedule() {
-        schedulesRepository.addSchedule("every.11.seconds");
+        schedulesRepository.addClock(CLOCK_11);
         Schedule createdSchedule = schedulesRepository.findBySchedule("every.11.seconds").get();
-        assertThat(createdSchedule.getClockCount(), is(1));
         assertThat(createdSchedule.getNextTick(), is(systemClock.millis()));
+        assertThat(createdSchedule.getClocks(), hasSize(1));
+        assertThat(createdSchedule.getClocks(), contains(CLOCK_11.getId()));
     }
 
     @Test
     void increaseClockCountOnAddingExistingSchedule() {
-        schedulesRepository.addSchedule("every.11.seconds");
-        schedulesRepository.addSchedule("every.11.seconds");
+        schedulesRepository.addClock(CLOCK_11);
+        schedulesRepository.addClock(CLOCK_11);
         List<Schedule> allSchedules = schedulesRepository.findAll();
         assertThat(allSchedules.size(), is(1));
-        assertThat(allSchedules.get(0).getClockCount(), is(2));
+        assertThat(allSchedules.get(0).getClocks(), hasSize(1));
+        assertThat(allSchedules.get(0).getClocks(), contains(CLOCK_11.getId()));
     }
 
     @Test
     void decreaseClockCount() {
-        schedulesRepository.addSchedule("every.11.seconds");
-        schedulesRepository.removeSchedule("every.11.seconds");
-        assertThat(schedulesRepository.findBySchedule("every.11.seconds").get().getClockCount(), is(0));
+        schedulesRepository.addClock(CLOCK_11);
+        schedulesRepository.removeClock(CLOCK_11);
+        Schedule schedule = schedulesRepository.findBySchedule("every.11.seconds").get();
+        assertThat(schedule.getClocks(), not(contains(CLOCK_11.getId())));
     }
 
     @Test
-    void findByLatestScheduledTick() {
-        schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, 1));
-        schedulesRepository.save(new Schedule("every.10.seconds", now() + 10 * SECOND, 1));
-        List<Schedule> schedules = schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(0, now());
+    void findSchedulesWithNextTickUpUntilTime() {
+        schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, asList("111")));
+        schedulesRepository.save(new Schedule("every.10.seconds", now() + 10 * SECOND, asList("222")));
+        List<Schedule> schedules = schedulesRepository.findActiveSchedulesByNextTickLesserThan(now());
         assertThat(schedules.size(), is(1));
         assertThat(schedules.get(0).getSchedule(), is("every.8.seconds"));
     }
 
     private long now() {
-        return System.currentTimeMillis();
+        return systemClock.millis();
     }
 
     @Test
     void shouldNotRetrieveNonActiveSchedules() {
-        schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, 0));
-        assertThat(schedulesRepository.findByClockCountGreaterThanAndNextTickLessThanEqual(0, now()).size(), is(0));
+        schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND));
+        assertThat(schedulesRepository.findActiveSchedulesByNextTickLesserThan(now()).size(), is(0));
     }
 
+    @Test
+    void updateNextTick() {
+        Schedule schedule = schedulesRepository.save(new Schedule("every.8.seconds", 1111));
+        schedulesRepository.updateNextTick(schedule.getId(), 2222);
+        assertThat(schedulesRepository.findById(schedule.getId()).get().getNextTick(), is(2222L));
+    }
+
+    @Test
+    void deleteNonActiveClocks() {
+        schedulesRepository.save(new Schedule("every.8.seconds", 0));
+        schedulesRepository.save(new Schedule("every.7.seconds", 0, emptyList()));
+        schedulesRepository.save(new Schedule("every.10.seconds", 0, asList("222")));
+        schedulesRepository.deleteNonActiveClocks();
+        List<Schedule> leftSchedules = schedulesRepository.findAll();
+        assertThat(leftSchedules, hasSize(1));
+        assertThat(leftSchedules.get(0).getSchedule(), is("every.10.seconds"));
+
+    }
 }

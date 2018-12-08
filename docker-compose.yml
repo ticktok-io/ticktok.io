@@ -9,7 +9,7 @@ services:
     hostname: ticktok-rabbit
 
   mongo:
-    image: mongo:3.4
+    image: mongo:3.6
     ports:
       - 27017:27017
 

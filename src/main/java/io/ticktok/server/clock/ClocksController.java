@@ -48,6 +48,7 @@ public class ClocksController {
                     responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
     })
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest, Principal principal) {
+        log.info("Clock create: {}", clockRequest.toString());
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
         TickChannel channel = tickChannelExplorer.create(savedClock);
         return createdClockEntity(savedClock, channel, principal);
@@ -75,12 +76,6 @@ public class ClocksController {
 
     private ClockResource createClockResourceFor(Clock clock) {
         return new ClockResource(domain, clock);
-    }
-
-    @DeleteMapping("/{id}")
-    @ApiOperation("Delete a specific clock")
-    public void deleteOne(@PathVariable("id") String id) {
-        clocksRepository.deleteById(id);
     }
 
     @GetMapping

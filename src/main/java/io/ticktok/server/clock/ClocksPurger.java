@@ -19,7 +19,7 @@ public class ClocksPurger {
         this.tickChannelExplorer = tickChannelExplorer;
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(fixedDelayString = "${purge.clock:300000}")
     public void purge() {
         clocksRepository.findByStatus(Clock.ACTIVE).forEach(this::deleteRedundantSchedules);
     }
@@ -27,7 +27,7 @@ public class ClocksPurger {
     private void deleteRedundantSchedules(Clock clock) {
         if (isChannelNotExistsFor(clock)) {
             clocksRepository.deleteClock(clock);
-            log.info("Purged the clock: {} with schedule: {}", clock.getName(), clock.getSchedule());
+            log.info("Purged the clock: {}", clock);
         }
     }
 
