@@ -27,7 +27,7 @@ public class ClocksPurger {
     private void deleteRedundantSchedules(Clock clock) {
         if (isChannelNotExistsFor(clock)) {
             clocksRepository.deleteClock(clock);
-            log.info("Purged the clock: {} with schedule: {}", clock.getName(), clock.getSchedule());
+            log.info("Purged the clock: {}", clock);
         }
     }
 

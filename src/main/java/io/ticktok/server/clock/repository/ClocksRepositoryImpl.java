@@ -31,7 +31,6 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
 
     @Override
     public void deleteClock(Clock clock) {
-        log.info("Going to delete: {}" + clock);
         mongo.remove(
                 Query.query(Criteria.where("name").is(clock.getName())
                         .and("schedule").is(clock.getSchedule())
