@@ -12,14 +12,9 @@ import org.junit.runners.MethodSorters
 import java.lang.Thread.sleep
 
 @TestInstance(PER_CLASS)
-class ApplicationE2ETest {
+class ApiE2ETest : AppE2ETest() {
 
     private val client = TickListener()
-
-    @BeforeAll
-    fun startApp() {
-        App.start()
-    }
 
     @Test
     fun registerNewClock() {
@@ -67,10 +62,10 @@ class ApplicationE2ETest {
         App.retrievedUserError()
     }
 
-    @RepeatedTest(value = 3, name = "handleConcurrentClockRequests {currentRepetition}/{totalRepetitions}")
+    @RepeatedTest(value = 2, name = "handleConcurrentClockRequests {currentRepetition}/{totalRepetitions}")
     fun handleConcurrentClockRequests() {
         App.purge()
-        sleep(1000)
+        sleep(500)
         invokeMultipleClockRequestsInParallel()
         App.allInteractionsSucceeded()
     }
@@ -83,15 +78,6 @@ class ApplicationE2ETest {
         threads.forEach { it.join() }
     }
 
-    @AfterEach
-    internal fun resetApp() {
-        App.reset()
-    }
-
-    @AfterAll
-    fun purgeApp() {
-        App.purge()
-    }
 }
 
 

@@ -138,9 +138,9 @@ object App {
     }
 
     fun purge() {
-        sleep(1000)
+        sleep(500)
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
-        sleep(1000)
+        sleep(500)
         assertThat(response.statusLine.statusCode, `is`(204))
     }
 

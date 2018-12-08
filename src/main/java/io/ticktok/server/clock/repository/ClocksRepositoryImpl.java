@@ -22,12 +22,11 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
 
     @Override
     public Clock saveClock(String name, String schedule) {
-        Clock clock = mongo.findAndModify(
+        return mongo.findAndModify(
                 Query.query(Criteria.where("name").is(name).and("schedule").is(schedule)),
                 new Update().set("lastModifiedDate", systemClock.millis()).set("status", Clock.PENDING),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 Clock.class);
-        return clock;
     }
 
     @Override
