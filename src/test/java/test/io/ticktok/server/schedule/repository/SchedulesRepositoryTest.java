@@ -6,10 +6,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
 import java.time.Clock;
 import java.util.List;
@@ -24,31 +26,21 @@ import static org.hamcrest.core.Is.is;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SchedulesRepositoryTestConfiguration.class})
+@ContextConfiguration(classes = {SchedulesRepositoryTestConfiguration.class, RepositoryCleanupExtension.class})
 class SchedulesRepositoryTest {
 
     static final int SECOND = 1000;
     static final io.ticktok.server.clock.Clock CLOCK_11 =
             new io.ticktok.server.clock.Clock("1423", "kuku11", "every.11.seconds");
 
+
+    @Autowired
+    @RegisterExtension
+    RepositoryCleanupExtension repositoryCleanupExtension;
     @Autowired
     SchedulesRepository schedulesRepository;
     @Autowired
     Clock systemClock;
-
-    @BeforeEach
-    void setUp() {
-        clearDBs();
-    }
-
-    void clearDBs() {
-        schedulesRepository.deleteAll();
-    }
-
-    @AfterEach
-    void tearDown() {
-        clearDBs();
-    }
 
     @Test
     void addANewSchedule() {

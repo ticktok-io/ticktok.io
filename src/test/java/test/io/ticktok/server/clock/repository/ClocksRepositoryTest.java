@@ -3,14 +3,16 @@ package test.io.ticktok.server.clock.repository;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.io.ticktok.server.support.RepositoryCleanupConfiguration;
+import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
@@ -21,8 +23,12 @@ import static org.mockito.Mockito.*;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ClocksRepositoryTestConfiguration.class})
+@ContextConfiguration(classes = {ClocksRepositoryTestConfiguration.class, RepositoryCleanupConfiguration.class})
 class ClocksRepositoryTest {
+
+    @Autowired
+    @RegisterExtension
+    RepositoryCleanupExtension repositoryCleanupExtension;
 
     @Autowired
     ClocksRepository repository;
@@ -104,8 +110,4 @@ class ClocksRepositoryTest {
         assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.ACTIVE));
     }
 
-    @AfterEach
-    void clearRepository() {
-        repository.deleteAll();
-    }
 }

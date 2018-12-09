@@ -9,5 +9,6 @@ public interface ClocksRepository extends MongoRepository<Clock, String>, Update
 
     List<Clock> findByStatus(String status);
 
+    List<Clock> findByStatusNot(String status);
 }
 

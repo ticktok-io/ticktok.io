@@ -1,5 +1,6 @@
 package io.ticktok.server.clock;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -27,6 +28,8 @@ public class Clock {
     private String schedule;
     @Indexed
     private String status;
+
+    @JsonIgnore
     private long lastModifiedDate;
 
     public Clock(String id, String name, String schedule) {
