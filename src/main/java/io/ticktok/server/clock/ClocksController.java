@@ -1,6 +1,7 @@
 package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
+import io.ticktok.server.clock.repository.ClocksFinder;
 import io.ticktok.server.clock.repository.ClocksPurger;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
@@ -82,7 +83,8 @@ public class ClocksController {
     @GetMapping
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll() {
-        return clocksRepository.findAll().stream().map(this::createClockResourceFor).collect(Collectors.toList());
+        return new ClocksFinder(clocksRepository).find()
+                .stream().map(this::createClockResourceFor).collect(Collectors.toList());
     }
 
     @PostMapping("/purge")
