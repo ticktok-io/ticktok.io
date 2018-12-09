@@ -59,7 +59,8 @@ public class SchedulesRepositoryImpl implements CustomSchedulesRepository {
     @Override
     public List<Schedule> findActiveSchedulesByNextTickLesserThan(long time) {
         return mongo.find(
-                Query.query(Criteria.where(NEXT_TICK).lte(systemTime.millis()).and(CLOCKS).exists(true).not().size(0)),
+                Query.query(Criteria.where(NEXT_TICK).lte(time)
+                        .and(CLOCKS).exists(true).not().size(0)),
                 Schedule.class);
     }
 

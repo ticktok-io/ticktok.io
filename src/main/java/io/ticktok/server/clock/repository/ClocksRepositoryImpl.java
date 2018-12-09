@@ -24,7 +24,9 @@ public class ClocksRepositoryImpl implements UpdateClockRepository {
     public Clock saveClock(String name, String schedule) {
         return mongo.findAndModify(
                 Query.query(Criteria.where("name").is(name).and("schedule").is(schedule)),
-                new Update().set("lastModifiedDate", systemClock.millis()).set("status", Clock.PENDING),
+                new Update()
+                        .set("lastModifiedDate", systemClock.millis())
+                        .setOnInsert("status", Clock.PENDING),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 Clock.class);
     }

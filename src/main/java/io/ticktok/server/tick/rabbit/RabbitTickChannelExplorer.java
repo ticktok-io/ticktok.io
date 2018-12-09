@@ -11,8 +11,6 @@ import org.springframework.amqp.core.TopicExchange;
 
 public class RabbitTickChannelExplorer implements TickChannelExplorer {
 
-    public static final int SECOND = 1000;
-
     private final long queueTTL;
     private final AmqpAdmin rabbitAdmin;
     private final String rabbitUri;

@@ -80,10 +80,12 @@ class SchedulesRepositoryTest {
     @Test
     void findSchedulesWithNextTickUpUntilTime() {
         schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, asList("111")));
-        schedulesRepository.save(new Schedule("every.10.seconds", now() + 10 * SECOND, asList("222")));
-        List<Schedule> schedules = schedulesRepository.findActiveSchedulesByNextTickLesserThan(now());
-        assertThat(schedules.size(), is(1));
+        schedulesRepository.save(new Schedule("every.9.seconds", now() + SECOND, asList("111")));
+        schedulesRepository.save(new Schedule("every.10.seconds", now() + 3000, asList("222")));
+        List<Schedule> schedules = schedulesRepository.findActiveSchedulesByNextTickLesserThan(now() + 2000);
+        assertThat(schedules.size(), is(2));
         assertThat(schedules.get(0).getSchedule(), is("every.8.seconds"));
+        assertThat(schedules.get(1).getSchedule(), is("every.9.seconds"));
     }
 
     private long now() {

@@ -96,6 +96,14 @@ class ClocksRepositoryTest {
         verify(schedulesRepository, times(1)).removeClock(clock);
     }
 
+    @Test
+    void shouldNotChangeStateWhenSavingAnexistingClock() {
+        Clock clock = repository.saveClock("popov", "every.13.seconds");
+        repository.updateStatus(clock.getId(), Clock.ACTIVE);
+        repository.saveClock("popov", "every.13.seconds");
+        assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.ACTIVE));
+    }
+
     @AfterEach
     void clearRepository() {
         repository.deleteAll();

@@ -1,5 +1,6 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.repository;
 
+import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class ClocksPurger {
         this.tickChannelExplorer = tickChannelExplorer;
     }
 
-    @Scheduled(fixedDelayString = "${purge.clock:300000}")
+    @Scheduled(initialDelay = 0, fixedDelayString = "${purge.clock:120000}")
     public void purge() {
         clocksRepository.findByStatus(Clock.ACTIVE).forEach(this::deleteRedundantSchedules);
     }

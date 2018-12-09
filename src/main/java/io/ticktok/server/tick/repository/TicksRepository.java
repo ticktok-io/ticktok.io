@@ -9,7 +9,6 @@ public interface TicksRepository extends MongoRepository<Tick, String>, UpdateTi
 
     List<Tick> findByStatusAndTimeLessThanEqual(String status, long time);
 
-
     class UnableToUpdateStatusException extends RuntimeException {
         public UnableToUpdateStatusException(String message) {
             super(message);
