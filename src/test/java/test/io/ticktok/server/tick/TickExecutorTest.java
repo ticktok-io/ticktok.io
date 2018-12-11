@@ -51,7 +51,7 @@ class TickExecutorTest {
 
     @NotNull
     private Tick createPendingTick() {
-        return new Tick("id", "1", "every.5.seconds", 1000L, "PENDING");
+        return new Tick("id", "every.5.seconds", 1000L, "PENDING");
     }
 
     @Test

@@ -25,6 +25,11 @@ public class TicksRepositoryImpl implements UpdateTicksRepository {
          verifyUpdated(result, id);
     }
 
+    @Override
+    public void deletePublishedExceptLastPerSchedule(int count) {
+
+    }
+
     private void verifyUpdated(UpdateResult result, String id) {
         if(result.getModifiedCount() == 0) {
             throw new TicksRepository.UnableToUpdateStatusException("Unable to update tick: " + id);

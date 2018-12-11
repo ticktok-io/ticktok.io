@@ -19,8 +19,6 @@ public class Tick {
 
     @Id
     private String id;
-
-    private String scheduleId;
     private String schedule;
     @Indexed
     private long time;
@@ -29,6 +27,6 @@ public class Tick {
 
 
     public static Tick create(Schedule schedule) {
-        return new Tick(null, "", schedule.getSchedule(), schedule.getNextTick(), PENDING);
+        return new Tick(null, schedule.getSchedule(), schedule.getNextTick(), PENDING);
     }
 }
