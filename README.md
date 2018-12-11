@@ -4,7 +4,7 @@
 Ticktok.io is an efficient, managed and clustered scheduler that allows 
 apps to receive accurate and reliable clock signals at scale. 
 
-
+![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clocks_list.png)
 
 ## Official SDKs
 * [Java](https://github.com/ticktok-io/ticktok-java-client) - WIP
