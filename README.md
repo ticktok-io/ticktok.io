@@ -8,8 +8,8 @@ apps to receive accurate and reliable clock signals at scale.
 
 ## Installation
 ### Prerequisites
-* MongoDB
-* RabbitMQ
+* [MongoDB](https://www.mongodb.com)
+* [RabbitMQ](https://www.rabbitmq.com)
 
 ### Usage
 ```
