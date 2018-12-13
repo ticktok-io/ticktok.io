@@ -57,7 +57,6 @@ dependencies {
 
 
     // ======================= Tests ==========================
-
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // JUnit 5
@@ -77,6 +76,8 @@ dependencies {
     //Other
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
     testCompile "org.apache.httpcomponents:fluent-hc:4.5.5"
+    testCompile 'org.assertj:assertj-core:3.11.1'
+
 
 
 

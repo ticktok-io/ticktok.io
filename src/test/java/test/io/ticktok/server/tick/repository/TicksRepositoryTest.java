@@ -3,6 +3,8 @@ package test.io.ticktok.server.tick.repository;
 import io.ticktok.server.schedule.Schedule;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.repository.TicksRepository;
+import org.assertj.core.api.Assertions;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +25,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -82,13 +85,12 @@ class TicksRepositoryTest {
     @Test
     void keepOnlyLastXPublishedTicks() {
         Tick tick1 = new Tick(null, "every.1.seconds", 111, Tick.PUBLISHED);
-        Tick tick2 = new Tick(null, "every.2.seconds", 222, Tick.PUBLISHED);
-        Tick tick3 = new Tick(null, "every.3.seconds", 333, Tick.PUBLISHED);
+        Tick tick2 = new Tick(null, "every.1.seconds", 222, Tick.PUBLISHED);
+        Tick tick3 = new Tick(null, "every.1.seconds", 333, Tick.PUBLISHED);
         repository.saveAll(asList(tick1, tick2, tick3));
         repository.deletePublishedExceptLastPerSchedule(2);
-        assertThat(repository.findAll(), usingEleme(argThat(refEq(tick3))));
+        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").doesNotContain(tick3);
         repository.deletePublishedExceptLastPerSchedule(1);
-        assertThat(repository.count(), is(1));
-        assertThat(repository.findAll(), containsInAnyOrder(refEq(tick1, "id")));
+        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").containsOnly(tick1);
     }
 }
