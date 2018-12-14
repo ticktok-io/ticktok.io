@@ -15,6 +15,6 @@ public interface CustomSchedulesRepository {
 
     List<Schedule> findActiveSchedulesByNextTickLesserThan(long time);
 
-    void deleteNonActiveClocks();
+    void deleteNonActiveSchedules();
 
 }

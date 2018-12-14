@@ -16,3 +16,17 @@ management:
   endpoints:
     web:
       base-path: /mgmt
+
+clocks:
+  purge:
+    interval: 120000
+
+schedules:
+  purge:
+    interval: 3600000
+
+ticks:
+  purge:
+    interval: 43200000
+    keepCount: 10
+

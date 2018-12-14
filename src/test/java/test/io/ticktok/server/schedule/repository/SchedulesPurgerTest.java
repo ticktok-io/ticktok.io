@@ -1,6 +1,6 @@
 package test.io.ticktok.server.schedule.repository;
 
-import io.ticktok.server.schedule.SchedulesPurger;
+import io.ticktok.server.schedule.repository.SchedulesPurger;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ class SchedulesPurgerTest {
     @Test
     void deleteAllSchedulesWithNoClocks() {
         new SchedulesPurger(schedulesRepository).purge();
-        verify(schedulesRepository).deleteNonActiveClocks();
+        verify(schedulesRepository).deleteNonActiveSchedules();
     }
 
 }

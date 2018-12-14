@@ -1,14 +1,12 @@
-package io.ticktok.server.schedule;
+package io.ticktok.server.schedule.repository;
 
-import io.ticktok.server.schedule.repository.SchedulesRepository;
-import lombok.extern.slf4j.Slf4j;
+import io.ticktok.server.logging.LogExecutionTime;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
  * Deleting any unused schedules to speed up repository
  */
-@Slf4j
 @Component
 public class SchedulesPurger {
 
@@ -18,9 +16,9 @@ public class SchedulesPurger {
         this.schedulesRepository = schedulesRepository;
     }
 
-    @Scheduled(fixedDelayString = "${purge.schedule:3600000}")
+    @LogExecutionTime
+    @Scheduled(fixedDelayString = "${schedules.purge.interval}")
     public void purge() {
-        log.info("Purging non active schedules");
-        schedulesRepository.deleteNonActiveClocks();
+        schedulesRepository.deleteNonActiveSchedules();
     }
 }

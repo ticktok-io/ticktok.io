@@ -13,5 +13,15 @@ management:
     web:
       base-path: /mgmt
 
-purge:
-  schedule: 250
+clocks:
+  purge:
+    interval: 5000
+
+schedules:
+  purge:
+    interval: 250
+
+ticks:
+  purge:
+    interval: 500
+    keepCount: 1

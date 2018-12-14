@@ -2,6 +2,7 @@ package io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.logging.LogExecutionTime;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,7 +21,8 @@ public class ClocksPurger {
         this.tickChannelExplorer = tickChannelExplorer;
     }
 
-    @Scheduled(initialDelay = 0, fixedDelayString = "${purge.clock:120000}")
+    @LogExecutionTime
+    @Scheduled(initialDelay = 0, fixedDelayString = "${clocks.purge.interval}")
     public void purge() {
         clocksRepository.findByStatus(Clock.ACTIVE).forEach(this::deleteRedundantSchedules);
     }

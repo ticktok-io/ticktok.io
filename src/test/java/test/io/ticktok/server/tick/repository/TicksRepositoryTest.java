@@ -3,9 +3,10 @@ package test.io.ticktok.server.tick.repository;
 import io.ticktok.server.schedule.Schedule;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.repository.TicksRepository;
-import org.junit.jupiter.api.AfterEach;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Bean;
@@ -13,18 +14,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.io.ticktok.server.support.RepositoryCleanupConfiguration;
+import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TicksRepositoryTest.TicksRepositoryTestConfiguration.class})
+@ContextConfiguration(classes = {TicksRepositoryTest.TicksRepositoryTestConfiguration.class, RepositoryCleanupConfiguration.class})
 class TicksRepositoryTest {
 
     @Configuration
@@ -37,6 +42,10 @@ class TicksRepositoryTest {
             return Clock.fixed(FIXED_INSTANT, ZoneId.of("UTC"));
         }
     }
+
+    @Autowired
+    @RegisterExtension
+    RepositoryCleanupExtension repositoryCleanupExtension;
 
 
     public static final Tick TICK = Tick.create(new Schedule("every.10.seconds", 1234L));
@@ -57,8 +66,33 @@ class TicksRepositoryTest {
                 () -> repository.updateTickStatus(savedTick.getId(), Tick.PENDING));
     }
 
-    @AfterEach
-    void clearDb() {
-        repository.deleteAll();
+    @Test
+    void keepNonPublishedTicks() {
+        repository.save(new Tick(null, "every.1.seconds", 111, Tick.PENDING));
+        repository.save(new Tick(null, "every.2.seconds", 111, Tick.IN_PROGRESS));
+        repository.deletePublishedExceptLastPerSchedule(1);
+        assertThat(repository.findAll(), hasSize(2));
+    }
+
+    @Test
+    void keepOnlyLastXPublishedTicks() {
+        Tick tick1 = new Tick(null, "every.1.seconds", 111, Tick.PUBLISHED);
+        Tick tick2 = new Tick(null, "every.1.seconds", 222, Tick.PUBLISHED);
+        Tick tick3 = new Tick(null, "every.1.seconds", 333, Tick.PUBLISHED);
+        repository.saveAll(asList(tick1, tick2, tick3));
+        repository.deletePublishedExceptLastPerSchedule(2);
+        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").doesNotContain(tick1);
+        repository.deletePublishedExceptLastPerSchedule(1);
+        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").containsOnly(tick3);
+    }
+
+    @Test
+    void keepTicksPerSchedule() {
+        Tick tick1 = new Tick(null, "every.1.seconds", 111, Tick.PUBLISHED);
+        Tick tick12 = new Tick(null, "every.1.seconds", 122, Tick.PUBLISHED);
+        Tick tick2 = new Tick(null, "every.2.seconds", 222, Tick.PUBLISHED);
+        repository.saveAll(asList(tick1, tick12, tick2));
+        repository.deletePublishedExceptLastPerSchedule(1);
+        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").containsOnly(tick12, tick2);
     }
 }
