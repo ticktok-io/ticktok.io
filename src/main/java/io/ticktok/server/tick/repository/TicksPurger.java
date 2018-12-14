@@ -11,14 +11,16 @@ import org.springframework.stereotype.Component;
 public class TicksPurger {
 
     private final TicksRepository repository;
+    private final int keepCount;
 
-    public TicksPurger(@Value("ticks.purge.keepCount") String keepCount, TicksRepository repository) {
+    public TicksPurger(@Value("${ticks.purge.keepCount}") String keepCount, TicksRepository repository) {
         this.repository = repository;
+        this.keepCount = Integer.valueOf(keepCount);
     }
 
     @LogExecutionTime
     @Scheduled(fixedDelayString = "${ticks.purge.interval}")
     public void purge() {
-        repository.deletePublishedExceptLastPerSchedule(8);
+        repository.deletePublishedExceptLastPerSchedule(keepCount);
     }
 }
