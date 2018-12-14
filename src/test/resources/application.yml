@@ -15,7 +15,7 @@ management:
 
 clocks:
   purge:
-    interval: 500
+    interval: 5000
 
 schedules:
   purge:
