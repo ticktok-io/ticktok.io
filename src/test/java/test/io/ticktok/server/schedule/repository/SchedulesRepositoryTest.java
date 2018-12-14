@@ -2,8 +2,6 @@ package test.io.ticktok.server.schedule.repository;
 
 import io.ticktok.server.schedule.Schedule;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -102,7 +100,7 @@ class SchedulesRepositoryTest {
         schedulesRepository.save(new Schedule("every.8.seconds", 0));
         schedulesRepository.save(new Schedule("every.7.seconds", 0, emptyList()));
         schedulesRepository.save(new Schedule("every.10.seconds", 0, asList("222")));
-        schedulesRepository.deleteNonActiveClocks();
+        schedulesRepository.deleteNonActiveSchedules();
         List<Schedule> leftSchedules = schedulesRepository.findAll();
         assertThat(leftSchedules, hasSize(1));
         assertThat(leftSchedules.get(0).getSchedule(), is("every.10.seconds"));

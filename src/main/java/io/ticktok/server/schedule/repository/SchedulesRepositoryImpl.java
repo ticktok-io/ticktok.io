@@ -65,7 +65,7 @@ public class SchedulesRepositoryImpl implements CustomSchedulesRepository {
     }
 
     @Override
-    public void deleteNonActiveClocks() {
+    public void deleteNonActiveSchedules() {
         mongo.remove(Query.query(new Criteria().orOperator(
                 Criteria.where(CLOCKS).exists(false),
                 Criteria.where(CLOCKS).exists(true).size(0))),

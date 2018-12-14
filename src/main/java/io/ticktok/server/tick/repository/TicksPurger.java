@@ -1,20 +1,24 @@
 package io.ticktok.server.tick.repository;
 
+import io.ticktok.server.logging.LogExecutionTime;
+import io.ticktok.server.tick.repository.TicksRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class TicksPurger {
 
     private final TicksRepository repository;
 
-    public TicksPurger(TicksRepository repository) {
+    public TicksPurger(@Value("ticks.purge.keepCount") String keepCount, TicksRepository repository) {
         this.repository = repository;
     }
 
+    @LogExecutionTime
+    @Scheduled(fixedDelayString = "${ticks.purge.interval}")
     public void purge() {
-        repository.deletePublishedExceptLastPerSchedule(10);
-        log.info("Purged published ticks");
+        repository.deletePublishedExceptLastPerSchedule(8);
     }
 }

@@ -9,18 +9,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static test.io.ticktok.server.tick.repository.TicksPurgerTest.TICKS_TO_KEEP;
 
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TicksPurgerTest.TicksPurgerTestConfiguration.class})
+@TestPropertySource(properties = {
+        "ticks.purge.keepCount=" + TICKS_TO_KEEP,
+})
 class TicksPurgerTest {
 
+
+    public static final int TICKS_TO_KEEP = 8;
+
     @Configuration
-    @ComponentScan(basePackages = "io.ticktok.server.tick.repository")
+    @ComponentScan(basePackages = {"io.ticktok.server.tick.repository"})
     static class TicksPurgerTestConfiguration {
         @Bean
         public TicksRepository ticksRepository() {
@@ -33,10 +41,9 @@ class TicksPurgerTest {
     @Autowired
     TicksPurger purger;
 
-
     @Test
     void purgeTicks() {
         purger.purge();
-        verify(repository).deletePublishedExceptLastPerSchedule(10);
+        verify(repository).deletePublishedExceptLastPerSchedule(TICKS_TO_KEEP);
     }
 }
