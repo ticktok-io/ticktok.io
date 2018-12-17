@@ -13,14 +13,14 @@ services:
     - 27018:27017
 
   app:
-    build: ..
+    image: app
     ports:
       - 8081:8080
     environment:
       - RABBIT_URI=amqp://rabbit
       - MONGO_URI=mongodb://mongo/e2e-test
       - SELF_DOMAIN=http://localhost:8081
-      - ACCESS_TOKEN=a5f98e2b068ee51f90fd81c530e7fb4e306e7f42
+      - ACCESS_TOKEN=${E2E_ACCESS_TOKEN}
     volumes:
       - "./application.yml:/opt/app/config/application.yml"
     depends_on:

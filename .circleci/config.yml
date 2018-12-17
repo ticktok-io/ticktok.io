@@ -68,17 +68,22 @@ jobs:
           name: Build Dashboard
           command: PUBLIC_URL=' ' npm run build --prefix dashboard
 
-      - run: ./gradlew build --info
+      - run: ./gradlew build
+
+
+      - run:
+          name: Build application Docker image
+          command: docker build -t app .
+
+      - run:
+          name: E2E tests against dockered app
+          command: ./gradlew
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts
 
       - store_artifacts:
           path: test-reports
-
-      - run:
-          name: Build application Docker image
-          command: docker build -t app .
 
       - run:
           name: Setup heroku

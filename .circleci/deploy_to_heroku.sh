@@ -13,26 +13,13 @@ check_health() {
 }
 
 
-if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then
-    if [ "$CIRCLE_BRANCH" == "master" ]; then
+if [[ ${CIRCLE_BRANCH} == "develop" ]]; then
+    if [[ ${CIRCLE_BRANCH} == "master" ]]; then
         HEROKU_APP=ticktok-io-demo
     else
         HEROKU_APP=ticktok-io-dev
     fi
-
-#    IMAGE=$HEROKU/$HEROKU_APP/web
-#    echo $(heroku auth:token) | docker login --username=_ --password-stdin $HEROKU
-#    echo image: $IMAGE
-#    docker tag app $IMAGE
-#    docker push $IMAGE
-#    heroku container:release web --app ticktok-io-dev
-#    echo $IMAGE deployed to heroku
-
-    # heroku git:remote -a $HEROKU_APP
-    # git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git HEAD:master
     heroku deploy:jar build/libs/*.jar --app $HEROKU_APP -o "--server.port=\$PORT"
-    # git push heroku master
-
     check_health https://$HEROKU_APP.herokuapp.com
 else
     echo No deployment from $CIRCLE_BRANCH branch

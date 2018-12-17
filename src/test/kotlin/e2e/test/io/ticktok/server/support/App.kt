@@ -3,12 +3,15 @@ package e2e.test.io.ticktok.server.support
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import io.ticktok.server.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
 import org.apache.http.util.EntityUtils
+import org.awaitility.Duration
+import org.awaitility.kotlin.atMost
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.until
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -16,13 +19,14 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
 import java.util.*
 
 object App {
 
-    const val APP_URL = "http://localhost:8081"
     const val ACCESS_TOKEN = "ct-auth-token"
+    private val APP_URL = System.getenv("APP_URL") ?: "http://localhost:8080"
 
 
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList());
@@ -30,9 +34,14 @@ object App {
 
     fun start() {
         if (!started) {
-            Application.main()
+            waitForAppToBeHealthy()
+            //Application.main()
             started = true
         }
+    }
+
+    private fun waitForAppToBeHealthy() {
+        await atMost(Duration.ONE_MINUTE) until { isAppHealthy() }
     }
 
     fun reset() {
@@ -67,7 +76,15 @@ object App {
     private inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
     fun isHealthy() {
-        assertThat(getHealthStatus(), `is`("UP"))
+        assertTrue(isAppHealthy())
+    }
+
+    private fun isAppHealthy(): Boolean {
+        return try {
+            getHealthStatus() == "UP"
+        } catch(t: Throwable) {
+            false
+        }
     }
 
     private fun getHealthStatus(): String {

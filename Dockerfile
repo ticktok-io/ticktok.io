@@ -8,4 +8,4 @@ RUN chmod +x /opt/app/entrypoint.sh
 
 WORKDIR /opt/app
 
-CMD ["entrypoint.sh"]
+CMD ["./entrypoint.sh"]

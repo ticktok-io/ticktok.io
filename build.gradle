@@ -43,8 +43,6 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-aop"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb"
     compile "org.springframework.boot:spring-boot-starter-amqp"
-    //compile "org.springframework.boot:spring-boot-starter-rabbit"
-    compile group: 'org.springframework.amqp', name: 'spring-erlang', version: '1.4.6.RELEASE'
 
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
@@ -80,16 +78,15 @@ dependencies {
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
     testCompile "org.apache.httpcomponents:fluent-hc:4.5.5"
     testCompile 'org.assertj:assertj-core:3.11.1'
-
-
-
-
+    testCompile group: 'org.awaitility', name: 'awaitility-kotlin', version: '3.1.5'
 }
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
@@ -128,21 +125,32 @@ clean {
 }
 
 test {
-    environment "DASHBOARD_URL", "http://localhost:8080"
-    environment "SELF_DOMAIN", "http://localhost:8080"
     useJUnitPlatform()
+    exclude "e2e/**"
 }
-
 
 
 task e2eWithDocker(type: Test) {
+    environment "DASHBOARD_URL", "http://localhost:8081"
+    environment "APP_URL", "http://localhost:8081"
     doFirst {
         exec {
-            commandLine "docker", "build", "-t", "e2e-test-ticktok", "."
+            commandLine "docker-compose", "-f", "docker-e2e/docker-compose.yml", "up", "-d"
         }
     }
     useJUnitPlatform()
+    include "e2e/**/*"
 }
+
+task shutDownE2EDockerCompose() {
+    doLast {
+        exec {
+            commandLine "docker-compose", "-f", "docker-e2e/docker-compose.yml", "down"
+        }
+    }
+}
+
+e2eWithDocker.finalizedBy(shutDownE2EDockerCompose)
 
 
 
