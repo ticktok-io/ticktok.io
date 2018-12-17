@@ -86,6 +86,7 @@ object App {
         return try {
             getHealthStatus() == "UP"
         } catch(t: Throwable) {
+            print(t)
             false
         }
     }
