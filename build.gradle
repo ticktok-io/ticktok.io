@@ -133,6 +133,7 @@ test {
 task e2eWithDocker(type: Test) {
     environment "DASHBOARD_URL", "http://localhost:8081"
     environment "APP_URL", "http://localhost:8081"
+    systemProperties = [startApp: "no"]
     doFirst {
         exec {
             commandLine "docker-compose", "-f", "docker-e2e/docker-compose.yml", "up", "-d"

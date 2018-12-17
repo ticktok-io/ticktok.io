@@ -3,6 +3,7 @@ package e2e.test.io.ticktok.server.support
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import io.ticktok.server.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
 import org.apache.http.client.fluent.Request
@@ -35,13 +36,15 @@ object App {
     fun start() {
         if (!started) {
             waitForAppToBeHealthy()
-            //Application.main()
+            if(System.getProperty("startApp", "no") != "no") {
+                Application.main()
+            }
             started = true
         }
     }
 
     private fun waitForAppToBeHealthy() {
-        await atMost(Duration.ONE_MINUTE) until { isAppHealthy() }
+        await atMost(Duration.FIVE_MINUTES) until { isAppHealthy() }
     }
 
     fun reset() {
