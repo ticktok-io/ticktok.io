@@ -86,7 +86,7 @@ object App {
         return try {
             getHealthStatus() == "UP"
         } catch(t: Throwable) {
-            print(t)
+            println("Failed to get health. Cause:${t.cause}, Message:${t.message}")
             false
         }
     }
