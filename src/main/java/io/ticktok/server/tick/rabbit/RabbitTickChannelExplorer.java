@@ -13,17 +13,16 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
 
     private final long queueTTL;
     private final AmqpAdmin rabbitAdmin;
-    private final String rabbitUri;
+    private final String consumerRabbitUri;
     private final TopicExchange exchange;
 
     public RabbitTickChannelExplorer(
-            String queueTTL,
+            RabbitProperties rabbitProperties,
             AmqpAdmin rabbitAdmin,
-            String rabbitUri,
             TopicExchange topicExchange) {
-        this.queueTTL = Long.valueOf(queueTTL);
+        this.queueTTL = Long.valueOf(rabbitProperties.queueTTL());
         this.rabbitAdmin = rabbitAdmin;
-        this.rabbitUri = rabbitUri;
+        this.consumerRabbitUri = rabbitProperties.getConsumerUri();
         this.exchange = topicExchange;
     }
 
@@ -41,7 +40,7 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
         Queue queue = new Queue(nameFor(clock), true, false, true, queueOptions());
         rabbitAdmin.declareQueue(queue);
         rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(clock.getSchedule()));
-        return new TickChannel(rabbitUri, queue.getName());
+        return new TickChannel(consumerRabbitUri, queue.getName());
     }
 
     private ImmutableMap<String, Object> queueOptions() {

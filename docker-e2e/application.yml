@@ -1,0 +1,17 @@
+rabbit:
+  consumerUri: amqp://localhost:5673
+  queue:
+    ttl: 200
+
+clocks:
+  purge:
+    interval: 5000
+
+schedules:
+  purge:
+    interval: 250
+
+ticks:
+  purge:
+    interval: 500
+    keepCount: 1

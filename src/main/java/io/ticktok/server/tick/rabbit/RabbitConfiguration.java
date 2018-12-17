@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,9 @@ public class RabbitConfiguration {
     private String rabbitUri;
     @Value("${rabbit.queue.ttl}")
     private String queueTTL;
+
+    @Autowired
+    private RabbitProperties rabbitProperties;
 
     @Bean
     public TopicExchange ticktokExchange() {
@@ -45,7 +49,7 @@ public class RabbitConfiguration {
 
     @Bean
     public TickChannelExplorer tickChannelExplorer(AmqpAdmin amqpAdmin, TopicExchange topicExchange) {
-        return new RabbitTickChannelExplorer(queueTTL, amqpAdmin, rabbitUri, topicExchange);
+        return new RabbitTickChannelExplorer(rabbitProperties, amqpAdmin, topicExchange);
     }
 
 }

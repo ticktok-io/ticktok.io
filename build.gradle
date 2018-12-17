@@ -43,6 +43,9 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-aop"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb"
     compile "org.springframework.boot:spring-boot-starter-amqp"
+    //compile "org.springframework.boot:spring-boot-starter-rabbit"
+    compile group: 'org.springframework.amqp', name: 'spring-erlang', version: '1.4.6.RELEASE'
+
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
 
@@ -129,6 +132,20 @@ test {
     environment "SELF_DOMAIN", "http://localhost:8080"
     useJUnitPlatform()
 }
+
+
+
+task e2eWithDocker(type: Test) {
+    doFirst {
+        exec {
+            commandLine "docker", "build", "-t", "e2e-test-ticktok", "."
+        }
+    }
+    useJUnitPlatform()
+}
+
+
+
 
 
 
