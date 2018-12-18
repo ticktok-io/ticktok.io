@@ -131,8 +131,8 @@ test {
 
 
 task e2eWithDocker(type: Test) {
-    environment "DASHBOARD_URL", "http://docker-e2e_app_1:8081"
-    environment "APP_URL", "http://docker-e2e_app_1:8081"
+    environment "DASHBOARD_URL", "http://127.0.0.1:8081"
+    environment "APP_URL", "http://127.0.0.1:8081"
     systemProperties = [startApp: "no"]
     doFirst {
         exec {
