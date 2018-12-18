@@ -36,7 +36,7 @@ object App {
     fun start() {
         if (!started) {
             waitForAppToBeHealthy()
-            if(System.getProperty("startApp", "no") != "no") {
+            if(System.getProperty("startApp", "yes") != "no") {
                 Application.main()
             }
             started = true
