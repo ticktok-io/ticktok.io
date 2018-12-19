@@ -27,7 +27,7 @@ jobs:
 
       - run:
           name: Update NodeJS
-          command: ./circleci/update_node.sh
+          command: .circleci/update_node.sh
 
       - run: node --version
 
