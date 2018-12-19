@@ -25,6 +25,8 @@ jobs:
     steps:
       - checkout
 
+      - run: node --version
+
       - run:
           name: Start mongo & rabbit
           command: docker-compose up -d
