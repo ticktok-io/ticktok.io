@@ -8,6 +8,8 @@ jobs:
     machine:
       # specify the version you desire here
       image: circleci/classic:201808-01
+      node:
+        version: 8
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -25,9 +27,9 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Update NodeJS
-          command: .circleci/update_node.sh
+#      - run:
+#          name: Update NodeJS
+#          command: .circleci/update_node.sh
 
       - run: node --version && java -version
 
