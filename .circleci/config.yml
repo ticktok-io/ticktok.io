@@ -7,8 +7,7 @@ jobs:
   build:
     machine:
       # specify the version you desire here
-      enabled: true
-      type: circleci/classic:latest
+      image: circleci/classic:latest
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
