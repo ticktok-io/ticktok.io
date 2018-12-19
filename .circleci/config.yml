@@ -29,7 +29,7 @@ jobs:
           name: Update NodeJS
           command: .circleci/update_node.sh
 
-      - run: node --version && java --version
+      - run: node --version && java -version
 
       - run:
           name: Start mongo & rabbit
