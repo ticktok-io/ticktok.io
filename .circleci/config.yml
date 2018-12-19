@@ -5,15 +5,15 @@
 version: 2
 jobs:
   build:
-    docker:
+    machine:
       # specify the version you desire here
-      - image: circleci/openjdk:8-jdk-node-browsers-legacy
+      - image: circleci/classic:latest
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: rabbitmq:3.7
-      - image: mongo:3.4
+      # - image: rabbitmq:3.7
+      # - image: mongo:3.4
     working_directory: ~/repo
 
     environment:
@@ -24,6 +24,11 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Start mongo & rabbit
+          command: docker-compose up -d
 
       - run: mkdir test-reports
       - run:
@@ -34,7 +39,6 @@ jobs:
           command: java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
           background: true
 
-      - setup_remote_docker
 
       - restore_cache:
           keys:
