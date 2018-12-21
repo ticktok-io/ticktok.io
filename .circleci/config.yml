@@ -5,17 +5,17 @@
 version: 2
 jobs:
   build:
-    machine:
+    docker:
       # specify the version you desire here
-      image: circleci/classic:201808-01
-      node:
-        version: 8
+      - image: circleci/openjdk:8-jdk-node-browsers-legacy
+#      node:
+#        version: 8
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: rabbitmq:3.7
-      # - image: mongo:3.4
+      - image: rabbitmq:3.7
+      - image: mongo:3.4
     working_directory: ~/repo
 
     environment:
