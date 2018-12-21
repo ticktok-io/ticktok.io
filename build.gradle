@@ -18,7 +18,11 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'com.github.johnrengelman.shadow'
-    
+
+
+plugins {
+    id 'com.gradle.build-scan' version '1.16'
+}
 
 bootJar {
     baseName = 'ticktok'
