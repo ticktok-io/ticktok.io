@@ -75,7 +75,7 @@ jobs:
 
       - run:
           name: Server's UT & IT
-          command: ./gradlew build --tests test.*
+          command: ./gradlew test --tests test.*
 
       - run:
           name: Build server
