@@ -13,6 +13,7 @@ import org.awaitility.Duration
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
+import org.awaitility.kotlin.withPollInterval
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -44,7 +45,7 @@ object App {
     }
 
     private fun waitForAppToBeHealthy() {
-        await atMost(Duration.FIVE_MINUTES) until { isAppHealthy() }
+        await withPollInterval(Duration.TWO_SECONDS) atMost(Duration.FIVE_MINUTES) until { isAppHealthy() }
     }
 
     fun reset() {
