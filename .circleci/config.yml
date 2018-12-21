@@ -88,7 +88,7 @@ jobs:
 
       - run:
           name: E2E tests against dockered app
-          command: ./gradlew e2eWithDocker --scan
+          command: ./gradlew e2eWithDocker --scan --info
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts
