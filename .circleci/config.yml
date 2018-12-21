@@ -27,15 +27,16 @@ jobs:
     steps:
       - checkout
 
+      - setup_remote_docker
 #      - run:
 #          name: Update NodeJS
 #          command: .circleci/update_node.sh
 
       - run: node --version && java -version
 
-      - run:
-          name: Start mongo & rabbit
-          command: docker-compose up -d
+#      - run:
+#          name: Start mongo & rabbit
+#          command: docker-compose up -d
 
       - run: mkdir test-reports
       - run:
