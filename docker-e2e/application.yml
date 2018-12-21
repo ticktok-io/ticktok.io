@@ -1,5 +1,4 @@
 rabbit:
-  consumerUri: amqp://localhost:5673
   queue:
     ttl: 200
 

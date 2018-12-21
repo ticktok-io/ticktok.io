@@ -7,15 +7,13 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/openjdk:8-jdk-node-browsers-legacy
-#      node:
-#        version: 8
+      image: circleci/classic:201808-01
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: rabbitmq:3.7
-      - image: mongo:3.4
+      # - image: rabbitmq:3.7
+      # - image: mongo:3.4
     working_directory: ~/repo
 
     environment:
@@ -27,16 +25,11 @@ jobs:
     steps:
       - checkout
 
-      - setup_remote_docker
-#      - run:
-#          name: Update NodeJS
-#          command: .circleci/update_node.sh
+      # - setup_remote_docker
 
-      - run: node --version && java -version
-
-#      - run:
-#          name: Start mongo & rabbit
-#          command: docker-compose up -d
+      - run:
+          name: Start mongo & rabbit
+          command: docker-compose -f docker-compose.yml -f .circleci/docker-compose.ci.yml up -d mongo rabbit
 
       - run: mkdir test-reports
       - run:
@@ -55,7 +48,7 @@ jobs:
             - node-v1-{{ .Branch }}-
             - node-v1-
 
-      - run: npm install --prefix dashboard
+      - run: .circleci/run_npm.sh install
 
       - save_cache:
           paths:
@@ -78,17 +71,23 @@ jobs:
 
       - run:
           name: Build Dashboard
-          command: PUBLIC_URL=' ' npm run build --prefix dashboard
+          command: PUBLIC_URL=' ' .circleci/run_npm.sh install build
 
-      - run: ./gradlew build
+      - run:
+          name: Build server
+          command: ./gradlew build --tests test.*
 
       - run:
           name: Build application Docker image
           command: docker build -t app .
 
       - run:
+          name: Start app
+          command: docker-compose -f docker-compose.yml -f .circleci/docker-compose.ci.yml up -d
+
+      - run:
           name: E2E tests against dockered app
-          command: ./gradlew e2eWithDocker --scan --info
+          command: ./gradlew test --tests e2e.* -DstartApp=no
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts

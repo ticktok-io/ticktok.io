@@ -134,7 +134,6 @@ clean {
 
 test {
     useJUnitPlatform()
-    exclude "e2e/**"
 }
 
 
@@ -160,22 +159,5 @@ task shutDownE2EDockerCompose() {
 }
 
 e2eWithDocker.finalizedBy(shutDownE2EDockerCompose)
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
-task testJar2(type: ShadowJar) {
-    classifier = 'tests'
-    from sourceSets.test.output.classesDirs
-    configurations = [project.configurations.testRuntime]
-    exclude "test/**"
-}
-
-task testJar(type: Jar) {
-    classifier = 'tests'
-    from sourceSets.test.output.classesDirs
-    exclude "test/**"
-}
-
-assemble.finalizedBy(testJar)
 
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }

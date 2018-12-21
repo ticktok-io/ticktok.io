@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  app:
+    image: app
+    ports:
+    - 8080:8080
+    environment:
+    - RABBIT_URI=amqp://rabbit
+    - MONGO_URI=mongodb://mongo/e2e-test
+    - SELF_DOMAIN=http://localhost:8081
+    - ACCESS_TOKEN=${E2E_ACCESS_TOKEN}
+    - RABBIT_QUEUE_TTL=200
+    - CLOCKS_PURGE_INTERVAL=5000
+    - SCHEDULES_PURGE_INTERVAL=250
+    - TICKS_PURGE_INTERVAL=500
+    - TICKS_PURGE_KEEPCOUNT=1
+    volumes:
+    - "./application.yml:/opt/app/config/application.yml"
+    depends_on:
+    - rabbit
+    - mongo

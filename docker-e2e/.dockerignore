@@ -1,0 +1,4 @@
+.gradle
+application.yml
+Dockerfile
+docker-compose.yml
