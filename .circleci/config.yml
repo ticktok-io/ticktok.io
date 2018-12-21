@@ -74,8 +74,12 @@ jobs:
           command: PUBLIC_URL=' ' .circleci/run_npm.sh install build
 
       - run:
-          name: Build server
+          name: Server's UT & IT
           command: ./gradlew build --tests test.*
+
+      - run:
+          name: Build server
+          command: ./gradlew build -x test
 
       - run:
           name: Build application Docker image
