@@ -173,4 +173,4 @@ task testJar(type: Jar) {
 
 assemble.finalizedBy(testJar)
 
-
+buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
