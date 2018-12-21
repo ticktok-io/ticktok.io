@@ -133,6 +133,7 @@ clean {
 }
 
 test {
+    systemProperty "startApp", System.getProperty("startApp")
     useJUnitPlatform()
 }
 
