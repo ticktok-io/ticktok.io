@@ -139,7 +139,7 @@ task e2eWithDocker(type: Test) {
     systemProperties = [startApp: "no"]
     doFirst {
         exec {
-            commandLine "docker-compose", "-f", "docker-e2e/docker-compose.yml", "up", "-d"
+            commandLine "./docker-e2e/start_app.sh"
         }
     }
     useJUnitPlatform()
@@ -149,7 +149,7 @@ task e2eWithDocker(type: Test) {
 task shutDownE2EDockerCompose() {
     doLast {
         exec {
-            commandLine "docker-compose", "-f", "docker-e2e/docker-compose.yml", "down"
+            commandLine "./docker-e2e/stop_app.sh"
         }
     }
 }
