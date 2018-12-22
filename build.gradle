@@ -45,7 +45,9 @@ dependencies {
     // Spring
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
+        exclude module: "spring-boot-starter-logging"
     }
+    compile "org.springframework.boot:spring-boot-starter-log4j2"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.boot:spring-boot-starter-aop"
@@ -133,6 +135,7 @@ clean {
 }
 
 test {
+    systemProperty "log4j.debug", "false"
     systemProperty "startApp", System.getProperty("startApp")
     useJUnitPlatform()
 }

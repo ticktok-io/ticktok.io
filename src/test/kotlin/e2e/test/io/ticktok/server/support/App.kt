@@ -45,7 +45,7 @@ object App {
     }
 
     private fun waitForAppToBeHealthy() {
-        await withPollInterval(Duration.TWO_SECONDS) atMost(Duration.FIVE_MINUTES) until { isAppHealthy() }
+        await withPollInterval(Duration.ONE_SECOND) atMost(Duration.FIVE_MINUTES) until { isAppHealthy() }
     }
 
     fun reset() {
