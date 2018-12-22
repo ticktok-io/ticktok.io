@@ -71,7 +71,7 @@ jobs:
 
     - run:
         name: Build Dashboard
-        command: PUBLIC_URL=' ' .circleci/run_npm.sh build
+        command: PUBLIC_URL=' ' .circleci/run_npm.sh run build
 
     - run:
         name: Server's UT & IT
