@@ -17,7 +17,8 @@ class DashboardE2ETest : AppE2ETest() {
     private val browser = Browser()
 
     @BeforeAll
-    fun startBrowser() {
+    override fun startApp() {
+        super.startApp()
         browser.start()
     }
 
