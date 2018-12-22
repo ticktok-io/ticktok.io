@@ -45,7 +45,11 @@ object App {
     }
 
     private fun waitForAppToBeHealthy() {
-        await withPollInterval(Duration.ONE_SECOND) atMost(Duration.FIVE_MINUTES) until { isAppHealthy() }
+        print("Wait for app($APP_URL) to be healthy")
+        await withPollInterval(Duration.ONE_SECOND) atMost(Duration.FIVE_MINUTES) until {
+            print(".")
+            isAppHealthy()
+        }
     }
 
     fun reset() {
@@ -87,7 +91,6 @@ object App {
         return try {
             getHealthStatus() == "UP"
         } catch(t: Throwable) {
-            println("Failed to get health. Cause:${t.cause}, Message:${t.message}")
             false
         }
     }

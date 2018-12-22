@@ -20,7 +20,7 @@ class DashboardE2ETest : AppE2ETest() {
     @BeforeAll
     override fun startApp() {
         super.startApp()
-        sleep(5000)
+        sleep(15000)
         browser.start()
     }
 
