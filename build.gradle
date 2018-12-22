@@ -138,6 +138,7 @@ clean {
 }
 
 test {
+    environment "DASHBOARD_URL", "http://localhost:8080"
     systemProperty "startApp", System.getProperty("startApp")
     useJUnitPlatform()
 }

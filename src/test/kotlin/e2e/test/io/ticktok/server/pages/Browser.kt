@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 class Browser {
 
     companion object {
-        val APP_URL = System.getenv("DASHBOARD_URL")!!
+        val APP_URL = System.getenv("DASHBOARD_URL") ?: "http://localhost:3000"
     }
 
     lateinit var driver: WebDriver
