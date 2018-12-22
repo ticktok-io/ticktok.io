@@ -37,7 +37,7 @@ object App {
     fun start() {
         if (!started) {
             waitForAppToBeHealthy()
-            if(System.getProperty("startApp", "yes") != "no") {
+            if (System.getProperty("startApp", "yes") != "no") {
                 Application.main()
             }
             started = true
@@ -45,11 +45,8 @@ object App {
     }
 
     private fun waitForAppToBeHealthy() {
-        print("Wait for app($APP_URL) to be healthy")
-        await withPollInterval(Duration.ONE_SECOND) atMost(Duration.FIVE_MINUTES) until {
-            print(".")
-            isAppHealthy()
-        }
+        println("Waiting for app($APP_URL) to be healthy ")
+        await withPollInterval (Duration.ONE_SECOND) atMost (Duration.FIVE_MINUTES) until { isAppHealthy() }
     }
 
     fun reset() {
@@ -90,7 +87,8 @@ object App {
     private fun isAppHealthy(): Boolean {
         return try {
             getHealthStatus() == "UP"
-        } catch(t: Throwable) {
+        } catch (t: Throwable) {
+            println("No healthy: ${t.message}")
             false
         }
     }
