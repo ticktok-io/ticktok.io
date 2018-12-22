@@ -24,7 +24,7 @@ class Browser {
     lateinit var driver: WebDriver
 
     fun start() {
-        await until { Request.Get(APP_URL).execute().returnResponse().statusLine.statusCode == 200 }
+        await atMost(Duration.ONE_MINUTE) until { Request.Get(APP_URL).execute().returnResponse().statusLine.statusCode == 200 }
         driver = ChromeDriver()
         val appUrl = URI("$APP_URL?api_key=${App.ACCESS_TOKEN}").toString()
         println("Will open browser on: $appUrl")
