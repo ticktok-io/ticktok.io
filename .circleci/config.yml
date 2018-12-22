@@ -71,7 +71,7 @@ jobs:
 
     - run:
         name: Build Dashboard
-        command: PUBLIC_URL=' ' .circleci/run_npm.sh install build
+        command: PUBLIC_URL=' ' .circleci/run_npm.sh build
 
     - run:
         name: Server's UT & IT
@@ -104,9 +104,6 @@ jobs:
 
     - store_artifacts:
         path: test-reports
-
-    - store_artifacts:
-        path: src/main/resources
 
     - run:
         name: Setup heroku
