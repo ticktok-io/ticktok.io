@@ -29,7 +29,7 @@ jobs:
 
       - run:
           name: Start mongo & rabbit
-          command: docker-compose -f docker-compose.yml -f .circleci/docker-compose.ci.yml up -d mongo rabbit
+          command: .circleci/run_compose.sh up -d mongo rabbit
 
       - run: mkdir test-reports
       - run:
@@ -87,11 +87,16 @@ jobs:
 
       - run:
           name: Start app
-          command: docker-compose -f docker-compose.yml -f .circleci/docker-compose.ci.yml up -d
+          command: .circleci/run_compose.sh up -d
 
       - run:
           name: E2E tests against dockered app
           command: ./gradlew test --tests e2e.* -DstartApp=no --info --scan
+
+
+      - run:
+          name: Collect app logs
+          command: .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
 
       - store_artifacts:
           path: /tmp/ticktok-artifacts
