@@ -31,15 +31,15 @@ object App {
     private val APP_URL = System.getenv("APP_URL") ?: "http://localhost:8080"
 
 
-    private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList());
+    private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
     private var started = false
 
     fun start() {
         if (!started) {
-            waitForAppToBeHealthy()
             if (System.getProperty("startApp", "yes") != "no") {
                 Application.main()
             }
+            waitForAppToBeHealthy()
             started = true
         }
     }
