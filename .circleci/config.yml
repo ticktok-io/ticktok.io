@@ -106,7 +106,7 @@ jobs:
         path: test-reports
 
     - store_artifacts:
-        path: /src/main/resources/public
+        path: src/main/resources
 
     - run:
         name: Setup heroku
