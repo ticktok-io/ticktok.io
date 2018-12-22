@@ -105,6 +105,9 @@ jobs:
     - store_artifacts:
         path: test-reports
 
+    - store_artifacts:
+        path: /src/main/resources/public
+
     - run:
         name: Setup heroku
         command: .circleci/heroku_setup.sh
