@@ -23,10 +23,10 @@ class DashboardE2ETest : AppE2ETest() {
 
     @Test
     fun showConfiguredClocks() {
-        App.registeredAClock("row1", "every.9.seconds")
-        App.registeredAClock("row2", "every.4.seconds")
-        ClockListPage(browser).containsClockWith("every.9.seconds")
-        ClockListPage(browser).containsClockWith("every.4.seconds")
+        App.registeredAClock("row1", "every.911.seconds")
+        App.registeredAClock("row2", "every.888.seconds")
+        ClockListPage(browser).containsClockWith("every.911.seconds")
+        ClockListPage(browser).containsClockWith("every.888.seconds")
     }
 
     @AfterAll
