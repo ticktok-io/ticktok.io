@@ -39,13 +39,16 @@ repositories {
 }
 
 dependencies {
+    configurations {
+        all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    }
+
     compileOnly "org.projectlombok:lombok:1.16.20"
     annotationProcessor "org.projectlombok:lombok:1.16.20"
 
     // Spring
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
-        exclude module: "spring-boot-starter-logging"
     }
     compile "org.springframework.boot:spring-boot-starter-log4j2"
     compile "org.springframework.boot:spring-boot-starter-actuator"
@@ -81,8 +84,8 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test"
 
     //Selenium
-    testCompile 'org.seleniumhq.selenium:selenium-java:3.14.0'
-    testCompile 'org.seleniumhq.selenium:selenium-support:3.13.0'
+    testCompile "org.seleniumhq.selenium:selenium-java:3.14.0"
+    testCompile "org.seleniumhq.selenium:selenium-support:3.13.0"
 
     //Other
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
@@ -135,33 +138,9 @@ clean {
 }
 
 test {
-    systemProperty "log4j.debug", "false"
     systemProperty "startApp", System.getProperty("startApp")
     useJUnitPlatform()
 }
 
-
-task e2eWithDocker(type: Test) {
-    environment "DASHBOARD_URL", "http://127.0.0.1:8081"
-    environment "APP_URL", "http://127.0.0.1:8081"
-    systemProperties = [startApp: "no"]
-    doFirst {
-        exec {
-            commandLine "./docker-e2e/start_app.sh"
-        }
-    }
-    useJUnitPlatform()
-    include "e2e/**/*"
-}
-
-task shutDownE2EDockerCompose() {
-    doLast {
-        exec {
-            commandLine "./docker-e2e/stop_app.sh"
-        }
-    }
-}
-
-e2eWithDocker.finalizedBy(shutDownE2EDockerCompose)
 
 buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
