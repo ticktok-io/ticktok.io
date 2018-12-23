@@ -9,6 +9,11 @@ import org.apache.http.HttpStatus
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
 import org.apache.http.util.EntityUtils
+import org.awaitility.Duration
+import org.awaitility.kotlin.atMost
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.until
+import org.awaitility.kotlin.withPollInterval
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -16,23 +21,32 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
 import java.util.*
 
 object App {
 
-    const val APP_URL = "http://localhost:8080"
     const val ACCESS_TOKEN = "ct-auth-token"
+    private val APP_URL = System.getenv("APP_URL") ?: "http://localhost:8080"
 
 
-    private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList());
+    private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
     private var started = false
 
     fun start() {
         if (!started) {
-            Application.main()
+            if (System.getProperty("startApp", "yes") != "no") {
+                Application.main()
+            }
+            waitForAppToBeHealthy()
             started = true
         }
+    }
+
+    private fun waitForAppToBeHealthy() {
+        println("Waiting for app($APP_URL) to be healthy...")
+        await withPollInterval (Duration.ONE_SECOND) atMost (Duration.FIVE_MINUTES) until { isAppHealthy() }
     }
 
     fun reset() {
@@ -67,7 +81,16 @@ object App {
     private inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
     fun isHealthy() {
-        assertThat(getHealthStatus(), `is`("UP"))
+        assertTrue(isAppHealthy())
+    }
+
+    private fun isAppHealthy(): Boolean {
+        return try {
+            getHealthStatus() == "UP"
+        } catch (t: Throwable) {
+            println("Failed to fetch health: ${t.message}")
+            false
+        }
     }
 
     private fun getHealthStatus(): String {

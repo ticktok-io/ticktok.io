@@ -57,7 +57,7 @@ class ApiE2ETest : AppE2ETest() {
     }
 
     @Test
-    fun failOnNonValidSchedule() {
+    fun failOnInValidSchedule() {
         App.registeredAClock("kuku", "non-valid")
         App.retrievedUserError()
     }

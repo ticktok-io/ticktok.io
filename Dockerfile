@@ -6,4 +6,6 @@ ADD build/libs/ticktok-*.jar /opt/app/app.jar
 ADD entrypoint.sh /opt/app
 RUN chmod +x /opt/app/entrypoint.sh
 
-CMD ["/opt/app/entrypoint.sh"]
+WORKDIR /opt/app
+
+CMD ["./entrypoint.sh"]

@@ -8,17 +8,17 @@ import org.junit.jupiter.api.BeforeAll
 abstract class AppE2ETest {
 
     @BeforeAll
-    fun startApp() {
+    open fun startApp() {
         App.start()
     }
 
     @AfterEach
-    fun resetApp() {
+    open fun resetApp() {
         App.reset()
     }
 
     @AfterAll
-    fun purgeApp() {
+    open fun purgeApp() {
         App.purge()
     }
 

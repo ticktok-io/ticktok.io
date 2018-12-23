@@ -3,11 +3,17 @@ buildscript {
 
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.1.RELEASE")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
     }
+}
+
+plugins {
+    id 'com.gradle.build-scan' version '1.16'
 }
 
 apply plugin: 'java'
@@ -15,7 +21,9 @@ apply plugin: 'kotlin'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
-    
+apply plugin: 'com.github.johnrengelman.shadow'
+
+
 
 bootJar {
     baseName = 'ticktok'
@@ -31,6 +39,10 @@ repositories {
 }
 
 dependencies {
+    configurations {
+        all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    }
+
     compileOnly "org.projectlombok:lombok:1.16.20"
     annotationProcessor "org.projectlombok:lombok:1.16.20"
 
@@ -38,11 +50,13 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
+    compile "org.springframework.boot:spring-boot-starter-log4j2"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile "org.springframework.boot:spring-boot-starter-security"
     compile "org.springframework.boot:spring-boot-starter-aop"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb"
     compile "org.springframework.boot:spring-boot-starter-amqp"
+
     compile "org.eclipse.jetty:jetty-webapp:9.+"
     compile "org.eclipse.jetty:jetty-jsp:9.+"
 
@@ -70,23 +84,22 @@ dependencies {
     testCompile "org.springframework.boot:spring-boot-starter-test"
 
     //Selenium
-    testCompile 'org.seleniumhq.selenium:selenium-java:3.14.0'
-    testCompile 'org.seleniumhq.selenium:selenium-support:3.13.0'
+    testCompile "org.seleniumhq.selenium:selenium-java:3.14.0"
+    testCompile "org.seleniumhq.selenium:selenium-support:3.13.0"
 
     //Other
     testCompile "org.apache.httpcomponents:httpclient:4.5.5"
     testCompile "org.apache.httpcomponents:fluent-hc:4.5.5"
     testCompile 'org.assertj:assertj-core:3.11.1'
-
-
-
-
+    testCompile group: 'org.awaitility', name: 'awaitility-kotlin', version: '3.1.5'
 }
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
@@ -126,9 +139,9 @@ clean {
 
 test {
     environment "DASHBOARD_URL", "http://localhost:8080"
-    environment "SELF_DOMAIN", "http://localhost:8080"
+    systemProperty "startApp", System.getProperty("startApp")
     useJUnitPlatform()
 }
 
 
-
+buildScan { termsOfServiceUrl = 'https://gradle.com/terms-of-service'; termsOfServiceAgree = 'yes' }
