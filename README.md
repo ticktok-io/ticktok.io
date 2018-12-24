@@ -7,7 +7,7 @@ apps to receive accurate and reliable clock signals at scale.
 
 ![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clocks_list.png)
 
-## Installation
+## Quick start
 ### Prerequisites
 * [MongoDB](https://www.mongodb.com)
 * [RabbitMQ](https://www.rabbitmq.com)
