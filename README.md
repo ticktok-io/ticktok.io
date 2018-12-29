@@ -8,11 +8,6 @@ apps to receive accurate and reliable clock signals at scale.
 ![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clocks_list.png)
 
 ## Quick start
-### Prerequisites
-* [MongoDB](https://www.mongodb.com)
-* [RabbitMQ](https://www.rabbitmq.com)
-
-### Usage
 ```
 docker run 
   -e RABBIT_URI=<rabbit uri for messaging bus>
@@ -20,7 +15,6 @@ docker run
   -e SELF_DOMAIN=<the domain name of the service>
   -e ACCESS_TOKEN=<sha1 encoded token>
   ticktok/ticktok:0.2.0 
-
 ```
 
 ## Official SDKs
