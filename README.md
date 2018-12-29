@@ -17,6 +17,8 @@ docker run
   ticktok/ticktok:0.2.0 
 ```
 
+Documentation: https://ticktok.io/docs
+
 ## Official SDKs
 * [Java](https://github.com/ticktok-io/ticktok-java-client) (wip)
 * [Clojure](https://github.com/ticktok-io/ticktok-clojure-client) (wip)
