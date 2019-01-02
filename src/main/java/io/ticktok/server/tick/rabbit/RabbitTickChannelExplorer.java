@@ -39,7 +39,7 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
 
     @Override
     public TickChannel create(Clock clock) {
-        log.info("Rabbit URI: {}", consumerRabbitUri);
+        log.info("Creating a queue for [name: {}, schedule: {}]", clock.getName(), clock.getSchedule());
         Queue queue = new Queue(nameFor(clock), true, false, true, queueOptions());
         rabbitAdmin.declareQueue(queue);
         rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(clock.getSchedule()));
