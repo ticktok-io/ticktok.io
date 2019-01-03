@@ -23,3 +23,4 @@ Documentation: https://ticktok.io/docs
 * [Java](https://github.com/ticktok-io/ticktok-java-client) (wip)
 * [Clojure](https://github.com/ticktok-io/ticktok-clojure-client) (wip)
 * [JavaScript](https://github.com/ticktok-io/ticktok-js-client) (wip)
+* [Python](https://github.com/ticktok-io/ticktok-python-client) (wip)
