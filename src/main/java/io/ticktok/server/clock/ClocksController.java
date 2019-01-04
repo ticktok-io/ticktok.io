@@ -7,12 +7,14 @@ import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
@@ -24,6 +26,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/clocks")
 public class ClocksController {
+
+
+    @Autowired
+    private HttpServletRequest httpRequest;
 
     private final ClocksRepository clocksRepository;
     private final String domain;
@@ -51,6 +57,7 @@ public class ClocksController {
     })
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest, Principal principal) {
         log.info("Clock create: {}", clockRequest.toString());
+        log.info("REQUEST URL ==> {}", httpRequest.getRequestURL());
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
         TickChannel channel = tickChannelExplorer.create(savedClock);
         return createdClockEntity(savedClock, channel, principal);
