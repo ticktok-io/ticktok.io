@@ -63,8 +63,7 @@ class TickExecutorTest {
         inOrder.verify(ticksRepository).updateTickStatus(tick.getId(), Tick.PUBLISHED);
     }
 
-    class FixedTimeTickExecutor extends TickExecutor {
-
+    static class FixedTimeTickExecutor extends TickExecutor {
 
         public FixedTimeTickExecutor(TicksRepository ticksRepository, TickPublisher tickPublisher) {
             super(ticksRepository, tickPublisher);
