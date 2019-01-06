@@ -31,17 +31,42 @@ let renderClockList = function () {
 
 test("Show fetched clocks", async () => {
   let clocks = [
-    {id: '3232', schedule: "every.2.seconds"},
-    {id: '1212', schedule: "every.8.seconds"}
+    {name: '3232', schedule: "every.2.seconds"},
+    {name: '1212', schedule: "every.8.seconds"}
   ];
   givenTheClocks(clocks);
 
-  const {queryByText, getAllByTestId} = renderClockList();
-  await wait(() => expect(queryByText(ClocksList.NO_CLOCKS_MSG)).not.toBeInTheDocument());
-  const rows = getAllByTestId("clock-row");
+  const rows = await getAllClocks();
   expect(rows).toHaveLength(2);
   expect(rows[0]).toHaveTextContent(clocks[0].schedule);
   expect(rows[1]).toHaveTextContent(clocks[1].schedule);
+});
+
+let getAllClocks = async function () {
+  const {queryByText, getAllByTestId} = renderClockList();
+  await wait(() => expect(queryByText(ClocksList.NO_CLOCKS_MSG)).not.toBeInTheDocument());
+  return getAllByTestId("clock-row");
+};
+
+test("Show paused clocks", async () => {
+  let clocks = [
+    {id: '1', name: '3232', schedule: "every.2.seconds", status: "PAUSED"},
+    {id: '2', name: '3232', schedule: "every.2.seconds", status: "ACTIVE"}
+  ];
+  givenTheClocks(clocks);
+  const rows = await getAllClocks();
+  expect(rows[0].cells[2]).toHaveTextContent("Resume");
+  expect(rows[1].cells[2]).toHaveTextContent("Pause");
+});
+
+test("Resume a paused clock", async () => {
+  let clocks = [
+    {id: '1', name: '3232', schedule: "every.2.seconds", status: "PAUSED"},
+  ];
+  givenTheClocks(clocks);
+  // click
+  // verify axios
+  expect((await getAllClocks())[0].cells[2]).toHaveTextContent("Pause");
 });
 
 afterEach(cleanup);

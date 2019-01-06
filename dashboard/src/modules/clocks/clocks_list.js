@@ -19,6 +19,10 @@ export class ClocksList extends Component {
     clearInterval(this.timer)
   }
 
+  eli() {
+
+  }
+
   render() {
     return (
       <div>
@@ -27,6 +31,7 @@ export class ClocksList extends Component {
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Schedule</th>
+            <th scope="col"/>
           </tr>
           </thead>
           <tbody>
@@ -52,12 +57,28 @@ export class ClocksList extends Component {
   renderClocks() {
     return _.map(this.props.clocks, clock => {
       return (
-        <tr data-testid="clock-row" className="clock-row" key={clock.id}>
+        <tr data-testid="clock-row" className={this.clockRowClass(clock)} key={clock.id}>
           <td>{clock.name}</td>
           <td>{clock.schedule}</td>
+          <td>
+            <button type="button" className={this.actionClassName(clock)}
+                    data-toggle="button">{this.actionText(clock)}</button>
+          </td>
         </tr>
       );
     });
+  }
+
+  clockRowClass(clock) {
+    return `clock-row ${clock.status === 'ACTIVE' ? '' : 'paused'}`;
+  }
+
+  actionClassName(clock) {
+    return `btn ${clock.status === 'ACTIVE' ? 'btn-outline-primary' : 'btn-outline-warning'}`;
+  }
+
+  actionText(clock) {
+    return clock.status === 'ACTIVE' ? 'Pause' : 'Resume';
   }
 }
 
