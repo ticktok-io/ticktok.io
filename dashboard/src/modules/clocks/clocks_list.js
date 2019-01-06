@@ -1,11 +1,18 @@
 import React, {Component} from 'react';
-import {fetchClocks} from "./actions";
+import {fetchClocks, resumeClock} from "./actions";
 import {connect} from 'react-redux';
 import _ from 'lodash';
+
+const ACTIVE = 'ACTIVE';
 
 export class ClocksList extends Component {
 
   static NO_CLOCKS_MSG = "No clocks are configured yet!";
+
+  constructor(props) {
+    super(props);
+    this.onPauseResumeClick = this.onPauseResumeClick.bind(this);
+  }
 
   componentDidMount() {
     this.timer = setInterval(this._tick, 2000)
@@ -17,10 +24,6 @@ export class ClocksList extends Component {
 
   componentWillUnmount() {
     clearInterval(this.timer)
-  }
-
-  eli() {
-
   }
 
   render() {
@@ -61,8 +64,13 @@ export class ClocksList extends Component {
           <td>{clock.name}</td>
           <td>{clock.schedule}</td>
           <td>
-            <button type="button" className={this.actionClassName(clock)}
-                    data-toggle="button">{this.actionText(clock)}</button>
+            <button
+              type="button"
+              className={this.actionClassName(clock)}
+              data-toggle="button"
+              onClick={this.onPauseResumeClick(clock.id)}>
+              {this.actionText(clock)}
+            </button>
           </td>
         </tr>
       );
@@ -70,15 +78,20 @@ export class ClocksList extends Component {
   }
 
   clockRowClass(clock) {
-    return `clock-row ${clock.status === 'ACTIVE' ? '' : 'paused'}`;
+    return `clock-row ${clock.status === ACTIVE ? '' : 'paused'}`;
   }
 
   actionClassName(clock) {
-    return `btn ${clock.status === 'ACTIVE' ? 'btn-outline-primary' : 'btn-outline-warning'}`;
+    return `btn ${clock.status === ACTIVE ? 'btn-outline-primary' : 'btn-outline-warning'}`;
   }
 
   actionText(clock) {
-    return clock.status === 'ACTIVE' ? 'Pause' : 'Resume';
+    return clock.status === ACTIVE ? 'Pause' : 'Resume';
+  }
+
+  onPauseResumeClick(id) {
+    console.log('>>>>', id);
+    resumeClock(id, this.props.apiKey);
   }
 }
 
@@ -86,4 +99,4 @@ function mapStateToProps(state) {
   return {clocks: state.clocks}
 }
 
-export default connect(mapStateToProps, {fetchClocks})(ClocksList)
+export default connect(mapStateToProps, {fetchClocks, resumeClock})(ClocksList)

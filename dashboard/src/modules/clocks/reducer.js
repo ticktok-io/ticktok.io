@@ -1,21 +1,16 @@
-import {FETCH_CLOCKS} from "./actions";
-
-
-const mockClocks = [
-  {id: "1", name: "kuku", schedule:"every.4.seconds", status: "ACTIVE"},
-  {id: "2", name: "popov", schedule:"every.11.seconds", status: "ACTIVE"},
-  {id: "3", name: "shushu", schedule:"every.40.seconds", status: "DISABLED"},
-];
-
+import _ from 'lodash'
+import {FETCH_CLOCKS, RESUME_CLOCK} from "./actions";
 
 export default function (state = [], action) {
+  console.log(action.type);
   switch (action.type) {
     case FETCH_CLOCKS:
-      const { payload } = action;
-      if(payload.data) {
-        return payload.data;
-      }
-      return state;
+      return _.mapKeys(action.payload.data, 'id');
+    case RESUME_CLOCK:
+      console.log('==>', action);
+      const updatedClock = state[action.payload.id];
+      updatedClock.status = action.payload.status;
+      return {...state, updatedClock};
     default:
       return state;
   }

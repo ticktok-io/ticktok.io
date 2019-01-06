@@ -1,6 +1,6 @@
 import React from 'react';
 import ClocksList from "../clocks_list";
-import {cleanup, render, wait} from "react-testing-library";
+import {cleanup, render, wait, fireEvent} from "react-testing-library";
 import "jest-dom/extend-expect"
 import axios from 'axios';
 import MockAdapter from "axios-mock-adapter";
@@ -64,9 +64,13 @@ test("Resume a paused clock", async () => {
     {id: '1', name: '3232', schedule: "every.2.seconds", status: "PAUSED"},
   ];
   givenTheClocks(clocks);
-  // click
-  // verify axios
-  expect((await getAllClocks())[0].cells[2]).toHaveTextContent("Pause");
+  backend.onPut(`/api/v1/clocks/1/resume?access_token=${apiKey}`).reply(200);
+  const {queryByText, getAllByTestId} = renderClockList();
+  await wait(() => expect(queryByText(ClocksList.NO_CLOCKS_MSG)).not.toBeInTheDocument());
+  fireEvent.click(getAllByTestId('clock-row')[0].querySelector('.btn'));
+  expect(backend.history.put.length).toBe(1);
+  await wait(() => expect(getAllByTestId('clock-row')[0].querySelector('.btn')).toHaveTextContent("Pause"));
+  //expect((await getAllClocks())[0].cells[2]).toHaveTextContent("Pause");
 });
 
 afterEach(cleanup);
