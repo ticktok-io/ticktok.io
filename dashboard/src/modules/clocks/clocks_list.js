@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
-import {fetchClocks, resumeClock} from "./actions";
+import {ACTIVE, fetchClocks, resumeClock} from "./actions";
 import {connect} from 'react-redux';
 import _ from 'lodash';
 
-const ACTIVE = 'ACTIVE';
+export const PAUSED_BTN = 'Pause';
+export const RESUME_BTN = 'Resume';
 
 export class ClocksList extends Component {
 
@@ -68,7 +69,9 @@ export class ClocksList extends Component {
               type="button"
               className={this.actionClassName(clock)}
               data-toggle="button"
-              onClick={this.onPauseResumeClick(clock.id)}>
+              onClick={() => {
+                this.onPauseResumeClick(clock.id)
+              }}>
               {this.actionText(clock)}
             </button>
           </td>
@@ -86,12 +89,11 @@ export class ClocksList extends Component {
   }
 
   actionText(clock) {
-    return clock.status === ACTIVE ? 'Pause' : 'Resume';
+    return clock.status === ACTIVE ? PAUSED_BTN : RESUME_BTN;
   }
 
   onPauseResumeClick(id) {
-    console.log('>>>>', id);
-    resumeClock(id, this.props.apiKey);
+    this.props.resumeClock(id, this.props.apiKey);
   }
 }
 
