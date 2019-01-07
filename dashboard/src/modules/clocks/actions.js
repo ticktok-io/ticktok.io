@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const FETCH_CLOCKS = 'fetch_clocks';
-export const RESUME_CLOCK = 'resume_clocks';
+export const UPDATE_STATUS = 'UPDATE_STATUS';
 
 export const ACTIVE = 'ACTIVE';
 export const PAUSED = 'PAUSED';
@@ -21,11 +21,12 @@ export function fetchClocks(apiKey) {
   };
 }
 
-export function resumeClock(id, apiKey) {
-  const request = axios.put(`/api/v1/clocks/${id}/resume?access_token=${apiKey}`);
+export function pauseResumeClock(clock, apiKey) {
+  const action = clock.status === ACTIVE ? 'pause' : 'resume';
+  const request = axios.put(`/api/v1/clocks/${clock.id}/${action}?access_token=${apiKey}`);
 
   return {
-    type: RESUME_CLOCK,
-    payload: {id: id, status: ACTIVE}
+    type: UPDATE_STATUS,
+    payload: {id: clock.id, status: clock.status === ACTIVE ? PAUSED : ACTIVE}
   };
 }

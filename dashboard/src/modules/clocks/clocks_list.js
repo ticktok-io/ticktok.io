@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ACTIVE, fetchClocks, resumeClock} from "./actions";
+import {ACTIVE, fetchClocks, pauseResumeClock} from "./actions";
 import {connect} from 'react-redux';
 import _ from 'lodash';
 
@@ -70,7 +70,7 @@ export class ClocksList extends Component {
               className={this.actionClassName(clock)}
               data-toggle="button"
               onClick={() => {
-                this.onPauseResumeClick(clock.id)
+                this.onPauseResumeClick(clock)
               }}>
               {this.actionText(clock)}
             </button>
@@ -92,8 +92,8 @@ export class ClocksList extends Component {
     return clock.status === ACTIVE ? PAUSED_BTN : RESUME_BTN;
   }
 
-  onPauseResumeClick(id) {
-    this.props.resumeClock(id, this.props.apiKey);
+  onPauseResumeClick(clock) {
+    this.props.pauseResumeClock(clock, this.props.apiKey);
   }
 }
 
@@ -101,4 +101,4 @@ function mapStateToProps(state) {
   return {clocks: state.clocks}
 }
 
-export default connect(mapStateToProps, {fetchClocks, resumeClock})(ClocksList)
+export default connect(mapStateToProps, {fetchClocks, pauseResumeClock})(ClocksList)
