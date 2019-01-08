@@ -1,6 +1,9 @@
 package e2e.test.io.ticktok.server.pages
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.fail
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 import org.openqa.selenium.support.PageFactory
@@ -20,7 +23,7 @@ class ClockListPage(private val browser: Browser) {
             if (containsScheduleOnce(c.text, schedule)) return
         }
         browser.takeScreenshot()
-        Assertions.fail<String>("$schedule not found")
+        fail<String>("$schedule not found")
     }
 
     private fun containsScheduleOnce(text: String, schedule: String): Boolean {
@@ -29,5 +32,23 @@ class ClockListPage(private val browser: Browser) {
         return matches.count() == 1 && matches.first().value == schedule
     }
 
+    fun forClock(name: String): ClockRow {
+        print(clocks)
+        return ClockRow(clocks.find { it.findElements(By.tagName("td"))[0].text == name })
+    }
 
+    class ClockRow(val row: WebElement?) {
+
+        fun clickAction() {
+            row!!.findElement(By.tagName("button")).click()
+        }
+
+        fun contains(s: String) {
+            row!!.text.contains(s)
+        }
+
+        fun actionIs(s: String) {
+            assertEquals(row!!.findElement(By.tagName("button")).text, s)
+        }
+    }
 }

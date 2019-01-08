@@ -30,6 +30,7 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
 
     @Override
     public boolean isExists(Clock clock) {
+        log.info("==> {}", rabbitAdmin.getQueueProperties(nameFor(clock)));
         return rabbitAdmin.getQueueProperties(nameFor(clock)) != null;
     }
 

@@ -42,8 +42,8 @@ public class Clock {
         this(null, name, schedules);
     }
 
-    public static Clock newClock(String name, String schedules) {
-        return new Clock(null, name, schedules);
+    public Clock(Clock clock) {
+        this(clock.getId(), clock.getName(), clock.getSchedule(), clock.getStatus(), clock.getLastModifiedDate());
     }
 
 }

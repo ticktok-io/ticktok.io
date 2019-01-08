@@ -35,7 +35,7 @@ export class ClocksList extends Component {
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Schedule</th>
-            <th scope="col"/>
+            <th scope="col" className="actions"/>
           </tr>
           </thead>
           <tbody>
@@ -48,7 +48,7 @@ export class ClocksList extends Component {
   }
 
   showNoClocksMessageIfNeeded() {
-    if (this.props.clocks === undefined || this.props.clocks.length === 0) {
+    if (this.props.clocks === undefined || Object.keys(this.props.clocks).length === 0) {
       return (
         <div className="noClocksMsg" key="no-clock-msg">
           {ClocksList.NO_CLOCKS_MSG}
@@ -98,6 +98,7 @@ export class ClocksList extends Component {
 }
 
 function mapStateToProps(state) {
+  console.log("... ", state);
   return {clocks: state.clocks}
 }
 

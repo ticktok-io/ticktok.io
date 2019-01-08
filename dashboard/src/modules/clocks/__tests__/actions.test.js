@@ -8,7 +8,7 @@ const backend = new MockAdapter(axios);
 
 test('pause on toggle active clock', async () => {
   backend.onPut(`/api/v1/clocks/111/pause?access_token=${apiKey}`).reply(200);
-  const action = pauseResumeClock({id: "111", status: ACTIVE}, apiKey);
+  const result = await pauseResumeClock({id: "111", status: ACTIVE}, apiKey).payload;
   await wait(() => expect(backend.history.put.length).toBe(1));
-  expect(action.payload.status).toBe(PAUSED);
+  expect(result.status).toBe(PAUSED);
 });

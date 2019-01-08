@@ -43,6 +43,10 @@ nav h4 {
     color: darkgray;
 }
 
+th.actions {
+    width: 15%;
+}
+
 .noClocksMsg {
     font-style: italic;
     color: #BDBDBD;

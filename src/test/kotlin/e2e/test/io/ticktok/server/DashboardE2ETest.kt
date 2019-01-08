@@ -32,6 +32,15 @@ class DashboardE2ETest : AppE2ETest() {
         ClockListPage(browser).containsClockWith("every.888.seconds")
     }
 
+    @Test
+    fun disableAClock() {
+        App.registeredAClock("kuku", "every.911.seconds")
+        val clockListPage = ClockListPage(browser)
+        clockListPage.forClock("kuku").contains("every.911.seconds")
+        clockListPage.forClock("kuku").clickAction()
+        clockListPage.forClock("kuku").actionIs("Resume")
+    }
+
     @AfterAll
     fun stopBrowser() {
         browser.stop()

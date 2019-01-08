@@ -13,7 +13,7 @@ public class ClockResource extends Clock {
     private String url;
 
     public ClockResource(String domain, Clock clock) {
-        super(clock.getId(), clock.getName(), clock.getSchedule());
+        super(clock);
         this.url = createUriFor(domain, clock);
     }
 
