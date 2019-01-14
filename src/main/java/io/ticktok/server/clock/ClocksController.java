@@ -1,6 +1,7 @@
 package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
+import io.ticktok.server.clock.actions.ClockActionFactory;
 import io.ticktok.server.clock.repository.ClocksFinder;
 import io.ticktok.server.clock.repository.ClocksPurger;
 import io.ticktok.server.clock.repository.ClocksRepository;
@@ -35,16 +36,19 @@ public class ClocksController {
     private final String domain;
     private final TickChannelExplorer tickChannelExplorer;
     private final ClocksPurger clocksPurger;
+    private final ClockActionFactory clockActionFactory;
 
 
     public ClocksController(@Value("${http.domain}") String domain,
                             ClocksRepository clocksRepository,
                             TickChannelExplorer tickChannelExplorer,
-                            ClocksPurger clocksPurger) {
+                            ClocksPurger clocksPurger,
+                            ClockActionFactory clockActionFactory) {
         this.domain = domain;
         this.clocksRepository = clocksRepository;
         this.tickChannelExplorer = tickChannelExplorer;
         this.clocksPurger = clocksPurger;
+        this.clockActionFactory = clockActionFactory;
     }
 
     @PostMapping
@@ -79,7 +83,7 @@ public class ClocksController {
     @GetMapping("/{id}")
     @ApiOperation("Retrieve a specific clock")
     public ClockResource findOne(@PathVariable("id") String id) {
-        return createClockResourceFor(clocksRepository.findById(id).get());
+        return createClockResourceFor(new ClocksFinder(clocksRepository).findById(id));
     }
 
     private ClockResource createClockResourceFor(Clock clock) {
@@ -99,5 +103,14 @@ public class ClocksController {
         clocksPurger.purge();
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/{action}")
+    @ApiOperation("Pause a specific clock")
+    public void pause(@PathVariable String id, @PathVariable String action) {
+        clockActionFactory.run(action, id);
+    }
+
+
+
 
 }

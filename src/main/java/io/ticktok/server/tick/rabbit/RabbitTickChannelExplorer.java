@@ -5,10 +5,7 @@ import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 
 @Slf4j
 public class RabbitTickChannelExplorer implements TickChannelExplorer {
@@ -30,7 +27,6 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
 
     @Override
     public boolean isExists(Clock clock) {
-        log.info("==> {}", rabbitAdmin.getQueueProperties(nameFor(clock)));
         return rabbitAdmin.getQueueProperties(nameFor(clock)) != null;
     }
 
@@ -41,13 +37,35 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
     @Override
     public TickChannel create(Clock clock) {
         log.info("Creating a queue for [name: {}, schedule: {}]", clock.getName(), clock.getSchedule());
-        Queue queue = new Queue(nameFor(clock), true, false, true, queueOptions());
+        Queue queue = queueFor(clock);
         rabbitAdmin.declareQueue(queue);
-        rabbitAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(clock.getSchedule()));
+        declareBindingFor(clock);
         return new TickChannel(consumerRabbitUri, queue.getName());
+    }
+
+    private Queue queueFor(Clock clock) {
+        return new Queue(nameFor(clock), true, false, true, queueOptions());
     }
 
     private ImmutableMap<String, Object> queueOptions() {
         return ImmutableMap.of("x-expires", queueTTL);
+    }
+
+    private void declareBindingFor(Clock clock) {
+        rabbitAdmin.declareBinding(clockBinding(clock));
+    }
+
+    private Binding clockBinding(Clock clock) {
+        return BindingBuilder.bind(queueFor(clock)).to(exchange).with(clock.getSchedule());
+    }
+
+    @Override
+    public void disable(Clock clock) {
+        rabbitAdmin.removeBinding(clockBinding(clock));
+    }
+
+    @Override
+    public void enable(Clock clock) {
+        declareBindingFor(clock);
     }
 }

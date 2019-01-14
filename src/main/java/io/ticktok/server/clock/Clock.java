@@ -21,6 +21,7 @@ public class Clock {
 
     public static final String PENDING = "PENDING";
     public static final String ACTIVE = "ACTIVE";
+    public static final String PAUSED = "PAUSED";
     @Id
     private String id;
 

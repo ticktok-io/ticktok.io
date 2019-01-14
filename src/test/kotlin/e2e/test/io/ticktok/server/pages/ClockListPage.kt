@@ -7,34 +7,16 @@ import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.FindBy
 import org.openqa.selenium.support.PageFactory
+import java.lang.String.format
+import kotlin.test.assertTrue
 
 
 class ClockListPage(private val browser: Browser) {
 
-    @FindBy(className = "clock-row")
-    private val clocks: List<WebElement> = listOf()
+    private val clockRowXPath = "//tr[td//text()[contains(., '%s')]]"
 
-    init {
-        PageFactory.initElements(browser.driver, this)
-    }
-
-    fun containsClockWith(schedule: String) {
-        clocks.forEach { c ->
-            if (containsScheduleOnce(c.text, schedule)) return
-        }
-        browser.takeScreenshot()
-        fail<String>("$schedule not found")
-    }
-
-    private fun containsScheduleOnce(text: String, schedule: String): Boolean {
-        val regex = """\w+\.\d+\.\w+""".toRegex()
-        val matches = regex.findAll(text)
-        return matches.count() == 1 && matches.first().value == schedule
-    }
-
-    fun forClock(name: String): ClockRow {
-        print(clocks)
-        return ClockRow(clocks.find { it.findElements(By.tagName("td"))[0].text == name })
+    fun clockNamed(name: String): ClockRow {
+        return ClockRow(browser.findElement(By.xpath(format(clockRowXPath, name))))
     }
 
     class ClockRow(val row: WebElement?) {
@@ -44,7 +26,7 @@ class ClockListPage(private val browser: Browser) {
         }
 
         fun contains(s: String) {
-            row!!.text.contains(s)
+            assertTrue { row!!.text.contains(s) }
         }
 
         fun actionIs(s: String) {
