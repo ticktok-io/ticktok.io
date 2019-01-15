@@ -39,6 +39,11 @@ class DashboardE2ETest : AppE2ETest() {
         clockListPage.clockNamed("kuku").actionIs("Resume")
     }
 
+    @AfterEach
+    fun takeScreenShot() {
+        browser.takeScreenshot()
+    }
+
     @AfterAll
     fun stopBrowser() {
         browser.stop()
