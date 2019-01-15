@@ -14,8 +14,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -23,6 +21,7 @@ import static java.lang.Thread.sleep;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
@@ -32,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RabbitTickChannelExplorerTest {
 
     public static final Clock CLOCK = new Clock("kuku", "every.111.seconds");
+    public static final String TICK_MSG = "hello";
 
     @Autowired
     private RabbitTickChannelExplorer tickChannelExplorer;
@@ -56,14 +56,42 @@ class RabbitTickChannelExplorerTest {
 
     @Test
     void createQueueForConsumer() {
-        rabbitTemplate.convertAndSend(exchange.getName(), CLOCK.getSchedule(), "hello");
-        assertThat(rabbitTemplate.receiveAndConvert(channel.getQueue(), 500), is("hello"));
+        sendTick();
+        assertThat(receivedTick(), is(TICK_MSG));
+    }
+
+    private void sendTick() {
+        rabbitTemplate.convertAndSend(exchange.getName(), CLOCK.getSchedule(), TICK_MSG);
+    }
+
+    private Object receivedTick() {
+        return rabbitTemplate.receiveAndConvert(channel.getQueue(), 500);
     }
 
     @Test
-    void channelShouldDeleteIfUnused() throws InterruptedException {
+    void channelShouldBeDeletedIfUnused() throws InterruptedException {
         sleep(1000);
         assertNull(amqpAdmin.getQueueProperties(channel.getQueue()));
     }
 
+    @Test
+    void shouldUnbindQueueOnDisable() {
+        tickChannelExplorer.disable(CLOCK);
+        sendTick();
+        assertNull(receivedTick());
+    }
+
+    @Test
+    void shouldBindQueueOnEnable() {
+        tickChannelExplorer.disable(CLOCK);
+        tickChannelExplorer.enable(CLOCK);
+        sendTick();
+        assertThat(receivedTick(), is(TICK_MSG));
+    }
+
+    @Test
+    void ignoreEnableFailureIfQueueNotExists() {
+        tickChannelExplorer.enable(new Clock("papa", "every.321.seconds"));
+        // pass
+    }
 }

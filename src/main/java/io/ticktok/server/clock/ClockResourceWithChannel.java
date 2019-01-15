@@ -1,5 +1,6 @@
 package io.ticktok.server.clock;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.ticktok.server.tick.TickChannel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,5 +16,11 @@ public class ClockResourceWithChannel extends ClockResource {
     public ClockResourceWithChannel(String domain, Clock clock, TickChannel channel) {
         super(domain, clock);
         this.channel = channel;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getStatus() {
+        return super.getStatus();
     }
 }

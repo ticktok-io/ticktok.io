@@ -1,33 +1,35 @@
 package e2e.test.io.ticktok.server.pages
 
-import org.assertj.core.api.Assertions
+import org.awaitility.Duration
+import org.awaitility.kotlin.atMost
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.until
+import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.FindBy
-import org.openqa.selenium.support.PageFactory
+import java.lang.String.format
+import kotlin.test.assertTrue
 
 
 class ClockListPage(private val browser: Browser) {
 
-    @FindBy(className = "clock-row")
-    private val clocks: List<WebElement> = listOf()
+    private val clockRowXPath = "//tr[td//text()[contains(., '%s')]]"
 
-    init {
-        PageFactory.initElements(browser.driver, this)
+    fun clockNamed(name: String): ClockRow {
+        return ClockRow(browser.findElement(By.xpath(format(clockRowXPath, name))))
     }
 
-    fun containsClockWith(schedule: String) {
-        clocks.forEach { c ->
-            if (containsScheduleOnce(c.text, schedule)) return
+    class ClockRow(val row: WebElement?) {
+
+        fun clickAction() {
+            row!!.findElement(By.tagName("button")).click()
         }
-        browser.takeScreenshot()
-        Assertions.fail<String>("$schedule not found")
+
+        fun contains(s: String) {
+            assertTrue { row!!.text.contains(s) }
+        }
+
+        fun actionIs(name: String) {
+            await atMost Duration.ONE_SECOND until { row!!.findElement(By.tagName("button")).text == name }
+        }
     }
-
-    private fun containsScheduleOnce(text: String, schedule: String): Boolean {
-        val regex = """\w+\.\d+\.\w+""".toRegex()
-        val matches = regex.findAll(text)
-        return matches.count() == 1 && matches.first().value == schedule
-    }
-
-
 }

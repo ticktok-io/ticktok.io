@@ -21,6 +21,7 @@ public class Clock {
 
     public static final String PENDING = "PENDING";
     public static final String ACTIVE = "ACTIVE";
+    public static final String PAUSED = "PAUSED";
     @Id
     private String id;
 
@@ -42,8 +43,8 @@ public class Clock {
         this(null, name, schedules);
     }
 
-    public static Clock newClock(String name, String schedules) {
-        return new Clock(null, name, schedules);
+    public Clock(Clock clock) {
+        this(clock.getId(), clock.getName(), clock.getSchedule(), clock.getStatus(), clock.getLastModifiedDate());
     }
 
 }

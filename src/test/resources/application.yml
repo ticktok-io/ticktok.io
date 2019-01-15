@@ -1,12 +1,16 @@
 rabbit:
   uri: amqp://localhost:5672
   queue:
-    ttl: 200
+    ttl: 1000
 
 http:
   auth-token: a5f98e2b068ee51f90fd81c530e7fb4e306e7f42
   domain: http://localhost:8080
 
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost/ticktok_test
 
 management:
   endpoints:
@@ -15,7 +19,7 @@ management:
 
 clocks:
   purge:
-    interval: 5000
+    interval: 2000
 
 schedules:
   purge:
@@ -24,4 +28,4 @@ schedules:
 ticks:
   purge:
     interval: 500
-    keepCount: 1
+    keepCount: 0

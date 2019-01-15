@@ -2,6 +2,7 @@ package test.io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksFinder;
+import io.ticktok.server.clock.repository.ClocksFinder.ClockNotFoundException;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.config.ApplicationConfig;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.RepositoryCleanupConfiguration;
 import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataMongoTest
@@ -41,5 +43,9 @@ class ClocksFinderTest {
         assertTrue(new ClocksFinder(repository).find().isEmpty());
     }
 
-
+    @Test
+    void failOnNonExistingClock() {
+        assertThrows(ClockNotFoundException.class,
+                () -> new ClocksFinder(repository).findById("non-existing-id"));
+    }
 }

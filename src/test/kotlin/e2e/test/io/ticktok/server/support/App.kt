@@ -58,7 +58,9 @@ object App {
                 .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
         lastResponses.add(response)
-        return Gson().fromJson(bodyOf(response))
+        val clock = Gson().fromJson<Clock>(bodyOf(response))
+        startListenOn(clock)
+        return clock
     }
 
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
@@ -79,6 +81,12 @@ object App {
     }
 
     private inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
+
+    private fun startListenOn(clock: Clock) {
+        if (clock.channel != null) {
+            Client.startListenTo(clock)
+        }
+    }
 
     fun isHealthy() {
         assertTrue(isAppHealthy())
@@ -109,20 +117,24 @@ object App {
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
-        val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks")).execute().returnContent().asString()
-        assertThat(Gson().fromJson(response, Array<Clock>::class.java).asList(), matcher)
+        assertThat(getAllClocks(), matcher)
     }
 
-    fun retrievedRegisteredClock(clockExpr: String) {
+    private fun getAllClocks() : List<Clock> {
+        val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks")).execute().returnContent().asString()
+        return Gson().fromJson(response, Array<Clock>::class.java).asList()
+    }
+
+    fun retrievedRegisteredClock(name: String, clockExpr: String) {
         assertThat(lastResponses[0].statusLine.statusCode, `is`(HttpStatus.SC_CREATED))
-        validateRetrievedBody(clockExpr)
+        validateRetrievedBody(name, clockExpr)
         validateRetrievedLocation()
     }
 
     private fun validateRetrievedLocation() {
         val lastResponseBody = lastResponseBody()
         val url = lastResponseLocation()
-        assertThat(getAsClock(url), `is`(toClock(lastResponseBody)))
+        assertThat(getAsClock(url), `is`(toClock(lastResponseBody).copy(status = Clock.ACTIVE)))
     }
 
     private fun lastResponseBody(): JsonObject {
@@ -130,14 +142,10 @@ object App {
         return Gson().fromJson(respBody, JsonObject::class.java)
     }
 
-    private fun validateRetrievedBody(clockExpr: String) {
+    private fun validateRetrievedBody(name: String, clockExpr: String) {
         val lastResponseBody = lastResponseBody()
+        assertThat(lastResponseBody.get("name").asString, `is`(name))
         assertThat(lastResponseBody.get("schedule").asString, `is`(clockExpr))
-        assertThat(lastResponseBody.get("url").asString, `is`(withoutToken(lastResponseLocation())))
-    }
-
-    private fun withoutToken(url: String): String {
-        return url.substring(0, url.indexOf("?"))
     }
 
     private fun lastResponseLocation(): String {
@@ -157,14 +165,21 @@ object App {
     }
 
     fun retrievedUserError() {
-        assertThat(lastResponses[0].statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
+        assertThat(lastResponses.last().statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
     }
 
     fun purge() {
+        resumeAllPausedClocks()
         sleep(500)
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
         sleep(500)
         assertThat(response.statusLine.statusCode, `is`(204))
+    }
+
+    private fun resumeAllPausedClocks() {
+        getAllClocks().forEach { c ->
+            Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${c.id}/resume")).execute()
+        }
     }
 
     fun allInteractionsSucceeded() {
@@ -173,6 +188,30 @@ object App {
                 .filter { sc -> sc !in 200..299 }
                 .count()
         assertThat(failedRequestsCount, `is`(0))
+    }
+
+    fun pauseClock(clock: Clock) {
+        val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/pause")).execute().returnResponse()
+        assertThat(response.statusLine.statusCode, `is`(200));
+    }
+
+    fun clock(id: String): Clock {
+        val result = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks/${id}")).execute().returnContent().asString()
+        return Gson().fromJson(result, Clock::class.java)
+    }
+
+    fun fetchUnknownClock() {
+        val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks/unknown-id")).execute().returnResponse()
+        lastResponses.add(response)
+    }
+
+    fun retrievedNotFoundError() {
+        assertThat(lastResponses.last().statusLine.statusCode, `is`(404))
+    }
+
+    fun invokeUnknownActionOn(clock: Clock) {
+        val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/unknown")).execute().returnResponse()
+        lastResponses.add(response)
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
