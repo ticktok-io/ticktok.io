@@ -98,7 +98,6 @@ export class ClocksList extends Component {
 }
 
 function mapStateToProps(state) {
-  console.log("... ", state);
   return {clocks: state.clocks}
 }
 

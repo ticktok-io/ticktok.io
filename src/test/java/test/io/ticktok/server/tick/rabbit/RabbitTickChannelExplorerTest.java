@@ -88,4 +88,10 @@ class RabbitTickChannelExplorerTest {
         sendTick();
         assertThat(receivedTick(), is(TICK_MSG));
     }
+
+    @Test
+    void ignoreEnableFailureIfQueueNotExists() {
+        tickChannelExplorer.enable(new Clock("papa", "every.321.seconds"));
+        // pass
+    }
 }

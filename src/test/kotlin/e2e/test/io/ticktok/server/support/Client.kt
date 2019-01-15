@@ -25,7 +25,7 @@ object Client {
     }
 
     fun receivesNoMoreTicks() {
-        sleep(1000)
+        sleep(2000)
         reset()
         sleep(2000)
         listeners.values.forEach { v ->

@@ -117,8 +117,12 @@ object App {
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
+        assertThat(getAllClocks(), matcher)
+    }
+
+    private fun getAllClocks() : List<Clock> {
         val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks")).execute().returnContent().asString()
-        assertThat(Gson().fromJson(response, Array<Clock>::class.java).asList(), matcher)
+        return Gson().fromJson(response, Array<Clock>::class.java).asList()
     }
 
     fun retrievedRegisteredClock(name: String, clockExpr: String) {
@@ -165,10 +169,17 @@ object App {
     }
 
     fun purge() {
+        resumeAllPausedClocks()
         sleep(500)
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
         sleep(500)
         assertThat(response.statusLine.statusCode, `is`(204))
+    }
+
+    private fun resumeAllPausedClocks() {
+        getAllClocks().forEach { c ->
+            Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${c.id}/resume")).execute()
+        }
     }
 
     fun allInteractionsSucceeded() {

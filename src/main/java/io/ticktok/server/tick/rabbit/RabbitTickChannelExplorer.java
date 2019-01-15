@@ -27,6 +27,10 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
 
     @Override
     public boolean isExists(Clock clock) {
+        return clockQueueExists(clock);
+    }
+
+    private boolean clockQueueExists(Clock clock) {
         return rabbitAdmin.getQueueProperties(nameFor(clock)) != null;
     }
 
@@ -52,7 +56,9 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
     }
 
     private void declareBindingFor(Clock clock) {
-        rabbitAdmin.declareBinding(clockBinding(clock));
+        if(clockQueueExists(clock)) {
+            rabbitAdmin.declareBinding(clockBinding(clock));
+        }
     }
 
     private Binding clockBinding(Clock clock) {
