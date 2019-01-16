@@ -94,7 +94,7 @@ class ApiE2ETest : AppE2ETest() {
 
     @Test
     fun failOnUnknownClockAction() {
-        val clock = App.registeredAClock("to-be-disabled", "every.2.seconds")
+        val clock = App.registeredAClock("to-be-disabled", "every.1.seconds")
         App.invokeUnknownActionOn(clock)
         App.retrievedNotFoundError()
     }

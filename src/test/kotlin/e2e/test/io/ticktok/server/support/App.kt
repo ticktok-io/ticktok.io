@@ -23,7 +23,9 @@ import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
+import java.time.LocalDateTime
 import java.util.*
+import java.util.logging.Logger
 
 object App {
 
@@ -54,6 +56,7 @@ object App {
     }
 
     fun registeredAClock(name: String, timeExpr: String): Clock {
+        println("${ LocalDateTime.now()} -- Registering clock: $name")
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()

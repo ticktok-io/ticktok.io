@@ -13,14 +13,13 @@ import java.util.List;
 public class TickScheduler {
 
     public static final int SECOND = 1000;
-    public static final int LOOK_AHEAD = 5 * SECOND;
 
     private final long lookaheadInMillis;
     private final SchedulesRepository schedulesRepository;
     private final TicksRepository ticksRepository;
 
     public TickScheduler(
-            @Value("${schedule.lookahead:5}") String lookaheadInSeconds,
+            @Value("${schedules.lookahead:5}") String lookaheadInSeconds,
             SchedulesRepository schedulesRepository,
             TicksRepository ticksRepository) {
         this.lookaheadInMillis = Long.valueOf(lookaheadInSeconds) * SECOND;
@@ -44,7 +43,7 @@ public class TickScheduler {
     }
 
     private List<Schedule> toBeExecutedSchedules() {
-        return schedulesRepository.findActiveSchedulesByNextTickLesserThan(now() + LOOK_AHEAD);
+        return schedulesRepository.findActiveSchedulesByNextTickLesserThan(now() + lookaheadInMillis);
     }
 
     protected long now() {

@@ -8,8 +8,10 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
 import org.junit.jupiter.api.fail
 import java.lang.Thread.sleep
+import java.time.LocalDateTime
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.logging.Logger
 import kotlin.test.assertTrue
 
 
@@ -29,7 +31,7 @@ object Client {
         reset()
         sleep(2000)
         listeners.values.forEach { v ->
-            assertTrue(v.messages.isEmpty(), "recieved ticks for ${v.queue}")
+            assertTrue(v.messages.isEmpty(), "received ticks for ${v.queue}")
         }
     }
 
@@ -42,6 +44,7 @@ object Client {
             connection = createConnection(clock.channel)
             channel = connection!!.createChannel()
         }
+        println("${LocalDateTime.now()} -- Start listening on: ${clock.name}")
         startTickListenerFor(clock)
     }
 

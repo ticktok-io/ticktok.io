@@ -22,6 +22,7 @@ clocks:
     interval: 2000
 
 schedules:
+  lookahead: 3
   purge:
     interval: 250
 
