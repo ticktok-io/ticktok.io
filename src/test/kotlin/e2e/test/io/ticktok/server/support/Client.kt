@@ -44,7 +44,6 @@ object Client {
             connection = createConnection(clock.channel)
             channel = connection!!.createChannel()
         }
-        println("${LocalDateTime.now()} -- Start listening on: ${clock.name}")
         startTickListenerFor(clock)
     }
 
@@ -96,6 +95,7 @@ object Client {
                     messages.add(body.toString())
                 }
             }
+            println("${LocalDateTime.now()} -- Starting to listen on: ${queue}")
             consumerTag = channel.basicConsume(queue, true, consumer)
         }
 
