@@ -1,17 +1,11 @@
 package e2e.test.io.ticktok.server.support
 
 import com.rabbitmq.client.*
-import org.assertj.core.api.Assertions
 import org.awaitility.Duration
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
-import org.junit.jupiter.api.fail
 import java.lang.Thread.sleep
-import java.time.LocalDateTime
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.logging.Logger
 import kotlin.test.assertTrue
 
 
@@ -105,8 +99,7 @@ object Client {
         }
 
         fun clear() {
-
-
+            messages.clear()
         }
     }
 
