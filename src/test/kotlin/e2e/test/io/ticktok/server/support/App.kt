@@ -56,7 +56,6 @@ object App {
     }
 
     fun registeredAClock(name: String, timeExpr: String): Clock {
-        println("${ LocalDateTime.now()} -- Registering clock: $name")
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
                 .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()

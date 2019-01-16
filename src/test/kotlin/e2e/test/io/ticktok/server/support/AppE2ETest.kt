@@ -20,7 +20,6 @@ abstract class AppE2ETest {
 
     @AfterAll
     open fun purgeApp() {
-        sleep(2000)
         App.purge()
     }
 

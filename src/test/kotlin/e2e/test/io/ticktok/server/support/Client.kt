@@ -95,7 +95,6 @@ object Client {
                     messages.add(body.toString())
                 }
             }
-            println("${LocalDateTime.now()} -- Starting to listen on: ${queue}")
             consumerTag = channel.basicConsume(queue, true, consumer)
         }
 

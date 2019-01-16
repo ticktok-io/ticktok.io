@@ -34,7 +34,7 @@ class DashboardE2ETest : AppE2ETest() {
 
     @Test
     fun pauseAClock() {
-        App.registeredAClock("kuku", "every.911.seconds")
+        App.registeredAClock("kuku", "every.922.seconds")
         clockListPage.clockNamed("kuku").clickAction()
         clockListPage.clockNamed("kuku").actionIs("Resume")
     }
