@@ -77,6 +77,9 @@ jobs:
         name: Server's UT & IT
         command: ./gradlew test --tests test.*
 
+    - store_test_results:
+        path: build/test-results
+
     - run:
         name: Build server
         command: ./gradlew build -x test
@@ -104,6 +107,9 @@ jobs:
 
     - store_artifacts:
         path: test-reports
+
+    - store_test_results:
+        path: build/test-results
 
     - run:
         name: Setup heroku

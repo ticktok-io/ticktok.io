@@ -1,7 +1,7 @@
 rabbit:
   uri: amqp://localhost:5672
   queue:
-    ttl: 2000
+    ttl: 1000
 
 http:
   auth-token: a5f98e2b068ee51f90fd81c530e7fb4e306e7f42
@@ -22,6 +22,7 @@ clocks:
     interval: 2000
 
 schedules:
+  lookahead: 3
   purge:
     interval: 250
 

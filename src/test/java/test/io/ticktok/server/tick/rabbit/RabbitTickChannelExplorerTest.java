@@ -12,8 +12,10 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -27,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {RabbitConfiguration.class})
 @EnableConfigurationProperties(RabbitProperties.class)
-@SpringBootTest
+@SpringBootTest(properties = {"rabbit.queue.ttl=500"})
 class RabbitTickChannelExplorerTest {
 
     public static final Clock CLOCK = new Clock("kuku", "every.111.seconds");
@@ -70,7 +72,7 @@ class RabbitTickChannelExplorerTest {
 
     @Test
     void channelShouldBeDeletedIfUnused() throws InterruptedException {
-        sleep(1000);
+        sleep(600);
         assertNull(amqpAdmin.getQueueProperties(channel.getQueue()));
     }
 

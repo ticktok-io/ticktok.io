@@ -20,6 +20,7 @@ class TickSchedulerTest {
 
     static final long NOW = 1000;
     static final int LOOK_AHEAD_IN_SECS = 2;
+    static final int LOOK_AHEAD_IN_MILLIS = LOOK_AHEAD_IN_SECS * 1000;
 
     SchedulesRepository schedulesRepository = mock(SchedulesRepository.class);
     TicksRepository ticksRepository = mock(TicksRepository.class);
@@ -47,7 +48,7 @@ class TickSchedulerTest {
     @Test
     void fetchOnlyClocksWithPastScheduledTicks() {
         schedule();
-        verify(schedulesRepository).findActiveSchedulesByNextTickLesserThan(NOW + TickScheduler.LOOK_AHEAD);
+        verify(schedulesRepository).findActiveSchedulesByNextTickLesserThan(NOW + LOOK_AHEAD_IN_MILLIS);
     }
 
     @Test
