@@ -39,12 +39,11 @@ public class ClocksController {
     private final ClockActionFactory clockActionFactory;
 
 
-    public ClocksController(@Value("${http.domain}") String domain,
-                            ClocksRepository clocksRepository,
+    public ClocksController(ClocksRepository clocksRepository,
                             TickChannelExplorer tickChannelExplorer,
                             ClocksPurger clocksPurger,
                             ClockActionFactory clockActionFactory) {
-        this.domain = domain;
+        this.domain = "http://hello";
         this.clocksRepository = clocksRepository;
         this.tickChannelExplorer = tickChannelExplorer;
         this.clocksPurger = clocksPurger;
@@ -105,12 +104,12 @@ public class ClocksController {
     }
 
     @PutMapping("/{id}/{action}")
-    @ApiOperation("Pause a specific clock")
-    public void pause(@PathVariable String id, @PathVariable String action) {
+    @ApiOperation(value = "Run an action on a specific clock")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> pause(@PathVariable String id,
+                      @ApiParam(required = true, allowableValues = "pause,resume") @PathVariable String action) {
         clockActionFactory.run(action, id);
+        return ResponseEntity.noContent().build();
     }
-
-
-
-
 }
+
