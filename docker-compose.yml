@@ -10,6 +10,7 @@ services:
 
   mongo:
     image: mongo:3.6
+    command: --storageEngine ephemeralForTest
     ports:
       - 27017:27017
 
