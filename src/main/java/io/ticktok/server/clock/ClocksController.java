@@ -8,11 +8,11 @@ import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,23 +28,16 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/clocks")
 public class ClocksController {
 
-
-    @Autowired
-    private HttpServletRequest httpRequest;
-
     private final ClocksRepository clocksRepository;
-    private final String domain;
     private final TickChannelExplorer tickChannelExplorer;
     private final ClocksPurger clocksPurger;
     private final ClockActionFactory clockActionFactory;
 
 
-    public ClocksController(@Value("${http.domain}") String domain,
-                            ClocksRepository clocksRepository,
+    public ClocksController(ClocksRepository clocksRepository,
                             TickChannelExplorer tickChannelExplorer,
                             ClocksPurger clocksPurger,
                             ClockActionFactory clockActionFactory) {
-        this.domain = domain;
         this.clocksRepository = clocksRepository;
         this.tickChannelExplorer = tickChannelExplorer;
         this.clocksPurger = clocksPurger;
@@ -57,21 +50,37 @@ public class ClocksController {
     @ApiResponses(value = {
             @ApiResponse(code = 201,
                     message = "Clock created successfully",
-                    responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)})
+                    responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)}),
+            @ApiResponse(code = 400,
+                    message = "Bad request")
     })
-    public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest, Principal principal) {
+    public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest) {
         log.info("CLOCK-REQUEST: {}", clockRequest.toString());
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
         TickChannel channel = tickChannelExplorer.create(savedClock);
-        return createdClockEntity(savedClock, channel, principal);
+        return createdClockEntity(savedClock, channel);
     }
 
-    private ResponseEntity<ClockResourceWithChannel> createdClockEntity(Clock clock, TickChannel channel, Principal principal) {
+    private ResponseEntity<ClockResourceWithChannel> createdClockEntity(Clock clock, TickChannel channel) {
         ClockResourceWithChannel clockResource =
-                new ClockResourceWithChannel(domain, clock, channel);
+                new ClockResourceWithChannel(host(), clock, channel);
         return ResponseEntity.created(
-                withAuthToken(clockResource.getUrl(), principal))
+                withAuthToken(clockResource.getUrl(), userPrincipal()))
                 .body(clockResource);
+    }
+
+    private String host() {
+        HttpServletRequest currentRequest = currentRequest();
+        return currentRequest.getRequestURL().toString().replaceAll(currentRequest.getRequestURI(), "");
+    }
+
+    private HttpServletRequest currentRequest() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest();
+    }
+
+    private Principal userPrincipal() {
+        return currentRequest().getUserPrincipal();
     }
 
     private URI withAuthToken(String clockUrl, Principal principal) {
@@ -87,7 +96,7 @@ public class ClocksController {
     }
 
     private ClockResource createClockResourceFor(Clock clock) {
-        return new ClockResource(domain, clock);
+        return new ClockResource(host(), clock);
     }
 
     @GetMapping
@@ -105,12 +114,13 @@ public class ClocksController {
     }
 
     @PutMapping("/{id}/{action}")
-    @ApiOperation("Pause a specific clock")
-    public void pause(@PathVariable String id, @PathVariable String action) {
+    @ApiOperation(value = "Run an action on a specific clock")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> pause(
+            @PathVariable String id,
+            @ApiParam(required = true, allowableValues = "pause,resume") @PathVariable String action) {
         clockActionFactory.run(action, id);
+        return ResponseEntity.noContent().build();
     }
-
-
-
-
 }
+
