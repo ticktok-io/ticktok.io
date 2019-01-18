@@ -8,7 +8,6 @@ services:
     environment:
     - RABBIT_URI=amqp://rabbit
     - MONGO_URI=mongodb://mongo/e2e-test
-    - SELF_DOMAIN=http://localhost:8080
     - ACCESS_TOKEN=${E2E_ACCESS_TOKEN}
     - RABBIT_CONSUMERURI=amqp://localhost
     - RABBIT_QUEUE_TTL=5000

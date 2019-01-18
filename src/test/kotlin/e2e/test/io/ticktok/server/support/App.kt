@@ -192,7 +192,7 @@ object App {
 
     fun pauseClock(clock: Clock) {
         val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/pause")).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(200));
+        assertThat(response.statusLine.statusCode, `is`(204));
     }
 
     fun clock(id: String): Clock {
