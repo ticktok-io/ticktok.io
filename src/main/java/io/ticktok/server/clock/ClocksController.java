@@ -8,7 +8,6 @@ import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,10 +27,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/clocks")
 public class ClocksController {
-
-
-    @Autowired
-    private HttpServletRequest httpRequest;
 
     private final ClocksRepository clocksRepository;
     private final TickChannelExplorer tickChannelExplorer;
@@ -68,21 +62,25 @@ public class ClocksController {
     }
 
     private ResponseEntity<ClockResourceWithChannel> createdClockEntity(Clock clock, TickChannel channel) {
-        HttpServletRequest request = currentRequest();
         ClockResourceWithChannel clockResource =
-                new ClockResourceWithChannel(getDomain(request), clock, channel);
+                new ClockResourceWithChannel(host(), clock, channel);
         return ResponseEntity.created(
-                withAuthToken(clockResource.getUrl(), request.getUserPrincipal()))
+                withAuthToken(clockResource.getUrl(), userPrincipal()))
                 .body(clockResource);
     }
 
-    private String getDomain(HttpServletRequest request) {
-        return request.getRequestURL().toString().replaceAll(request.getRequestURI(), "");
+    private String host() {
+        HttpServletRequest currentRequest = currentRequest();
+        return currentRequest.getRequestURL().toString().replaceAll(currentRequest.getRequestURI(), "");
     }
 
     private HttpServletRequest currentRequest() {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest();
+    }
+
+    private Principal userPrincipal() {
+        return currentRequest().getUserPrincipal();
     }
 
     private URI withAuthToken(String clockUrl, Principal principal) {
@@ -98,7 +96,7 @@ public class ClocksController {
     }
 
     private ClockResource createClockResourceFor(Clock clock) {
-        return new ClockResource(getDomain(currentRequest()), clock);
+        return new ClockResource(host(), clock);
     }
 
     @GetMapping

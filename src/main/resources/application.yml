@@ -5,7 +5,6 @@ rabbit:
 
 http:
   auth-token: ${ACCESS_TOKEN:41082cd7e33aa93ee76635820ded697f2c0b1b32}
-  domain: ${SELF_DOMAIN}
 
 spring:
   data:
