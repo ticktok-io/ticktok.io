@@ -94,8 +94,23 @@ jobs:
 
     - run:
         name: E2E tests against dockered app
-        command: ./gradlew test --tests e2e.* -DstartApp=no --info --scan
+        command: ./gradlew test --tests e2e.* -DstartApp=no --scan
 
+    - run:
+        name: Stop app
+        command: .circleci/run_compose.sh down
+
+    - run:
+        name: Build sandbox server
+        command: docker build -f sandbox/Dockerfile -t sandbox .
+
+    - run:
+        name: Start sandbox
+        command: docker run -e ACCESS_TOKEN=$E2E_ACCESS_TOKEN -e RABBIT_URI=amqp://localhost sandbox
+
+    - run:
+        name: Sandbox sanity testing
+        command: ./gradlew test -Ptags=sanity -DstartApp=no --scan
 
     - run:
         name: Collect app logs
