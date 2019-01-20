@@ -3,7 +3,7 @@ FROM openjdk:8-jdk
 VOLUME /tmp
 
 RUN apt-get update && \
-    # apt-get -y install rabbitmq-server && \
+    apt-get -y install rabbitmq-server && \
     apt-get -y install mongodb && \
     apt-get clean
 
