@@ -2,7 +2,6 @@
 
 set -e
 
-export RABBITMQ_NODE_PORT=5789
 export MONGO_URI=mongodb://localhost/ticktok
 export RABBIT_URI=amqp://localhost:5789
 
