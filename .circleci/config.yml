@@ -106,7 +106,7 @@ jobs:
 
     - run:
         name: Start sandbox
-        command: docker run -e ACCESS_TOKEN=$E2E_ACCESS_TOKEN -e -p 5672:5672 sandbox
+        command: docker run -e ACCESS_TOKEN=$E2E_ACCESS_TOKEN -p 5672:5672 sandbox
 
     - run:
         name: Sandbox sanity testing
