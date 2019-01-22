@@ -3,4 +3,9 @@
 
 port=${PORT:-8080}
 
+if [[ -z "${MONGO_URI}" ]]; then
+    export MONGO_URI=mongodb://localhost/ticktok
+    mkdir /tmp/mongo
+    mongod --storageEngine ephemeralForTest --dbpath /tmp/mongo &
+fi
 exec java -Dserver.port=$port -Xmx32m -Xss256k -Djava.security.egd=file:/dev/./urandom -jar /opt/app/app.jar

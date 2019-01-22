@@ -100,13 +100,13 @@ jobs:
         name: Stop app
         command: .circleci/run_compose.sh down
 
-    - run:
-        name: Build sandbox server
-        command: docker build -f sandbox/Dockerfile -t sandbox .
+#    - run:
+#        name: Build sandbox server
+#        command: docker build -f sandbox/Dockerfile -t sandbox .
 
     - run:
-        name: Start sandbox
-        command: docker run -e ACCESS_TOKEN=$E2E_ACCESS_TOKEN -p 5672:5672 sandbox
+        name: Start as sandbox
+        command: .circleci/run_compose_sandbox.sh up -d app rabbit
 
     - run:
         name: Sandbox sanity testing

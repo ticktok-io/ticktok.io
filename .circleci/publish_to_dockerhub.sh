@@ -20,11 +20,11 @@ if [[ "${CIRCLE_BRANCH}" == "master" ]] || [[ "${CIRCLE_BRANCH}" == realease-* ]
     else
         echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
         push_image app $IMAGE
-        push_image sandbox $SANDBOX
+        # push_image sandbox $SANDBOX
 
         if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
             push_image app $IMAGE_NAME:latest
-            push_image sandbox $IMAGE_NAME:sandbox
+            # push_image sandbox $IMAGE_NAME:sandbox
         fi
     fi
 else
