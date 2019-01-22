@@ -95,6 +95,9 @@ jobs:
     - run:
         name: E2E tests against dockered app
         command: ./gradlew test --tests e2e.* -DstartApp=no --scan
+        
+    - store_test_results:
+        path: build/test-results
 
     - run:
         name: Stop app
