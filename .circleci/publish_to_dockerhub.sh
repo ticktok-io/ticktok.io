@@ -13,8 +13,8 @@ push_image() {
 if [[ "${CIRCLE_BRANCH}" == "master" ]] || [[ "${CIRCLE_BRANCH}" == realease-* ]]; then
     TAG=`git describe --tags --abbrev=0`
     IMAGE=$IMAGE_NAME:$TAG
-    SANDBOX=IMAGE-sandbox
-    if [[ `docker pull $IMAGE` ]] || [[ `docker pull $SANDBOX` ]]; then
+    # SANDBOX=IMAGE-sandbox
+    if [[ `docker pull $IMAGE` ]]; then
         echo $IMAGE already exists
         exit 1
     else

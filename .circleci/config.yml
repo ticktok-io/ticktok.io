@@ -128,8 +128,10 @@ jobs:
 
     - run:
         name: Setup heroku
-        command: .circleci/heroku_setup.sh
-
+        command: |
+          if [ "${CIRCLE_BRANCH}" == "develop" ];
+            .circleci/heroku_setup.sh
+          fi
     - run:
         name: Deploy ticktok server (Heroku)
         no_output_timeout: 5m
