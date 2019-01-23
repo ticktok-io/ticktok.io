@@ -71,15 +71,15 @@ jobs:
       # specify the version you desire here
       image: circleci/classic:201808-01
 
-      working_directory: ~/repo
+    working_directory: ~/repo
 
-      environment:
-        # Customize the JVM maximum heap limit
-        JVM_OPTS: -Xmx3200m
-        TERM: dumb
-        APP: ticktok
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+      APP: ticktok
 
-      steps:
+    steps:
       # - checkout
       - run:
           name: Server's UT & IT
@@ -138,15 +138,15 @@ jobs:
       # specify the version you desire here
       image: circleci/classic:201808-01
 
-      working_directory: ~/repo
+    working_directory: ~/repo
 
-      environment:
-        # Customize the JVM maximum heap limit
-        JVM_OPTS: -Xmx3200m
-        TERM: dumb
-        APP: ticktok
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+      APP: ticktok
 
-      steps:
+    steps:
       - run:
           name: Setup heroku
           command: |
