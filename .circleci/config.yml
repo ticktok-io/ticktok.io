@@ -132,7 +132,7 @@ jobs:
     - run:
         name: Setup heroku
         command: |
-          if [ "${CIRCLE_BRANCH}" == "develop" ];
+          if [ "${CIRCLE_BRANCH}" == "develop" ]; then
             .circleci/heroku_setup.sh
           fi
     - run:
