@@ -138,11 +138,16 @@ jobs:
     - run:
         name: Deploy ticktok server (Heroku)
         no_output_timeout: 5m
-        command: .circleci/deploy_to_heroku.sh
-
+        command: |
+          if [ "${CIRCLE_BRANCH}" == "develop" ];
+            .circleci/deploy_to_heroku.sh
+          fi
     - run:
         name: Publish to dockerhub
-        command: .circleci/publish_to_dockerhub.sh
+        command: |
+          if [[ "${CIRCLE_BRANCH}" == "master" ]] || [[ "${CIRCLE_BRANCH}" == realease-* ]]; then
+            .circleci/publish_to_dockerhub.sh
+          fi
 
 
 
