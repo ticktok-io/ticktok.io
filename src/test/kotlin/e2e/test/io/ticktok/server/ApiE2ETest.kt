@@ -8,6 +8,7 @@ import e2e.test.io.ticktok.server.support.Client.CLOCK_EXPR
 import e2e.test.io.ticktok.server.support.Clock
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -24,6 +25,7 @@ class ApiE2ETest : AppE2ETest() {
     }
 
     @Test
+    @Tag("sanity")
     fun retrieveScheduledMessage() {
         val clock = App.registeredAClock("kuku", CLOCK_EXPR)
         Client.receivedTicksFor(clock)

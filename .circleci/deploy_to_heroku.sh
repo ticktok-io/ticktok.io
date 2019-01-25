@@ -12,15 +12,6 @@ check_health() {
     echo $1 is healthy!
 }
 
-
-if [[ ${CIRCLE_BRANCH} == "develop" ]]; then
-    if [[ ${CIRCLE_BRANCH} == "master" ]]; then
-        HEROKU_APP=ticktok-io-demo
-    else
-        HEROKU_APP=ticktok-io-dev
-    fi
-    heroku deploy:jar build/libs/*.jar --app $HEROKU_APP -o "--server.port=\$PORT"
-    check_health https://$HEROKU_APP.herokuapp.com
-else
-    echo No deployment from $CIRCLE_BRANCH branch
-fi
+HEROKU_APP=ticktok-io-dev
+heroku deploy:jar build/libs/*.jar --app $HEROKU_APP -o "--server.port=\$PORT"
+check_health https://$HEROKU_APP.herokuapp.com

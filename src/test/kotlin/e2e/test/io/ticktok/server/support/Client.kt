@@ -6,6 +6,7 @@ import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
 import java.lang.Thread.sleep
+import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 
 
@@ -17,7 +18,7 @@ object Client {
     private val listeners = hashMapOf<String, TickListener>()
 
     fun receivedTicksFor(clock: Clock) {
-        await atMost Duration.TWO_SECONDS until { listeners[clock.id]?.messages?.isNotEmpty()!! }
+        await atMost Duration(3, TimeUnit.SECONDS) until { listeners[clock.id]?.messages?.isNotEmpty()!! }
     }
 
     fun receivesNoMoreTicks() {

@@ -2,23 +2,27 @@
 
 set -e
 
-if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == realease-* ]; then
-    TAG=`git describe --tags --abbrev=0`
-    IMAGE=ticktok/ticktok:$TAG
-    if [[ `docker pull $IMAGE` ]]; then
-        echo $IMAGE already exists
-        exit 1
-    else
-        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-        docker tag app $IMAGE
-        docker push $IMAGE
+IMAGE_NAME=ticktok/ticktok
 
-        if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker tag app ticktok/ticktok:latest
-            docker push ticktok/ticktok:latest
-        fi
-        echo $IMAGE uploaded to Dockerhub
-    fi
+push_image() {
+    docker tag $1 $2
+    docker push $2
+    echo $2 uploaded to Dockerhub
+}
+
+TAG=`git describe --tags --abbrev=0`
+IMAGE=$IMAGE_NAME:$TAG
+# SANDBOX=IMAGE-sandbox
+if [[ `docker pull $IMAGE` ]]; then
+    echo $IMAGE already exists
+    exit 1
 else
-    echo No publishing from $CIRCLE_BRANCH branch
+    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+    push_image app $IMAGE
+    # push_image sandbox $SANDBOX
+
+    if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
+        push_image app $IMAGE_NAME:latest
+        # push_image sandbox $IMAGE_NAME:sandbox
+    fi
 fi
