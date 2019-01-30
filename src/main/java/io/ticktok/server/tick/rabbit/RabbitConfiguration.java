@@ -1,7 +1,9 @@
 package io.ticktok.server.tick.rabbit;
 
 import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickPublisher;
 import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -11,18 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.net.URI;
 
 @Configuration
+@Profile("rabbit")
 public class RabbitConfiguration {
 
     private static final String EXCHANGE_NAME = "ticktok.tick.exchange";
-
-    @Value("${rabbit.uri}")
-    private String rabbitUri;
-    @Value("${rabbit.queue.ttl}")
-    private String queueTTL;
 
     @Autowired
     private RabbitProperties rabbitProperties;
@@ -34,7 +33,7 @@ public class RabbitConfiguration {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        return new CachingConnectionFactory(URI.create(rabbitUri));
+        return new CachingConnectionFactory(URI.create(rabbitProperties.getUri()));
     }
 
     @Bean
@@ -50,6 +49,11 @@ public class RabbitConfiguration {
     @Bean
     public TickChannelExplorer tickChannelExplorer(AmqpAdmin amqpAdmin, TopicExchange topicExchange) {
         return new RabbitTickChannelExplorer(rabbitProperties, amqpAdmin, topicExchange);
+    }
+
+    @Bean
+    public TickPublisher tickPublisher(RabbitTemplate rabbitTemplate, Exchange ticktokExchange) {
+        return new RabbitTickPublisher(rabbitTemplate, ticktokExchange);
     }
 
 }

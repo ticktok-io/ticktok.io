@@ -5,22 +5,22 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import java.lang.Thread.sleep
 
-abstract class AppE2ETest {
-
-    @BeforeAll
-    open fun startApp() {
-        App.start()
-    }
+abstract class CommonAppE2ETest {
 
     @AfterEach
     open fun resetApp() {
-        App.reset()
+        app().reset()
         Client.stop()
     }
 
     @AfterAll
     open fun purgeApp() {
-        App.purge()
+        app().purge()
+    }
+
+
+    fun app(): App {
+        return App.instance()
     }
 
 }

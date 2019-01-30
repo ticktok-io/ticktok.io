@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
 public class RabbitTickPublisher implements TickPublisher {
 
     public static final String TICK_MESSAGE = "tick";
@@ -14,7 +13,6 @@ public class RabbitTickPublisher implements TickPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final Exchange exchange;
 
-    @Autowired
     public RabbitTickPublisher(RabbitTemplate rabbitTemplate, Exchange exchange) {
         this.rabbitTemplate = rabbitTemplate;
         this.exchange = exchange;

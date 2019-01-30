@@ -25,27 +25,38 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
 import java.util.*
 
-object App {
+class App {
 
-    const val ACCESS_TOKEN = "ct-auth-token"
-    private val APP_URL = System.getenv("APP_URL") ?: "http://localhost:8080"
+    companion object {
+        const val ACCESS_TOKEN = "ct-auth-token"
+        private var appInstance: App? = null
 
+        fun instance() : App {
+            if (appInstance == null) {
+                appInstance = App(System.getenv("APP_URL") ?: "http://localhost:8080")
+                if (System.getProperty("startApp", "yes") != "no") {
+                    appInstance?.start()
+                }
+            }
+            return appInstance as App;
+        }
 
+    }
+
+    var appUrl = "http://localhost:8080"
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
-    private var started = false
+
+    constructor(url: String) {
+        appUrl = System.getenv("APP_URL") ?: "http://localhost:8080"
+    }
 
     fun start() {
-        if (!started) {
-            if (System.getProperty("startApp", "yes") != "no") {
-                Application.main()
-            }
-            waitForAppToBeHealthy()
-            started = true
-        }
+        Application.main("--spring.profiles.active=rabbit")
+        waitForAppToBeHealthy()
     }
 
     private fun waitForAppToBeHealthy() {
-        println("Waiting for app($APP_URL) to be healthy...")
+        println("Waiting for app($appUrl) to be healthy...")
         await withPollInterval (Duration.ONE_SECOND) atMost (Duration.FIVE_MINUTES) until { isAppHealthy() }
     }
 
@@ -66,7 +77,7 @@ object App {
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
 
     private fun createAuthenticatedUrlFor(slag: String): String {
-        return withAuthToken("$APP_URL/$slag")
+        return withAuthToken("$appUrl/$slag")
     }
 
     private fun withAuthToken(url: String?): String {
@@ -102,12 +113,12 @@ object App {
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("$APP_URL/mgmt/health").execute().returnContent().asString()
+        val health = Request.Get("$appUrl/mgmt/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 
     fun isAccessedWithoutAToken() {
-        lastResponses.add(Request.Post("$APP_URL/api/v1/clocks")
+        lastResponses.add(Request.Post("$appUrl/api/v1/clocks")
                 .bodyString(createClockRequestFor("no-token", "in.1.minute"), ContentType.APPLICATION_JSON)
                 .execute().returnResponse())
     }
