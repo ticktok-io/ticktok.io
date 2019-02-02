@@ -44,7 +44,7 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
         Queue queue = queueFor(clock);
         rabbitAdmin.declareQueue(queue);
         declareBindingFor(clock);
-        return new TickChannel(consumerRabbitUri, queue.getName());
+        return TickChannel.rabbit(consumerRabbitUri, queue.getName());
     }
 
     private Queue queueFor(Clock clock) {

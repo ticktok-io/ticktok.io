@@ -14,7 +14,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import java.lang.Thread.sleep
 
 @TestInstance(PER_CLASS)
-class ApplicationE2ETest : CommonAppE2ETest() {
+class ApiE2ETest : CommonAppE2ETest() {
 
     @Test
     fun registerNewClock() {

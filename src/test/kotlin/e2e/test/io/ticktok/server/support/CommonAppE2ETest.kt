@@ -13,14 +13,13 @@ abstract class CommonAppE2ETest {
         Client.stop()
     }
 
+    fun app(profile: String = "rabbit"): App {
+        return App.instance(profile)
+    }
+
     @AfterAll
     open fun purgeApp() {
         app().purge()
-    }
-
-
-    fun app(): App {
-        return App.instance()
     }
 
 }

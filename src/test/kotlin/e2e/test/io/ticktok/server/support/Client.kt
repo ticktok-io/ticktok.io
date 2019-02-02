@@ -13,8 +13,6 @@ import kotlin.test.assertTrue
 object Client {
 
     const val CLOCK_EXPR = "every.2.seconds"
-    private var connection: Connection? = null
-    private var channel: Channel? = null
     private val listeners = hashMapOf<String, TickListener>()
 
     fun receivedTicksFor(clock: Clock) {
@@ -26,7 +24,7 @@ object Client {
         reset()
         sleep(2000)
         listeners.values.forEach { v ->
-            assertTrue(v.messages.isEmpty(), "received ticks for ${v.queue}")
+            assertTrue(v.messages.isEmpty(), "received ticks for ${v.name()}")
         }
     }
 
@@ -35,33 +33,22 @@ object Client {
     }
 
     fun startListenTo(clock: Clock) {
-        if (connection == null) {
-            connection = createConnection(clock.channel)
-            channel = connection!!.createChannel()
-        }
-        startTickListenerFor(clock)
-    }
-
-    private fun createConnection(channel: ClockChannel?): Connection {
-        val factory = ConnectionFactory()
-        factory.setUri(channel?.uri)
-        return factory.newConnection()
-    }
-
-    private fun startTickListenerFor(clock: Clock) {
         if (!listeners.contains(clock.id)) {
-            listeners[clock.id] = TickListener(channel!!, clock.channel!!.queue)
+            listeners[clock.id] = createListenerFor(clock)
             listeners[clock.id]?.start()
+        }
+    }
+
+    fun createListenerFor(clock: Clock) : TickListener {
+        return when(clock.channel!!.type) {
+            "rabbit" -> RabbitTickListener(clock)
+            "http" -> HttpTickListener(clock)
+            else -> NoTickListener(clock)
         }
     }
 
     fun stop() {
         stopAllListeners()
-        if (connection != null) {
-            connection!!.close()
-            connection = null
-        }
-        closeChannel()
     }
 
     private fun stopAllListeners() {
@@ -69,39 +56,85 @@ object Client {
         listeners.clear()
     }
 
-    private fun closeChannel() {
-        if (isOpen(channel)) {
-            channel!!.close()
-            channel = null
+    abstract class TickListener(val clock: Clock) {
+        val messages: MutableList<String> = mutableListOf()
+
+        fun start() {
+            listenOn(clock)
+        }
+
+        abstract fun listenOn(clock: Clock)
+
+        open fun name() : String {
+            return "${clock.id} - ${clock.name} - ${clock.schedule}"
+        }
+
+        open fun stop() {
+            // do nothing by default
+        }
+
+        fun clear() {
+            messages.clear()
         }
     }
 
-    private fun isOpen(channel: Channel?) = channel != null && channel.isOpen
+    class RabbitTickListener(clock: Clock) : TickListener(clock) {
 
-    class TickListener(val channel: Channel, val queue: String) {
+        companion object {
+            var connection: Connection? = null
+            var channel: Channel? = null
+        }
 
-        val messages: MutableList<String> = mutableListOf()
         var consumerTag: String = ""
 
-        fun start() {
+        override fun listenOn(clock: Clock) {
+            createConnectionIfNeeded()
             val consumer = object : DefaultConsumer(channel) {
                 override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
                                             properties: AMQP.BasicProperties?, body: ByteArray?) {
                     messages.add(body.toString())
                 }
             }
-            consumerTag = channel.basicConsume(queue, true, consumer)
+            consumerTag = channel!!.basicConsume(clock.channel!!.details["queue"], true, consumer)
         }
 
-        fun stop() {
-            if (!consumerTag.isEmpty()) {
-                channel.basicCancel(consumerTag)
+        private fun createConnectionIfNeeded() {
+            if (connection == null) {
+                connection = createConnection(clock.channel)
+                channel = connection!!.createChannel()
             }
         }
 
-        fun clear() {
-            messages.clear()
+        private fun createConnection(channel: ClockChannel?): Connection {
+            val factory = ConnectionFactory()
+            factory.setUri(channel?.details!!["uri"])
+            return factory.newConnection()
         }
+
+        override fun stop() {
+            if (!consumerTag.isEmpty()) {
+                channel!!.basicCancel(consumerTag)
+            }
+        }
+
+
+    }
+
+    class HttpTickListener(clock: Clock) : TickListener(clock) {
+
+        override fun listenOn(clock: Clock) {
+            
+
+        }
+
+    }
+
+    class NoTickListener(clock: Clock) : TickListener(clock) {
+
+        override fun listenOn(clock: Clock) {
+            throw NotImplementedError()
+        }
+
     }
 
 }

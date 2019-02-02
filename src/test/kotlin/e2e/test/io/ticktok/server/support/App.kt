@@ -31,28 +31,31 @@ class App {
         const val ACCESS_TOKEN = "ct-auth-token"
         private var appInstance: App? = null
 
-        fun instance() : App {
+        fun instance(profile: String): App {
             if (appInstance == null) {
-                appInstance = App(System.getenv("APP_URL") ?: "http://localhost:8080")
+                appInstance = App()
                 if (System.getProperty("startApp", "yes") != "no") {
                     appInstance?.start()
                 }
             }
+            appInstance?.updateActiveProfileTo(profile)
             return appInstance as App;
         }
-
     }
 
-    var appUrl = "http://localhost:8080"
+    var appUrl = System.getenv("APP_URL") ?: "http://localhost:8080"
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
-
-    constructor(url: String) {
-        appUrl = System.getenv("APP_URL") ?: "http://localhost:8080"
-    }
+    private var currentProfile: String = ""
 
     fun start() {
-        Application.main("--spring.profiles.active=rabbit")
+        Application.main()
         waitForAppToBeHealthy()
+    }
+
+    fun updateActiveProfileTo(profile: String) {
+        currentProfile = profile
+        val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
+        assertThat(response.statusLine.statusCode, `is`(200))
     }
 
     private fun waitForAppToBeHealthy() {
@@ -65,13 +68,17 @@ class App {
     }
 
     fun registeredAClock(name: String, timeExpr: String): Clock {
-        val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
-                .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
-                .execute().returnResponse()
+        val response = requestClock(name, timeExpr)
         lastResponses.add(response)
         val clock = Gson().fromJson<Clock>(bodyOf(response))
         startListenOn(clock)
         return clock
+    }
+
+    private fun requestClock(name: String, timeExpr: String): HttpResponse {
+        return Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
+                .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
+                .execute().returnResponse()
     }
 
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
@@ -81,7 +88,7 @@ class App {
     }
 
     private fun withAuthToken(url: String?): String {
-        return "$url?access_token=$ACCESS_TOKEN"
+        return "$url${if (url!!.indexOf("?") > -1) "&" else "?"}access_token=$ACCESS_TOKEN"
     }
 
     private fun createClockRequestFor(name: String, timeExpr: String): String {
@@ -95,8 +102,13 @@ class App {
 
     private fun startListenOn(clock: Clock) {
         if (clock.channel != null) {
+            validateTickChannelType(clock)
             Client.startListenTo(clock)
         }
+    }
+
+    private fun validateTickChannelType(clock: Clock) {
+        assertThat(clock.channel!!.type, `is`(currentProfile))
     }
 
     fun isHealthy() {
@@ -131,7 +143,7 @@ class App {
         assertThat(getAllClocks(), matcher)
     }
 
-    private fun getAllClocks() : List<Clock> {
+    private fun getAllClocks(): List<Clock> {
         val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks")).execute().returnContent().asString()
         return Gson().fromJson(response, Array<Clock>::class.java).asList()
     }
