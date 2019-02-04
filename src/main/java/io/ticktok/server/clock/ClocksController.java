@@ -52,8 +52,7 @@ public class ClocksController {
                     message = "Clock created successfully",
                     responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)}),
             @ApiResponse(code = 400,
-                    message = "Bad request")
-    })
+                    message = "Bad request")})
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest) {
         log.info("CLOCK-REQUEST: {}", clockRequest.toString());
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());

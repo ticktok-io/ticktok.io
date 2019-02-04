@@ -11,10 +11,17 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.lang.Thread.sleep
+import java.util.stream.Stream
 
 @TestInstance(PER_CLASS)
 class ApiE2ETest : CommonAppE2ETest() {
+
+    companion object {
+
+    }
 
     @Test
     fun registerNewClock() {
@@ -22,11 +29,16 @@ class ApiE2ETest : CommonAppE2ETest() {
         app().retrievedRegisteredClock("kuku", CLOCK_EXPR)
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("appProvider")
     @Tag("sanity")
-    fun retrieveScheduledMessage() {
-        val clock = app().registeredAClock("kuku", CLOCK_EXPR)
+    fun retrieveScheduledMessage(brokerMethod: String) {
+        val clock = app(brokerMethod).registeredAClock("kuku", CLOCK_EXPR)
         Client.receivedTicksFor(clock)
+    }
+
+    fun appProvider(): Stream<String> {
+        return Stream.of("rabbit", "http")
     }
 
     @Test

@@ -1,12 +1,17 @@
 package e2e.test.io.ticktok.server.support
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.rabbitmq.client.*
+import org.apache.http.client.fluent.Request
 import org.awaitility.Duration
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
 import java.lang.Thread.sleep
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.timer
 import kotlin.test.assertTrue
 
 
@@ -39,8 +44,8 @@ object Client {
         }
     }
 
-    fun createListenerFor(clock: Clock) : TickListener {
-        return when(clock.channel!!.type) {
+    fun createListenerFor(clock: Clock): TickListener {
+        return when (clock.channel!!.type) {
             "rabbit" -> RabbitTickListener(clock)
             "http" -> HttpTickListener(clock)
             else -> NoTickListener(clock)
@@ -65,7 +70,7 @@ object Client {
 
         abstract fun listenOn(clock: Clock)
 
-        open fun name() : String {
+        open fun name(): String {
             return "${clock.id} - ${clock.name} - ${clock.schedule}"
         }
 
@@ -116,17 +121,30 @@ object Client {
                 channel!!.basicCancel(consumerTag)
             }
         }
-
-
     }
 
     class HttpTickListener(clock: Clock) : TickListener(clock) {
 
-        override fun listenOn(clock: Clock) {
-            
+        var listenerTimer: Timer? = null
 
+        override fun listenOn(clock: Clock) {
+            listenerTimer = timer(name = clock.id, period = 1000) {
+                object : TimerTask() {
+                    override fun run() {
+                        val content = Request.Get("${clock.url}/${clock.channel!!.details["url"]}?access_tocken=${App.ACCESS_TOKEN}")
+                                .execute()
+                                .returnContent().asString()
+                        val ticksJson = Gson().fromJson(content, JsonObject::class.java)
+                        val ticks = ticksJson.getAsJsonArray()
+                        ticks.forEach { t -> messages.add(t.asJsonObject.get("payload").asString) }
+                    }
+                }
+            }
         }
 
+        override fun stop() {
+            listenerTimer?.cancel()
+        }
     }
 
     class NoTickListener(clock: Clock) : TickListener(clock) {
