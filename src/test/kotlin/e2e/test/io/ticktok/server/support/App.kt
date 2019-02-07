@@ -29,6 +29,7 @@ class App {
 
     companion object {
         const val ACCESS_TOKEN = "ct-auth-token"
+        var appUrl = System.getenv("APP_URL") ?: "http://localhost:8080"
         private var appInstance: App? = null
 
         fun instance(profile: String): App {
@@ -43,19 +44,18 @@ class App {
         }
     }
 
-    var appUrl = System.getenv("APP_URL") ?: "http://localhost:8080"
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
     private var currentProfile: String = ""
 
     fun start() {
         Application.main()
-        waitForAppToBeHealthy()
     }
 
     fun updateActiveProfileTo(profile: String) {
         currentProfile = profile
         val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
         assertThat(response.statusLine.statusCode, `is`(200))
+        waitForAppToBeHealthy()
     }
 
     private fun waitForAppToBeHealthy() {

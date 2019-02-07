@@ -18,19 +18,19 @@ public class AdminController {
     private Environment env;
 
     @GetMapping("/restart")
-    public void restart(@RequestParam String profiles) {
-        if(Arrays.equals(currentProfiles(), requestProfiles(profiles))) {
+    public void restart(@RequestParam String profiles) throws InterruptedException {
+        if(!Arrays.equals(currentProfiles(), toSortedArray(profiles))) {
             Application.restart("--spring.profiles.active=" + profiles);
         }
     }
 
     private String[] currentProfiles() {
-        String[] p = env.getActiveProfiles();
+        String[] p = env.getDefaultProfiles();
         Arrays.sort(p);
         return p;
     }
 
-    private String[] requestProfiles(String profiles) {
+    private String[] toSortedArray(String profiles) {
         String[] p = profiles.split(",");
         Arrays.sort(p);
         return p;

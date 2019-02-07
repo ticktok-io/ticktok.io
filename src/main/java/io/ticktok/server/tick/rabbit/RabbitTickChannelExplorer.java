@@ -44,7 +44,16 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
         Queue queue = queueFor(clock);
         rabbitAdmin.declareQueue(queue);
         declareBindingFor(clock);
-        return TickChannel.rabbit(consumerRabbitUri, queue.getName());
+        return createTickChannelFor(queue);
+    }
+
+    private TickChannel createTickChannelFor(Queue queue) {
+        return TickChannel.builder()
+                .type(TickChannel.RABBIT)
+                .uri(consumerRabbitUri)
+                .queue(queue.getName())
+                .details(ImmutableMap.of("uri", consumerRabbitUri, "queue", queue.getName()))
+                .build();
     }
 
     private Queue queueFor(Clock clock) {
@@ -56,7 +65,7 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
     }
 
     private void declareBindingFor(Clock clock) {
-        if(clockQueueExists(clock)) {
+        if (clockQueueExists(clock)) {
             rabbitAdmin.declareBinding(clockBinding(clock));
         }
     }

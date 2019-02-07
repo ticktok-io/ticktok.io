@@ -1,6 +1,7 @@
 package e2e.test.io.ticktok.server.support
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.rabbitmq.client.*
 import org.apache.http.client.fluent.Request
@@ -11,7 +12,6 @@ import org.awaitility.kotlin.until
 import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.concurrent.timer
 import kotlin.test.assertTrue
 
 
@@ -21,7 +21,7 @@ object Client {
     private val listeners = hashMapOf<String, TickListener>()
 
     fun receivedTicksFor(clock: Clock) {
-        await atMost Duration(3, TimeUnit.SECONDS) until { listeners[clock.id]?.messages?.isNotEmpty()!! }
+        await atMost Duration(4, TimeUnit.SECONDS) until { listeners[clock.id]?.messages?.isNotEmpty()!! }
     }
 
     fun receivesNoMoreTicks() {
@@ -125,25 +125,23 @@ object Client {
 
     class HttpTickListener(clock: Clock) : TickListener(clock) {
 
-        var listenerTimer: Timer? = null
+        var listenerTimer: Timer = Timer(true);
 
         override fun listenOn(clock: Clock) {
-            listenerTimer = timer(name = clock.id, period = 1000) {
-                object : TimerTask() {
-                    override fun run() {
-                        val content = Request.Get("${clock.url}/${clock.channel!!.details["url"]}?access_tocken=${App.ACCESS_TOKEN}")
-                                .execute()
-                                .returnContent().asString()
-                        val ticksJson = Gson().fromJson(content, JsonObject::class.java)
-                        val ticks = ticksJson.getAsJsonArray()
-                        ticks.forEach { t -> messages.add(t.asJsonObject.get("payload").asString) }
-                    }
+            val task = object : TimerTask() {
+                override fun run() {
+                    val url = "${App.appUrl}${clock.channel!!.details["path"]}?access_token=${App.ACCESS_TOKEN}"
+                    val content = Request.Get(url).execute().returnContent().asString()
+                    val ticksJson = Gson().fromJson(content, JsonArray::class.java)
+                    val ticks = ticksJson.getAsJsonArray()
+                    ticks.forEach { t -> messages.add(t.asJsonObject.get("payload").asString) }
                 }
             }
+            listenerTimer.schedule(task, 0, 1000)
         }
 
         override fun stop() {
-            listenerTimer?.cancel()
+            listenerTimer.cancel()
         }
     }
 
@@ -152,7 +150,6 @@ object Client {
         override fun listenOn(clock: Clock) {
             throw NotImplementedError()
         }
-
     }
 
 }

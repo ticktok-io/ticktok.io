@@ -115,7 +115,7 @@ public class ClocksController {
     @PutMapping("/{id}/{action}")
     @ApiOperation(value = "Run an action on a specific clock")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> pause(
+    public ResponseEntity<Void> clockAction(
             @PathVariable String id,
             @ApiParam(required = true, allowableValues = "pause,resume") @PathVariable String action) {
         clockActionFactory.run(action, id);
