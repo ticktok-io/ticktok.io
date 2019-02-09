@@ -30,14 +30,15 @@ class ApiE2ETest : CommonAppE2ETest() {
     }
 
     @ParameterizedTest
-    @MethodSource("appProvider")
+    @MethodSource("brokerMethods")
     @Tag("sanity")
     fun retrieveScheduledMessage(brokerMethod: String) {
         val clock = app(brokerMethod).registeredAClock("kuku", CLOCK_EXPR)
         Client.receivedTicksFor(clock)
     }
 
-    fun appProvider(): Stream<String> {
+    @Suppress("unused")
+    fun brokerMethods(): Stream<String> {
         return Stream.of("rabbit", "http")
     }
 

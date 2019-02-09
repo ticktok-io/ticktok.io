@@ -5,11 +5,15 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.rabbitmq.client.*
 import org.apache.http.client.fluent.Request
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Duration
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
+import org.junit.jupiter.api.assertThrows
 import java.lang.Thread.sleep
+import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
@@ -62,7 +66,7 @@ object Client {
     }
 
     abstract class TickListener(val clock: Clock) {
-        val messages: MutableList<String> = mutableListOf()
+        val messages: MutableList<String> = Collections.synchronizedList(mutableListOf())
 
         fun start() {
             listenOn(clock)
@@ -97,7 +101,8 @@ object Client {
             val consumer = object : DefaultConsumer(channel) {
                 override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
                                             properties: AMQP.BasicProperties?, body: ByteArray?) {
-                    messages.add(body.toString())
+                    val bodyStr = body?.toString(Charset.forName("UTF-8"))
+                    messages.add(Gson().fromJson(bodyStr, JsonObject::class.java).get("schedule").asString)
                 }
             }
             consumerTag = channel!!.basicConsume(clock.channel!!.details["queue"], true, consumer)
@@ -130,11 +135,12 @@ object Client {
         override fun listenOn(clock: Clock) {
             val task = object : TimerTask() {
                 override fun run() {
+                    println("====>")
                     val url = "${App.appUrl}${clock.channel!!.details["path"]}?access_token=${App.ACCESS_TOKEN}"
                     val content = Request.Get(url).execute().returnContent().asString()
                     val ticksJson = Gson().fromJson(content, JsonArray::class.java)
-                    val ticks = ticksJson.getAsJsonArray()
-                    ticks.forEach { t -> messages.add(t.asJsonObject.get("payload").asString) }
+                    val ticks = ticksJson.asJsonArray
+                    ticks.forEach { t -> messages.add(t.asJsonObject.get("schedule").asString) }
                 }
             }
             listenerTimer.schedule(task, 0, 1000)

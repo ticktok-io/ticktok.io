@@ -2,6 +2,7 @@ package io.ticktok.server.tick.http;
 
 import io.ticktok.server.clock.V1Controller;
 import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -33,8 +35,8 @@ public class HttpConfiguration {
     public static class QueuesController {
 
         @GetMapping(HttpConfiguration.POP_PATH)
-        public List<String> pop(@PathVariable String id) {
-            return new ArrayList<>();
+        public List<TickMessage> pop(@PathVariable String id) {
+            return Arrays.asList(new TickMessage(""));
         }
     }
 }

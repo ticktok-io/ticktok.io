@@ -1,6 +1,7 @@
 package io.ticktok.server.admin;
 
 import io.ticktok.server.Application;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
 
+import static java.lang.Thread.sleep;
+
+@Slf4j
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -20,6 +24,7 @@ public class AdminController {
     @GetMapping("/restart")
     public void restart(@RequestParam String profiles) throws InterruptedException {
         if(!Arrays.equals(currentProfiles(), toSortedArray(profiles))) {
+            log.info("Changing active profile to: {}", profiles.toString());
             Application.restart("--spring.profiles.active=" + profiles);
         }
     }

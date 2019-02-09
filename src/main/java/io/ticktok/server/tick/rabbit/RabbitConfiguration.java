@@ -32,13 +32,13 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public ConnectionFactory connectionFactory() {
-        return new CachingConnectionFactory(URI.create(rabbitProperties.getUri()));
+    public RabbitTemplate rabbitTemplate() {
+        return new RabbitTemplate(connectionFactory());
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate() {
-        return new RabbitTemplate(connectionFactory());
+    public ConnectionFactory connectionFactory() {
+        return new CachingConnectionFactory(URI.create(rabbitProperties.getUri()));
     }
 
     @Bean

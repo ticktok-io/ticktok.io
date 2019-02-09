@@ -19,7 +19,7 @@ public class HttpTickChannelExplorer implements TickChannelExplorer {
     public TickChannel create(Clock clock) {
         return TickChannel.builder()
                 .type(TickChannel.HTTP)
-                .details(ImmutableMap.of("path", POP_PATH.replaceAll("\\{id}", clock.getId())))
+                .details(ImmutableMap.of("path", POP_PATH.replaceAll("\\{id}", "123")))
                 .build();
     }
 

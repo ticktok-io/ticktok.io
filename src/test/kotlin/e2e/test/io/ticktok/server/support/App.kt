@@ -49,6 +49,7 @@ class App {
 
     fun start() {
         Application.main()
+        waitForAppToBeHealthy()
     }
 
     fun updateActiveProfileTo(profile: String) {
@@ -56,6 +57,7 @@ class App {
         val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
         assertThat(response.statusLine.statusCode, `is`(200))
         waitForAppToBeHealthy()
+        println("App is healthy!")
     }
 
     private fun waitForAppToBeHealthy() {
