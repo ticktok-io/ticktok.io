@@ -30,7 +30,7 @@ public class AdminController {
     }
 
     private String[] currentProfiles() {
-        String[] p = env.getDefaultProfiles();
+        String[] p = env.getActiveProfiles().length == 0 ? env.getDefaultProfiles() : env.getActiveProfiles();
         Arrays.sort(p);
         return p;
     }

@@ -36,7 +36,7 @@ class App {
             if (appInstance == null) {
                 appInstance = App()
                 if (System.getProperty("startApp", "yes") != "no") {
-                    appInstance?.start()
+                    appInstance?.start(profile)
                 }
             }
             appInstance?.updateActiveProfileTo(profile)
@@ -47,17 +47,19 @@ class App {
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
     private var currentProfile: String = ""
 
-    fun start() {
-        Application.main()
+    fun start(profile: String) {
+        Application.main("--spring.profiles.active=$profile")
         waitForAppToBeHealthy()
     }
 
     fun updateActiveProfileTo(profile: String) {
-        currentProfile = profile
-        val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(200))
-        waitForAppToBeHealthy()
-        println("App is healthy!")
+        if(currentProfile != profile) {
+            currentProfile = profile
+            val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
+            assertThat(response.statusLine.statusCode, `is`(200))
+            waitForAppToBeHealthy()
+            println("App is healthy!")
+        }
     }
 
     private fun waitForAppToBeHealthy() {

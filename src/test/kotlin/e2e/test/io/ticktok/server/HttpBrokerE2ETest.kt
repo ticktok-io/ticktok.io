@@ -8,8 +8,4 @@ class HttpBrokerE2ETest : CommonAppE2ETest() {
         return App.instance("http")
     }
 
-    fun retrieveScheduledMessage() {
-        verifyRetrieveScheduledMessage(app)
-    }
-
 }
