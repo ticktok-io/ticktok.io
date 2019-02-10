@@ -1,9 +1,9 @@
-package e2e.test.io.ticktok.server.support
+package e2e.test.io.ticktok.server
 
+import e2e.test.io.ticktok.server.support.App
+import e2e.test.io.ticktok.server.support.Client
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import java.lang.Thread.sleep
 
 abstract class CommonAppE2ETest {
 
@@ -13,9 +13,7 @@ abstract class CommonAppE2ETest {
         Client.stop()
     }
 
-    fun app(profile: String = "rabbit"): App {
-        return App.instance(profile)
-    }
+    abstract fun app() : App
 
     @AfterAll
     open fun purgeApp() {
