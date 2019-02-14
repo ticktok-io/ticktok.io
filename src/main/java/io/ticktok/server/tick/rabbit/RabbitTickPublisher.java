@@ -4,22 +4,24 @@ import com.google.gson.Gson;
 import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
 import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.core.RabbitOperations;
 
 public class RabbitTickPublisher implements TickPublisher {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final RabbitOperations rabbitOperations;
     private final Exchange exchange;
 
-    public RabbitTickPublisher(RabbitTemplate rabbitTemplate, Exchange exchange) {
-        this.rabbitTemplate = rabbitTemplate;
+    public RabbitTickPublisher(RabbitOperations rabbitOperations, Exchange exchange) {
+        this.rabbitOperations = rabbitOperations;
         this.exchange = exchange;
     }
 
     @Override
     public void publish(String schedule) {
-        rabbitTemplate.convertAndSend(exchange.getName(), schedule, new Gson().toJson(new TickMessage("")));
+        rabbitOperations.convertAndSend(exchange.getName(), schedule, tickMessageFor(schedule));
+    }
+
+    private String tickMessageFor(String schedule) {
+        return new Gson().toJson(new TickMessage(schedule));
     }
 }
