@@ -1,5 +1,6 @@
 package io.ticktok.server.tick.http;
 
+import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelExplorer;
 import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
@@ -25,7 +26,7 @@ public class HttpConfiguration {
     }
 
     @Bean
-    public TickPublisher tickPublisher(HttpQueuesRepository repository) {
+    public TickPublisher tickPublisher(HttpQueuesRepository repository, ClocksRepository clocksRepository) {
         return new HttpTickPublisher(repository, clocksRepository);
     }
 

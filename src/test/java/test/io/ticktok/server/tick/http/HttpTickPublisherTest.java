@@ -7,23 +7,22 @@ import io.ticktok.server.tick.http.HttpQueuesRepository;
 import io.ticktok.server.tick.http.HttpTickPublisher;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.*;
 
 class HttpTickPublisherTest {
 
-    private HttpQueuesRepository queuesRepository = mock(HttpQueuesRepository.class);
-    private ClocksRepository clocksRepository = mock(ClocksRepository.class);
+    private final HttpQueuesRepository queuesRepository = mock(HttpQueuesRepository.class);
+    private final ClocksRepository clocksRepository = mock(ClocksRepository.class);
+    private final HttpTickPublisher httpTickPublisher = new HttpTickPublisher(queuesRepository, clocksRepository);
 
     @Test
-    void addNewTickToQueue() {
-        Clock clock = new Clock("11447711", "kuku", "every.666.seconds");
-        when(clocksRepository.findBySchedule(clock.getSchedule())).thenReturn(singletonList(clock));
-        new HttpTickPublisher(queuesRepository, clocksRepository).publish(clock.getSchedule());
-        verify(queuesRepository).add(asList("11447711"), new TickMessage(clock.getSchedule()));
+    void addNewTicksToQueue() {
+        Clock clock1 = new Clock("11447711", "kuku", "every.666.seconds");
+        Clock clock2 = new Clock("11445433", "popo", clock1.getId());
+        when(clocksRepository.findBySchedule(clock1.getSchedule())).thenReturn(asList(clock1, clock2));
+        httpTickPublisher.publish(clock1.getSchedule());
+        //verify(queuesRepository).add(asList(clock1.getId(), clock2.getId()), new TickMessage(clock1.getSchedule()));
     }
+
 }

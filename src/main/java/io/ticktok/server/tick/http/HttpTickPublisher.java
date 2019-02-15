@@ -1,7 +1,12 @@
 package io.ticktok.server.tick.http;
 
+import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class HttpTickPublisher implements TickPublisher {
     private final HttpQueuesRepository queuesRepository;
@@ -14,6 +19,10 @@ public class HttpTickPublisher implements TickPublisher {
 
     @Override
     public void publish(String schedule) {
-        queuesRepository.add(schedule);
+        //queuesRepository.add(clockIdsFor(schedule), new TickMessage(schedule));
+    }
+
+    private List<String> clockIdsFor(String schedule) {
+        return clocksRepository.findBySchedule(schedule).stream().map(Clock::getId).collect(Collectors.toList());
     }
 }

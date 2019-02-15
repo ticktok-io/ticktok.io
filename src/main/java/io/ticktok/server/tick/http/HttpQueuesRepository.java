@@ -1,6 +1,5 @@
 package io.ticktok.server.tick.http;
 
-import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.TickMessage;
 
 import java.util.List;
@@ -8,11 +7,16 @@ import java.util.List;
 public interface HttpQueuesRepository {
     List<TickMessage> pop(String clockId);
 
-    void add(String schedule);
+    HttpQueue createQueue(String name, String schedule);
 
-    void assignClock(String clockId, String schedule);
+    void push(TickMessage tickMessage);
 
-    void add(List<String> clocksIds, TickMessage tickMessage);
+    void deleteQueue(String name);
 
-    // void unassignClock(String clockId, String schedule);
+
+    class QueueNotExistsException extends RuntimeException {
+        public QueueNotExistsException(String message) {
+            super(message);
+        }
+    }
 }
