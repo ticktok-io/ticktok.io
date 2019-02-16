@@ -2,6 +2,7 @@ package io.ticktok.server.tick.rabbit;
 
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
+import io.ticktok.server.tick.QueueNameCreator;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;

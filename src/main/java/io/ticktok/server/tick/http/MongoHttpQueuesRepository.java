@@ -53,4 +53,17 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     public void deleteQueue(String name) {
         mongo.remove(Query.query(Criteria.where("name").is(name)), HttpQueue.class);
     }
+
+    @Override
+    public boolean isQueueExists(String queueName) {
+        return mongo.exists(Query.query(Criteria.where("name").is(queueName)), HttpQueue.class);
+    }
+
+    @Override
+    public void updateQueueSchedule(String queueName, String schedule) {
+        mongo.upsert(
+                Query.query(Criteria.where("name").is(queueName)),
+                Update.update("schedule", schedule),
+                HttpQueue.class);
+    }
 }

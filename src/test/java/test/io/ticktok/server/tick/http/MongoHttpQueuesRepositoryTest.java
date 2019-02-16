@@ -63,8 +63,9 @@ class MongoHttpQueuesRepositoryTest {
     }
 
     @Test
-    void retrieveEmptyListWhenQueueIsEmpty() {
+    void createNewQueue() {
         HttpQueue queue = createQueue("kuku", "every.666.seconds");
+        assertThat(repository.isQueueExists(queue.getName())).isTrue();
         assertThat(repository.pop(queue.getId())).isEmpty();
     }
 
@@ -79,7 +80,7 @@ class MongoHttpQueuesRepositoryTest {
         repository.push(new TickMessage("every.666.seconds"));
         repository.push(new TickMessage("every.666.seconds"));
         assertThat(repository.pop(queue.getId())).containsExactly(
-                new TickMessage("every.666.seconds"),new TickMessage("every.666.seconds"));
+                new TickMessage("every.666.seconds"), new TickMessage("every.666.seconds"));
     }
 
     @Test
@@ -101,5 +102,18 @@ class MongoHttpQueuesRepositoryTest {
         repository.push(new TickMessage("every.666.seconds"));
         assertThat(repository.pop(queue.getId())).hasSize(1);
         assertThat(repository.pop(queue.getId())).hasSize(0);
+    }
+
+    @Test
+    void shouldBeFalseOnNonExistingQueue() {
+        assertThat(repository.isQueueExists("no-name")).isFalse();
+    }
+
+    @Test
+    void shouldAlterAssignedSchedule() {
+        HttpQueue queue = createQueue("q-name", "every.666.seconds");
+        repository.updateQueueSchedule("q-name", "");
+        repository.push(new TickMessage("every.666.seconds"));
+        assertThat(repository.pop(queue.getId())).isEmpty();
     }
 }
