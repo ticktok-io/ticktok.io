@@ -5,8 +5,11 @@ import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.http.HttpQueue;
 import io.ticktok.server.tick.http.HttpQueuesRepository;
 import io.ticktok.server.tick.http.HttpQueuesRepository.QueueNotExistsException;
+import org.awaitility.Duration;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -17,19 +20,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.io.ticktok.server.support.IntegrationTest;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-@DataMongoTest
+@DataMongoTest(properties = {"queues.ttl=500"})
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {MongoHttpQueuesRepositoryTest.TestConfiguration.class})
 @ActiveProfiles({"http"})
+@IntegrationTest
 class MongoHttpQueuesRepositoryTest {
 
     @Configuration
@@ -115,5 +121,13 @@ class MongoHttpQueuesRepositoryTest {
         repository.updateQueueSchedule("q-name", "");
         repository.push(new TickMessage("every.666.seconds"));
         assertThat(repository.pop(queue.getId())).isEmpty();
+    }
+
+    @Test
+    @DisabledIfSystemProperty(named = "scope", matches = "core")
+    @Tag("slow")
+    void deleteQueueIfNotInUse() {
+        createQueue("q-name", "every.666.seconds");
+        await().atMost(Duration.ONE_MINUTE).until(() -> !repository.isQueueExists("q-name"));
     }
 }

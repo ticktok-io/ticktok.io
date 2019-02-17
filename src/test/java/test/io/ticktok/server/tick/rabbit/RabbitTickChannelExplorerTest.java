@@ -6,6 +6,7 @@ import io.ticktok.server.tick.rabbit.RabbitConfiguration;
 import io.ticktok.server.tick.rabbit.RabbitProperties;
 import io.ticktok.server.tick.rabbit.RabbitTickChannelExplorer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.amqp.core.AmqpAdmin;
@@ -22,6 +23,7 @@ import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.io.ticktok.server.support.IntegrationTest;
 
 import static java.lang.Thread.sleep;
 import static org.hamcrest.core.Is.is;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = {RabbitConfiguration.class})
 @EnableConfigurationProperties(RabbitProperties.class)
 @SpringBootTest(properties = {"rabbit.queue.ttl=500"})
+@IntegrationTest
 class RabbitTickChannelExplorerTest {
 
     public static final Clock CLOCK = new Clock("kuku", "every.111.seconds");

@@ -3,6 +3,7 @@ package e2e.test.io.ticktok.server.support
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import com.rabbitmq.client.AMQP
 import io.ticktok.server.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
@@ -248,7 +249,7 @@ class App {
 
         override fun matches(item: Any?): Boolean {
             return (item as List<*>).firstOrNull {
-                it == clock
+                it == clock.copy(status = (it as Clock).status)
             } != null
         }
 

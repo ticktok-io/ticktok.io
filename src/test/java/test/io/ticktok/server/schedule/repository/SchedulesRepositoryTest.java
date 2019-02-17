@@ -2,6 +2,7 @@ package test.io.ticktok.server.schedule.repository;
 
 import io.ticktok.server.schedule.Schedule;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.io.ticktok.server.support.IntegrationTest;
 import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
 import java.time.Clock;
@@ -25,6 +27,7 @@ import static org.hamcrest.core.Is.is;
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SchedulesRepositoryTestConfiguration.class, RepositoryCleanupExtension.class})
+@IntegrationTest
 class SchedulesRepositoryTest {
 
     static final int SECOND = 1000;

@@ -2,8 +2,12 @@ package e2e.test.io.ticktok.server
 
 import e2e.test.io.ticktok.server.support.App
 import e2e.test.io.ticktok.server.support.Client
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 
+@DisabledIfSystemProperty(named = "scope", matches = "core")
+@Tag("ct")
 class HttpBrokerE2ETest : CommonAppE2ETest() {
 
     override fun app(): App {
@@ -16,12 +20,5 @@ class HttpBrokerE2ETest : CommonAppE2ETest() {
 
     }
 
-//    @Test
-//    fun retrieveScheduledMessage() {
-//        val clock = app().registeredAClock("kuku", "every.30.seconds")
-//        Client.receivedTicksFor(clock)
-//        Client.receivesNoMoreTicksFor(clock)
-//        Client.receivedTicksFor(app().registeredAClock("popov", "every.40.seconds"))
-//    }
 
 }

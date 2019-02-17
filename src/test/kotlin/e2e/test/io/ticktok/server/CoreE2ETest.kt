@@ -13,7 +13,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 import java.lang.Thread.sleep
 
-
+@Tag("ct")
 class CoreE2ETest : CommonAppE2ETest() {
 
     override fun app(): App {
@@ -101,8 +101,9 @@ class CoreE2ETest : CommonAppE2ETest() {
     }
 
     @Nested
-    @DisabledIfSystemProperty(named = "scope", matches = "server")
+    @DisabledIfSystemProperty(named = "scope", matches = "core")
     @TestInstance(PER_CLASS)
+    @Tag("ui")
     inner class DashboardTests {
 
         private val browser = Browser()

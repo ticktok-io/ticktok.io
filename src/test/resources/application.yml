@@ -18,6 +18,9 @@ management:
     web:
       base-path: /mgmt
 
+queues:
+  ttl: 1000
+
 clocks:
   purge:
     interval: 2000

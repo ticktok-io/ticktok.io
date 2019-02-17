@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -24,6 +25,7 @@ public class HttpQueue {
     private String name;
     private String schedule;
     private List<TickMessage> ticks = new ArrayList<>();
+    private Date lastAccessedTime;
 
     public HttpQueue(String name, String schedule) {
         this.name = name;

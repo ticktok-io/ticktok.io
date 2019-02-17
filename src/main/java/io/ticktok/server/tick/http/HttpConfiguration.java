@@ -3,6 +3,7 @@ package io.ticktok.server.tick.http;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelExplorer;
 import io.ticktok.server.tick.TickPublisher;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -25,7 +26,7 @@ public class HttpConfiguration {
     }
 
     @Bean
-    public HttpQueuesRepository queuesRepository(MongoOperations mongoOperations) {
-        return new MongoHttpQueuesRepository(mongoOperations);
+    public HttpQueuesRepository queuesRepository(@Value("${queues.ttl}") String queueTTL, MongoOperations mongoOperations) {
+        return new MongoHttpQueuesRepository(queueTTL, mongoOperations);
     }
 }
