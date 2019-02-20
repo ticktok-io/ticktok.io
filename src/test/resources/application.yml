@@ -8,7 +8,7 @@ http:
 
 spring:
   profiles:
-    default: rabbit
+    active: rabbit
   data:
     mongodb:
       uri: mongodb://localhost/ticktok_test

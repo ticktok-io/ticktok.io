@@ -49,7 +49,7 @@ class App {
     private var currentProfile: String = ""
 
     fun start(profile: String) {
-        Application.main("--spring.profiles.active=$profile")
+        Application.main()
         waitForAppToBeHealthy()
     }
 
