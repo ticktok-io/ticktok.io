@@ -5,10 +5,13 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.rabbitmq.client.*
 import org.apache.http.client.fluent.Request
+import org.apache.http.util.EntityUtils
+import org.assertj.core.api.Assertions
 import org.awaitility.Duration
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
+import org.awaitility.kotlin.untilNotNull
 import java.lang.Thread.sleep
 import java.nio.charset.Charset
 import java.util.*
@@ -65,8 +68,18 @@ object Client {
         listeners.clear()
     }
 
+    fun failToFindQueue() {
+        await atMost Duration(4, TimeUnit.SECONDS) untilNotNull  { firstListenerWithError() }
+        Assertions.assertThat(firstListenerWithError()!!.errors[0]).contains("Error: 404")
+    }
+
+    fun firstListenerWithError() : TickListener? {
+        return listeners.values.find { l -> !l.errors.isEmpty() }
+    }
+
     abstract class TickListener(val clock: Clock) {
         val messages: MutableList<JsonObject> = Collections.synchronizedList(mutableListOf())
+        val errors: MutableList<String> = Collections.synchronizedList(mutableListOf())
 
         fun start() {
             listenOn(clock)
@@ -136,10 +149,15 @@ object Client {
             val task = object : TimerTask() {
                 override fun run() {
                     val url = "${App.appUrl}${clock.channel!!.details["path"]}?access_token=${App.ACCESS_TOKEN}"
-                    val content = Request.Get(url).execute().returnContent().asString()
-                    val ticksJson = Gson().fromJson(content, JsonArray::class.java)
-                    val ticks = ticksJson.asJsonArray
-                    ticks.forEach { t -> messages.add(t.asJsonObject) }
+                    val response = Request.Get(url).execute().returnResponse()
+                    val content = EntityUtils.toString(response.entity)
+                    if(response.statusLine.statusCode != 200) {
+                        errors.add("Error: ${response.statusLine.statusCode} [$content]")
+                    } else {
+                        val ticksJson = Gson().fromJson(content, JsonArray::class.java)
+                        val ticks = ticksJson.asJsonArray
+                        ticks.forEach { t -> messages.add(t.asJsonObject) }
+                    }
                 }
             }
             listenerTimer.schedule(task, 0, 1000)

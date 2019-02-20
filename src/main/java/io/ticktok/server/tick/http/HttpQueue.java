@@ -27,8 +27,4 @@ public class HttpQueue {
     private List<TickMessage> ticks = new ArrayList<>();
     private Date lastAccessedTime;
 
-    public HttpQueue(String name, String schedule) {
-        this.name = name;
-        this.schedule = schedule;
-    }
 }

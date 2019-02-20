@@ -1,6 +1,5 @@
 package io.ticktok.server.tick.http;
 
-import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelExplorer;
 import io.ticktok.server.tick.TickPublisher;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,15 +12,15 @@ import org.springframework.data.mongodb.core.MongoOperations;
 @Profile("http")
 public class HttpConfiguration {
 
-    public static final java.lang.String POP_PATH = "/api/v1/queues/{id}/pop";
+    public static final String POP_PATH = "/api/v1/queues/{id}/pop";
 
     @Bean
-    public TickChannelExplorer tickChannelExplorer(HttpQueuesRepository httpQueuesRepository) {
-        return new HttpTickChannelExplorer(httpQueuesRepository);
+    public TickChannelExplorer tickChannelExplorer(HttpQueuesRepository queuesRepository) {
+        return new HttpTickChannelExplorer(queuesRepository);
     }
 
     @Bean
-    public TickPublisher tickPublisher(HttpQueuesRepository repository, ClocksRepository clocksRepository) {
+    public TickPublisher tickPublisher(HttpQueuesRepository repository) {
         return new HttpTickPublisher(repository);
     }
 
