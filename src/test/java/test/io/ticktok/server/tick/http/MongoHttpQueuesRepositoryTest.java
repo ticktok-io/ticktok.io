@@ -48,10 +48,6 @@ class MongoHttpQueuesRepositoryTest {
         }
     }
 
-    public static final String SCHEDULE = "every.9.seconds";
-    public static final String CLOCK_1_ID = "1415";
-    public static final String CLOCK_2_ID = "73529";
-
     private List<String> createdQueues = new ArrayList<>();
 
     @Autowired
