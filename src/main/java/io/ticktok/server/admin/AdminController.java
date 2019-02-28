@@ -24,7 +24,7 @@ public class AdminController {
     @GetMapping("/restart")
     public void restart(@RequestParam String profiles) throws InterruptedException {
         if(!Arrays.equals(currentProfiles(), toSortedArray(profiles))) {
-            log.info("Changing active profile to: {}", profiles.toString());
+            log.info("Changing active profile to: {}", profiles);
             Application.restart("--spring.profiles.active=" + profiles);
         }
     }
