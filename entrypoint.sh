@@ -8,4 +8,4 @@ if [[ -z "${MONGO_URI}" ]]; then
     mkdir /tmp/mongo
     mongod --storageEngine ephemeralForTest --dbpath /tmp/mongo &
 fi
-exec java -Dserver.port=$port -Xmx32m -Xss256k -Djava.security.egd=file:/dev/./urandom -jar /opt/app/app.jar
+exec java -Dserver.port=$port -Xmx64m -Xss512k -Djava.security.egd=file:/dev/./urandom -jar /opt/app/app.jar

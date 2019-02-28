@@ -8,10 +8,13 @@ http:
 
 spring:
   profiles:
-    default: rabbit
+    active: rabbit
   data:
     mongodb:
       uri: ${MONGO_URI}
+
+queues:
+  ttl: 120000
 
 management:
   endpoints:

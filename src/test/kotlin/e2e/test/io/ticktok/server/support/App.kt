@@ -50,11 +50,12 @@ class App {
 
     fun start(profile: String) {
         Application.main()
-        waitForAppToBeHealthy()
+        appInstance?.waitForAppToBeHealthy()
     }
 
     fun updateActiveProfileTo(profile: String) {
         if(currentProfile != profile) {
+            appInstance?.waitForAppToBeHealthy()
             currentProfile = profile
             val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
             assertThat(response.statusLine.statusCode, `is`(200))
