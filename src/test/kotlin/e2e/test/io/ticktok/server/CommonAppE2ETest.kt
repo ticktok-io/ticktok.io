@@ -21,6 +21,7 @@ abstract class CommonAppE2ETest {
     @AfterAll
     open fun purgeApp() {
         app().purge()
+        app().shutdown()
     }
 
     @Test

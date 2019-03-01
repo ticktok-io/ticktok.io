@@ -13,7 +13,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 import java.lang.Thread.sleep
 
-@Tag("ct")
+@Tag("core-tests")
 class CoreE2ETest : CommonAppE2ETest() {
 
     override fun app(): App {

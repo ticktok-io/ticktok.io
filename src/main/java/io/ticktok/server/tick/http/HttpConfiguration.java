@@ -14,6 +14,10 @@ public class HttpConfiguration {
 
     public static final String POP_PATH = "/api/v1/queues/{id}/pop";
 
+    public static String popPathForId(String id) {
+       return POP_PATH.replaceAll("\\{id}", id);
+    }
+
     @Bean
     public TickChannelExplorer tickChannelExplorer(HttpQueuesRepository queuesRepository) {
         return new HttpTickChannelExplorer(queuesRepository);

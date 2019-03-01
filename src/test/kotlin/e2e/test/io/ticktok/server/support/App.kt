@@ -40,7 +40,7 @@ class App {
                     appInstance?.start(profile)
                 }
             }
-            appInstance?.updateActiveProfileTo(profile)
+//            appInstance?.updateActiveProfileTo(profile)
             return appInstance as App;
         }
     }
@@ -49,7 +49,8 @@ class App {
     private var currentProfile: String = ""
 
     fun start(profile: String) {
-        Application.main()
+        currentProfile = profile
+        Application.main("--spring.profiles.active=$profile")
         appInstance?.waitForAppToBeHealthy()
     }
 
@@ -241,6 +242,12 @@ class App {
     fun invokeUnknownActionOn(clock: Clock) {
         val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/unknown")).execute().returnResponse()
         lastResponses.add(response)
+    }
+
+    fun shutdown() {
+        assertThat(Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse().statusLine.statusCode, `is`(200))
+        appInstance = null
+        currentProfile = ""
     }
 
     class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {

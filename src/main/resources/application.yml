@@ -17,8 +17,13 @@ queues:
   ttl: 120000
 
 management:
+  endpoint:
+    shutdown:
+      enabled: true
   endpoints:
     web:
+      exposure:
+        include: health, shutdown, env, info
       base-path: /mgmt
 
 clocks:

@@ -14,8 +14,13 @@ spring:
       uri: mongodb://localhost/ticktok_test
 
 management:
+  endpoint:
+    shutdown:
+      enabled: true
   endpoints:
     web:
+      exposure:
+        include: health, shutdown, env
       base-path: /mgmt
 
 queues:

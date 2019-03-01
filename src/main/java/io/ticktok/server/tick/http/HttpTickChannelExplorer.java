@@ -7,6 +7,7 @@ import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 
 import static io.ticktok.server.tick.http.HttpConfiguration.POP_PATH;
+import static io.ticktok.server.tick.http.HttpConfiguration.popPathForId;
 
 
 public class HttpTickChannelExplorer implements TickChannelExplorer {
@@ -31,7 +32,7 @@ public class HttpTickChannelExplorer implements TickChannelExplorer {
         HttpQueue httpQueue = queuesRepository.createQueue(queueNameFor(clock), clock.getSchedule());
         return TickChannel.builder()
                 .type(TickChannel.HTTP)
-                .details(ImmutableMap.of("path", POP_PATH.replaceAll("\\{id}", httpQueue.getId())))
+                .details(ImmutableMap.of("path", popPathForId(httpQueue.getId())))
                 .build();
     }
 

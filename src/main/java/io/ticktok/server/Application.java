@@ -14,12 +14,10 @@ public class Application {
     }
 
     public static void restart(String... args) {
-        System.gc();
         Thread thread = new Thread(() -> {
             context.close();
             System.gc();
             context = SpringApplication.run(Application.class, args);
-            context.refresh();
         });
         thread.setDaemon(false);
         thread.start();

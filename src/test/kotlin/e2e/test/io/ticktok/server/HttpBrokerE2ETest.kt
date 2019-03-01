@@ -9,22 +9,10 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 import java.lang.Thread.sleep
 
 @DisabledIfSystemProperty(named = "scope", matches = "core")
-@Tag("ct")
+@Tag("http-broker-tests")
 class HttpBrokerE2ETest : CommonAppE2ETest() {
 
     override fun app(): App {
         return App.instance("http")
     }
-
-
-    @Test
-    fun failOnNonExistingQueue() {
-        val clock = app().registeredAClock("http-404", CLOCK_EXPR)
-        Client.stop()
-        sleep(1000 * 60)
-        Client.startListenTo(clock)
-        Client.failToFindQueue()
-    }
-
-
 }
