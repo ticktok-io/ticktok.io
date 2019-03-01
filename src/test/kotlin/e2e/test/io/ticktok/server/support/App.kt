@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
 import java.util.*
 
-class App {
+class App(profile: String) {
 
     companion object {
         const val ACCESS_TOKEN = "ct-auth-token"
@@ -35,23 +35,21 @@ class App {
 
         fun instance(profile: String): App {
             if (appInstance == null) {
-                appInstance = App()
+                appInstance = App(profile)
                 if (System.getProperty("startApp", "yes") != "no") {
-                    appInstance?.start(profile)
+                    appInstance?.start()
                 }
                 appInstance?.waitForAppToBeHealthy()
             }
-//            appInstance?.updateActiveProfileTo(profile)
             return appInstance as App;
         }
     }
 
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
-    private var currentProfile: String = ""
+    private var currentProfile: String = profile
 
-    fun start(profile: String) {
-        currentProfile = profile
-        Application.main("--spring.profiles.active=$profile")
+    fun start() {
+        Application.main("--spring.profiles.active=$currentProfile")
     }
 
     fun updateActiveProfileTo(profile: String) {
