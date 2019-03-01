@@ -39,6 +39,7 @@ class App {
                 if (System.getProperty("startApp", "yes") != "no") {
                     appInstance?.start(profile)
                 }
+                appInstance?.waitForAppToBeHealthy()
             }
 //            appInstance?.updateActiveProfileTo(profile)
             return appInstance as App;
@@ -51,7 +52,6 @@ class App {
     fun start(profile: String) {
         currentProfile = profile
         Application.main("--spring.profiles.active=$profile")
-        appInstance?.waitForAppToBeHealthy()
     }
 
     fun updateActiveProfileTo(profile: String) {
