@@ -6,13 +6,9 @@ services:
     ports:
     - 8080:8080
     environment:
-    - RABBIT_URI=amqp://rabbit
     - ACCESS_TOKEN=${E2E_ACCESS_TOKEN}
-    - RABBIT_CONSUMERURI=amqp://localhost
     - RABBIT_QUEUE_TTL=5000
     - CLOCKS_PURGE_INTERVAL=4000
     - SCHEDULES_PURGE_INTERVAL=250
     - TICKS_PURGE_INTERVAL=500
     - TICKS_PURGE_KEEPCOUNT=1
-    depends_on:
-    - rabbit
