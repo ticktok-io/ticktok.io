@@ -31,12 +31,13 @@ class App(profile: String) {
     companion object {
         const val ACCESS_TOKEN = "ct-auth-token"
         var appUrl = System.getenv("APP_URL") ?: "http://localhost:8080"
+        var startApp = System.getProperty("startApp", "yes") != "no"
         private var appInstance: App? = null
 
         fun instance(profile: String): App {
             if (appInstance == null) {
                 appInstance = App(profile)
-                if (System.getProperty("startApp", "yes") != "no") {
+                if (startApp) {
                     appInstance?.start()
                 }
                 appInstance?.waitForAppToBeHealthy()
@@ -53,7 +54,7 @@ class App(profile: String) {
     }
 
     fun updateActiveProfileTo(profile: String) {
-        if(currentProfile != profile) {
+        if (currentProfile != profile) {
             appInstance?.waitForAppToBeHealthy()
             currentProfile = profile
             val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
@@ -243,7 +244,9 @@ class App(profile: String) {
     }
 
     fun shutdown() {
-        assertThat(Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse().statusLine.statusCode, `is`(200))
+        if (startApp) {
+            assertThat(Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse().statusLine.statusCode, `is`(200))
+        }
         appInstance = null
         currentProfile = ""
     }
