@@ -35,13 +35,17 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
 
     @PostConstruct
     public void createTTLIndex() {
+        dropTTLIndexIfNeeded();
+        mongo.indexOps(HttpQueue.class).ensureIndex(
+                new Index().named(QUEUE_TTL).on(LAST_ACCESSED_TIME, Sort.Direction.ASC).expire(queueTTL, TimeUnit.MILLISECONDS));
+    }
+
+    private void dropTTLIndexIfNeeded() {
         try {
             mongo.indexOps(HttpQueue.class).dropIndex(QUEUE_TTL);
         } catch (UncategorizedMongoDbException e) {
             // Index not found, ignore
         }
-        mongo.indexOps(HttpQueue.class).ensureIndex(
-                new Index().named(QUEUE_TTL).on(LAST_ACCESSED_TIME, Sort.Direction.ASC).expire(queueTTL, TimeUnit.MILLISECONDS));
     }
 
     @Override

@@ -98,7 +98,7 @@ jobs:
 
     - run:
         name: Sandbox sanity testing
-        command: ./gradlew test -Ptags=http-broker-tests -DstartApp=no --scan --info
+        command: ./gradlew test -Ptags=http-broker-tests -DstartApp=no --scan
 
     - run:
         name: Collect app logs

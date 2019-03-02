@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.rabbitmq.client.*
+import org.apache.http.HttpResponse
 import org.apache.http.client.fluent.Request
 import org.apache.http.util.EntityUtils
 import org.assertj.core.api.Assertions
@@ -69,11 +70,11 @@ object Client {
     }
 
     fun failToFindQueue() {
-        await atMost Duration(4, TimeUnit.SECONDS) untilNotNull  { firstListenerWithError() }
+        await atMost Duration(4, TimeUnit.SECONDS) untilNotNull { firstListenerWithError() }
         Assertions.assertThat(firstListenerWithError()!!.errors[0]).contains("Error: 404")
     }
 
-    fun firstListenerWithError() : TickListener? {
+    fun firstListenerWithError(): TickListener? {
         return listeners.values.find { l -> !l.errors.isEmpty() }
     }
 
@@ -149,18 +150,21 @@ object Client {
             val task = object : TimerTask() {
                 override fun run() {
                     val url = "${App.appUrl}${clock.channel!!.details["path"]}?access_token=${App.ACCESS_TOKEN}"
-                    val response = Request.Get(url).execute().returnResponse()
-                    val content = EntityUtils.toString(response.entity)
-                    if(response.statusLine.statusCode != 200) {
-                        errors.add("Error: ${response.statusLine.statusCode} [$content]")
-                    } else {
-                        val ticksJson = Gson().fromJson(content, JsonArray::class.java)
-                        val ticks = ticksJson.asJsonArray
-                        ticks.forEach { t -> messages.add(t.asJsonObject) }
-                    }
+                    actOnPopResponse(Request.Get(url).execute().returnResponse())
                 }
             }
             listenerTimer.schedule(task, 0, 1000)
+        }
+
+        fun actOnPopResponse(response: HttpResponse) {
+            val content = EntityUtils.toString(response.entity)
+            if (response.statusLine.statusCode != 200) {
+                errors.add("Error: ${response.statusLine.statusCode} [$content]")
+            } else {
+                val ticksJson = Gson().fromJson(content, JsonArray::class.java)
+                val ticks = ticksJson.asJsonArray
+                ticks.forEach { t -> messages.add(t.asJsonObject) }
+            }
         }
 
         override fun stop() {
