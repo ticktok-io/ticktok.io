@@ -3,7 +3,6 @@ package e2e.test.io.ticktok.server.support
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import com.rabbitmq.client.AMQP
 import io.ticktok.server.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
@@ -51,17 +50,6 @@ class App(profile: String) {
 
     fun start() {
         Application.main("--spring.profiles.active=$currentProfile")
-    }
-
-    fun updateActiveProfileTo(profile: String) {
-        if (currentProfile != profile) {
-            appInstance?.waitForAppToBeHealthy()
-            currentProfile = profile
-            val response = Request.Get(createAuthenticatedUrlFor("/admin/restart?profiles=$profile")).execute().returnResponse()
-            assertThat(response.statusLine.statusCode, `is`(200))
-            waitForAppToBeHealthy()
-            println("App is healthy!")
-        }
     }
 
     private fun waitForAppToBeHealthy() {
