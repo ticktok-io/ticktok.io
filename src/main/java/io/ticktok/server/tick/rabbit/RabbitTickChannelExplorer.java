@@ -2,6 +2,7 @@ package io.ticktok.server.tick.rabbit;
 
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
+import io.ticktok.server.tick.QueueNameCreator;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
         Queue queue = queueFor(clock);
         rabbitAdmin.declareQueue(queue);
         declareBindingFor(clock);
-        return new TickChannel(consumerRabbitUri, queue.getName());
+        return createTickChannelFor(queue);
     }
 
     private Queue queueFor(Clock clock) {
@@ -56,13 +57,22 @@ public class RabbitTickChannelExplorer implements TickChannelExplorer {
     }
 
     private void declareBindingFor(Clock clock) {
-        if(clockQueueExists(clock)) {
+        if (clockQueueExists(clock)) {
             rabbitAdmin.declareBinding(clockBinding(clock));
         }
     }
 
     private Binding clockBinding(Clock clock) {
         return BindingBuilder.bind(queueFor(clock)).to(exchange).with(clock.getSchedule());
+    }
+
+    private TickChannel createTickChannelFor(Queue queue) {
+        return TickChannel.builder()
+                .type(TickChannel.RABBIT)
+                .uri(consumerRabbitUri)
+                .queue(queue.getName())
+                .details(ImmutableMap.of("uri", consumerRabbitUri, "queue", queue.getName()))
+                .build();
     }
 
     @Override

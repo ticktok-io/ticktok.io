@@ -6,18 +6,24 @@ import io.ticktok.server.tick.rabbit.RabbitConfiguration;
 import io.ticktok.server.tick.rabbit.RabbitProperties;
 import io.ticktok.server.tick.rabbit.RabbitTickChannelExplorer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test.io.ticktok.server.support.IntegrationTest;
 
 import static java.lang.Thread.sleep;
 import static org.hamcrest.core.Is.is;
@@ -30,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ContextConfiguration(classes = {RabbitConfiguration.class})
 @EnableConfigurationProperties(RabbitProperties.class)
 @SpringBootTest(properties = {"rabbit.queue.ttl=500"})
+@IntegrationTest
 class RabbitTickChannelExplorerTest {
 
     public static final Clock CLOCK = new Clock("kuku", "every.111.seconds");

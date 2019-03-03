@@ -7,13 +7,26 @@ http:
   auth-token: ${ACCESS_TOKEN:41082cd7e33aa93ee76635820ded697f2c0b1b32}
 
 spring:
+  profiles:
+    active: rabbit
   data:
     mongodb:
       uri: ${MONGO_URI}
 
+queues:
+  ttl: 120000
+
+
 management:
+  health:
+    defaults:
+      enabled: false
+    mongo:
+      enabled: true
   endpoints:
     web:
+      exposure:
+        include: health
       base-path: /mgmt
 
 clocks:

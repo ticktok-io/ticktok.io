@@ -7,14 +7,27 @@ http:
   auth-token: a5f98e2b068ee51f90fd81c530e7fb4e306e7f42
 
 spring:
+  profiles:
+    active: rabbit
   data:
     mongodb:
       uri: mongodb://localhost/ticktok_test
 
 management:
+  health:
+    defaults:
+      enabled: false
+  endpoint:
+    shutdown:
+      enabled: true
   endpoints:
     web:
+      exposure:
+        include: health, shutdown, env
       base-path: /mgmt
+
+queues:
+  ttl: 1000
 
 clocks:
   purge:

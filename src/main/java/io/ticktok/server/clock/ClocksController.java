@@ -52,8 +52,7 @@ public class ClocksController {
                     message = "Clock created successfully",
                     responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)}),
             @ApiResponse(code = 400,
-                    message = "Bad request")
-    })
+                    message = "Bad request")})
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest) {
         log.info("CLOCK-REQUEST: {}", clockRequest.toString());
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
@@ -116,7 +115,7 @@ public class ClocksController {
     @PutMapping("/{id}/{action}")
     @ApiOperation(value = "Run an action on a specific clock")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> pause(
+    public ResponseEntity<Void> clockAction(
             @PathVariable String id,
             @ApiParam(required = true, allowableValues = "pause,resume") @PathVariable String action) {
         clockActionFactory.run(action, id);

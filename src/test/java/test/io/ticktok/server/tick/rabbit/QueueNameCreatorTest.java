@@ -1,7 +1,7 @@
 package test.io.ticktok.server.tick.rabbit;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.rabbit.QueueNameCreator;
+import io.ticktok.server.tick.QueueNameCreator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

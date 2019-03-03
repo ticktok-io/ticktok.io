@@ -1,18 +1,24 @@
 package io.ticktok.server.tick;
 
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter
+import java.util.Map;
+
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
 @EqualsAndHashCode
 @ToString
 public class TickChannel {
 
+    public static final String RABBIT = "rabbit";
+    public static final String HTTP = "http";
+
+    private String type;
     private String uri;
     private String queue;
+    private Map<String, String> details;
 
 }
