@@ -65,10 +65,10 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     }
 
     @Override
-    public HttpQueue createQueue(String name, String schedule) {
+    public HttpQueue createQueue(String name) {
         return mongo.findAndModify(
                 Query.query(Criteria.where(NAME).is(name)),
-                Update.update(SCHEDULE, schedule).set(LAST_ACCESSED_TIME, new Date()),
+                Update.update(LAST_ACCESSED_TIME, new Date()),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 HttpQueue.class);
     }

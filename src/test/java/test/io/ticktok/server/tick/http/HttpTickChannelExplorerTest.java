@@ -6,7 +6,6 @@ import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.http.HttpQueue;
 import io.ticktok.server.tick.http.HttpQueuesRepository;
 import io.ticktok.server.tick.http.HttpTickChannelExplorer;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static io.ticktok.server.tick.http.HttpConfiguration.POP_PATH;
@@ -23,7 +22,7 @@ class HttpTickChannelExplorerTest {
     @Test
     void createNewQueue() {
         HttpQueue httpQueue = HttpQueue.builder().id("32415").build();
-        when(queuesRepository.createQueue(queueName(), CLOCK.getSchedule())).thenReturn(httpQueue);
+        when(queuesRepository.createQueue(queueName())).thenReturn(httpQueue);
         TickChannel tickChannel = tickChannelExplorer.create(CLOCK);
         assertThat(tickChannel.getDetails().get("path")).isEqualTo(
                 POP_PATH.replaceAll("\\{id}", httpQueue.getId()));

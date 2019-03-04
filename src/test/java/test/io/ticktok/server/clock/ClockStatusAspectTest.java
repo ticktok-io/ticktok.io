@@ -57,12 +57,6 @@ class ClockStatusAspectTest {
     }
 
     @Test
-    void activateClock() {
-        tickChannelExplorer.create(CLOCK);
-        verify(clocksRepository).updateStatus(CLOCK.getId(), Clock.ACTIVE);
-    }
-
-    @Test
     void pauseClockAfterClockDisable() {
         tickChannelExplorer.disable(CLOCK);
         verify(clocksRepository).updateStatus(CLOCK.getId(), Clock.PAUSED);

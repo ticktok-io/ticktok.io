@@ -6,6 +6,7 @@ import io.ticktok.server.clock.repository.ClocksFinder;
 import io.ticktok.server.clock.repository.ClocksPurger;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.TickChannelCreator;
 import io.ticktok.server.tick.TickChannelExplorer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,7 @@ public class ClocksController {
     public ResponseEntity<ClockResourceWithChannel> create(@Valid @RequestBody ClockRequest clockRequest) {
         log.info("CLOCK-REQUEST: {}", clockRequest.toString());
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
-        TickChannel channel = tickChannelExplorer.create(savedClock);
+        TickChannel channel = new TickChannelCreator(tickChannelExplorer).createFor(savedClock);
         return createdClockEntity(savedClock, channel);
     }
 
@@ -121,5 +122,6 @@ public class ClocksController {
         clockActionFactory.run(action, id);
         return ResponseEntity.noContent().build();
     }
+
 }
 

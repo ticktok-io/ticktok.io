@@ -56,6 +56,7 @@ class RabbitTickChannelExplorerTest {
     @BeforeEach
     void createChannel() {
         channel = tickChannelExplorer.create(CLOCK);
+
     }
 
     @Test
@@ -65,6 +66,7 @@ class RabbitTickChannelExplorerTest {
 
     @Test
     void createQueueForConsumer() {
+        tickChannelExplorer.enable(CLOCK);
         sendTick();
         assertThat(receivedTick(), is(TICK_MSG));
     }
@@ -85,6 +87,7 @@ class RabbitTickChannelExplorerTest {
 
     @Test
     void shouldUnbindQueueOnDisable() {
+        tickChannelExplorer.enable(CLOCK);
         tickChannelExplorer.disable(CLOCK);
         sendTick();
         assertNull(receivedTick());
@@ -92,7 +95,6 @@ class RabbitTickChannelExplorerTest {
 
     @Test
     void shouldBindQueueOnEnable() {
-        tickChannelExplorer.disable(CLOCK);
         tickChannelExplorer.enable(CLOCK);
         sendTick();
         assertThat(receivedTick(), is(TICK_MSG));

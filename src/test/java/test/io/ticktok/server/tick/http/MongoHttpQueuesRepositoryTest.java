@@ -38,6 +38,8 @@ import static org.mockito.Mockito.mock;
 @IntegrationTest
 class MongoHttpQueuesRepositoryTest {
 
+    public static final String SCHEDULE = "every.666.seconds";
+
     @Configuration
     @ComponentScan(basePackages = {"io.ticktok.server.tick.http"})
     static class TestConfiguration {
@@ -66,42 +68,44 @@ class MongoHttpQueuesRepositoryTest {
 
     @Test
     void createNewQueue() {
-        HttpQueue queue = createQueue("kuku", "every.666.seconds");
+        HttpQueue queue = createQueue("kuku");
         assertThat(repository.isQueueExists(queue.getName())).isTrue();
         assertThat(repository.pop(queue.getId())).isEmpty();
     }
 
-    private HttpQueue createQueue(String name, String schedule) {
+    private HttpQueue createQueue(String name) {
         createdQueues.add(name);
-        return repository.createQueue(name, schedule);
+        return repository.createQueue(name);
     }
 
     @Test
     void retrievePushedTicks() {
-        HttpQueue queue = createQueue("q-name", "every.666.seconds");
-        repository.push(new TickMessage("every.666.seconds"));
-        repository.push(new TickMessage("every.666.seconds"));
+        HttpQueue queue = createQueue("q-name");
+        repository.updateQueueSchedule("q-name", SCHEDULE);
+        repository.push(new TickMessage(SCHEDULE));
+        repository.push(new TickMessage(SCHEDULE));
         assertThat(repository.pop(queue.getId())).containsExactly(
                 new TickMessage("every.666.seconds"), new TickMessage("every.666.seconds"));
     }
 
     @Test
     void deleteQueue() {
-        HttpQueue queue = createQueue("popov", "every.555.seconds");
+        HttpQueue queue = createQueue("popov");
         repository.deleteQueue("popov");
         assertThrows(QueueNotExistsException.class, () -> repository.pop(queue.getId()));
     }
 
     @Test
     void ignoreRecreatingAQueue() {
-        HttpQueue queue = createQueue("popov", "every.555.seconds");
-        assertThat(createQueue("popov", "every.555.seconds").getId()).isEqualTo(queue.getId());
+        HttpQueue queue = createQueue("popov");
+        assertThat(createQueue("popov").getId()).isEqualTo(queue.getId());
     }
 
     @Test
     void popShouldClearQueue() {
-        HttpQueue queue = createQueue("q-name", "every.666.seconds");
-        repository.push(new TickMessage("every.666.seconds"));
+        HttpQueue queue = createQueue("q-name");
+        repository.updateQueueSchedule("q-name", SCHEDULE);
+        repository.push(new TickMessage(SCHEDULE));
         assertThat(repository.pop(queue.getId())).hasSize(1);
         assertThat(repository.pop(queue.getId())).hasSize(0);
     }
@@ -113,9 +117,9 @@ class MongoHttpQueuesRepositoryTest {
 
     @Test
     void shouldAlterAssignedSchedule() {
-        HttpQueue queue = createQueue("q-name", "every.666.seconds");
+        HttpQueue queue = createQueue("q-name");
         repository.updateQueueSchedule("q-name", "");
-        repository.push(new TickMessage("every.666.seconds"));
+        repository.push(new TickMessage(SCHEDULE));
         assertThat(repository.pop(queue.getId())).isEmpty();
     }
 
@@ -123,7 +127,7 @@ class MongoHttpQueuesRepositoryTest {
     @DisabledIfSystemProperty(named = "scope", matches = "core")
     @Tag("slow")
     void deleteQueueIfNotInUse() {
-        createQueue("q-name", "every.666.seconds");
+        createQueue("q-name");
         await().atMost(Duration.ONE_MINUTE).until(() -> !repository.isQueueExists("q-name"));
     }
 }

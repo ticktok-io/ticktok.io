@@ -6,7 +6,6 @@ import io.ticktok.server.tick.QueueNameCreator;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelExplorer;
 
-import static io.ticktok.server.tick.http.HttpConfiguration.POP_PATH;
 import static io.ticktok.server.tick.http.HttpConfiguration.popPathForId;
 
 
@@ -29,7 +28,7 @@ public class HttpTickChannelExplorer implements TickChannelExplorer {
 
     @Override
     public TickChannel create(Clock clock) {
-        HttpQueue httpQueue = queuesRepository.createQueue(queueNameFor(clock), clock.getSchedule());
+        HttpQueue httpQueue = queuesRepository.createQueue(queueNameFor(clock));
         return TickChannel.builder()
                 .type(TickChannel.HTTP)
                 .details(ImmutableMap.of("path", popPathForId(httpQueue.getId())))
