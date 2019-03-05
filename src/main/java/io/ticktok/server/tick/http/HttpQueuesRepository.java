@@ -11,7 +11,7 @@ public interface HttpQueuesRepository {
 
     void push(TickMessage tickMessage);
 
-    HttpQueue createQueue(String name, String schedule);
+    HttpQueue createQueue(String name);
 
     void deleteQueue(String queueName);
 

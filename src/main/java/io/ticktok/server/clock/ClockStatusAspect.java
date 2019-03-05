@@ -17,9 +17,7 @@ public class ClockStatusAspect {
         this.clocksRepository = clocksRepository;
     }
 
-    @AfterReturning("(execution(* io.ticktok.server.tick.TickChannelExplorer.create(..)) || " +
-            "execution(* io.ticktok.server.tick.TickChannelExplorer.enable(..))) && " +
-            "args(clock)")
+    @AfterReturning("execution(* io.ticktok.server.tick.TickChannelExplorer.enable(..)) && args(clock)")
     public void activateClock(JoinPoint joinPoint, Clock clock) {
         clocksRepository.updateStatus(clock.getId(), Clock.ACTIVE);
     }
