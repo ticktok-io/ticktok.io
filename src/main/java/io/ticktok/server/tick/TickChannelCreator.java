@@ -1,13 +1,11 @@
 package io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class TickChannelCreator {
     private final TickChannelExplorer channelExplorer;
-
-    public TickChannelCreator(TickChannelExplorer channelExplorer) {
-        this.channelExplorer = channelExplorer;
-    }
 
     public TickChannel createFor(Clock clock) {
         TickChannel tickChannel = channelExplorer.create(clock);

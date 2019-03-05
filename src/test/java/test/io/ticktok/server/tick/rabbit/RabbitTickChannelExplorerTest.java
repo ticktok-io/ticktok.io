@@ -56,7 +56,6 @@ class RabbitTickChannelExplorerTest {
     @BeforeEach
     void createChannel() {
         channel = tickChannelExplorer.create(CLOCK);
-
     }
 
     @Test
