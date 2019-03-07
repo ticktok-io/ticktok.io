@@ -26,13 +26,20 @@ public class Tick {
     @Indexed
     private String status;
 
-
     public static Tick create(Schedule schedule) {
         return new Tick(null, schedule.getSchedule(), schedule.getNextTick(), PENDING);
+    }
+
+    public static Tick create(String schedule, long time) {
+        return new Tick(null, schedule, time, PENDING);
     }
 
     public Tick nextTick() {
         long nextTick = this.time + new ScheduleParser(schedule).interval() * 1000;
         return new Tick(null, schedule, nextTick, PENDING);
+    }
+
+    public Tick boundTo(long boundTime) {
+       return new Tick(id, schedule, time < boundTime ? boundTime : time, status);
     }
 }

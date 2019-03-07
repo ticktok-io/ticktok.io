@@ -9,8 +9,14 @@ import static org.junit.Assert.assertThat;
 
 class TickTest {
 
+    private final static long NOW = 43245;
     @Test
     void defaultStatusShouldBePending() {
         assertThat(Tick.create(new Schedule()).getStatus(), is(Tick.PENDING));
+    }
+
+    @Test
+    void shouldNotAlteredTickTimeIfItLargerThanBoundTime() {
+        assertThat(Tick.create("every.3.seconds", NOW + 1000).boundTo(NOW).getTime(), is(NOW + 1000));
     }
 }

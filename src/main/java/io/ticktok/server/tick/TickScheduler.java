@@ -34,7 +34,7 @@ public class TickScheduler {
     }
 
     private void scheduleNextTickFor(final Schedule schedule, long scheduleTimeFrame) {
-        Tick t = schedule.nextTick();
+        Tick t = schedule.nextTick().boundTo(now());
         while (t.getTime() < scheduleTimeFrame) {
             ticksRepository.save(t);
             t = t.nextTick();
