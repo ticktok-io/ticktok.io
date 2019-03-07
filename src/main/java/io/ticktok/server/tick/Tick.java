@@ -1,6 +1,7 @@
 package io.ticktok.server.tick;
 
 import io.ticktok.server.schedule.Schedule;
+import io.ticktok.server.schedule.ScheduleParser;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -28,5 +29,10 @@ public class Tick {
 
     public static Tick create(Schedule schedule) {
         return new Tick(null, schedule.getSchedule(), schedule.getNextTick(), PENDING);
+    }
+
+    public Tick nextTick() {
+        long nextTick = this.time + new ScheduleParser(schedule).interval() * 1000;
+        return new Tick(null, schedule, nextTick, PENDING);
     }
 }

@@ -34,12 +34,12 @@ public class TickScheduler {
     }
 
     private void scheduleNextTickFor(final Schedule schedule, long scheduleTimeFrame) {
-        Schedule s = schedule;
-        while (s.getNextTick() < scheduleTimeFrame) {
-            ticksRepository.save(Tick.create(s));
-            s = s.nextTick();
+        Tick t = schedule.nextTick();
+        while (t.getTime() < scheduleTimeFrame) {
+            ticksRepository.save(t);
+            t = t.nextTick();
         }
-        schedulesRepository.updateNextTick(s.getId(), s.getNextTick());
+        schedulesRepository.updateNextTick(schedule.getId(), t.getTime());
     }
 
     private List<Schedule> toBeExecutedSchedules() {
