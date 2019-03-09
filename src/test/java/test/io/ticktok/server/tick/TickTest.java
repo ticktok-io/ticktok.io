@@ -17,7 +17,7 @@ class TickTest {
     }
 
     @Test
-    void NotAlteredTickTimeIfItLargerThanBoundTime() {
+    void keepTimeWhenLargerThanBound() {
         assertThat(Tick.create("every.3.seconds", NOW + 1000).boundTo(NOW).getTime(), is(NOW + 1000));
     }
 }
