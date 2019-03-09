@@ -40,6 +40,10 @@ public class Tick {
     }
 
     public Tick boundTo(long boundTime) {
-       return new Tick(id, schedule, time < boundTime ? boundTime : time, status);
+       return new Tick(id, schedule, boundedTimeTo(boundTime), status);
+    }
+
+    private long boundedTimeTo(long boundTime) {
+        return time < boundTime ? boundTime : time;
     }
 }

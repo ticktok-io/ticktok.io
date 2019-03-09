@@ -50,7 +50,7 @@ class TickSchedulerTest {
     }
 
     @Test
-    void scheduleNewTicks1() {
+    void scheduleNewTicks() {
         Schedule schedule1 = createEverySecondsSchedule("3");
         Schedule schedule4 = createEverySecondsSchedule("4");
         when(schedulesRepository.findActiveSchedulesByNextTickLesserThan(anyLong()))
@@ -61,20 +61,20 @@ class TickSchedulerTest {
     }
 
     @Test
-    void scheduleNextTickForNowIfItIsInThePast() {
-        Schedule schedule1 = new Schedule("every.4.seconds", NOW - 60 * 1000);
-        when(schedulesRepository.findActiveSchedulesByNextTickLesserThan(anyLong())).thenReturn(asList(schedule1));
+    void scheduleNextTickForNowInCaseTickFromThePast() {
+        Schedule schedule = new Schedule("every.4.seconds", NOW - 60 * 1000);
+        when(schedulesRepository.findActiveSchedulesByNextTickLesserThan(anyLong())).thenReturn(asList(schedule));
         schedule();
-        verify(ticksRepository, only()).save(Tick.create(schedule1.getSchedule(), NOW));
+        verify(ticksRepository, only()).save(Tick.create(schedule.getSchedule(), NOW));
     }
 
     @Test
     void scheduleMultipleTicksUpToLookAhead() {
-        Schedule schedule1 = createEverySecondsSchedule("1");
-        when(schedulesRepository.findActiveSchedulesByNextTickLesserThan(anyLong())).thenReturn(asList(schedule1));
+        Schedule schedule = createEverySecondsSchedule("1");
+        when(schedulesRepository.findActiveSchedulesByNextTickLesserThan(anyLong())).thenReturn(asList(schedule));
         schedule();
-        verify(ticksRepository).save(Tick.create(schedule1.getSchedule(), NOW));
-        verify(ticksRepository).save(Tick.create(schedule1.getSchedule(), NOW + 1000));
+        verify(ticksRepository).save(Tick.create(schedule.getSchedule(), NOW));
+        verify(ticksRepository).save(Tick.create(schedule.getSchedule(), NOW + 1000));
 
     }
 
