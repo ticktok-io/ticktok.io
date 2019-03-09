@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Component
@@ -34,12 +35,13 @@ public class TickScheduler {
     }
 
     private void scheduleNextTickFor(final Schedule schedule, long scheduleTimeFrame) {
-        Schedule s = schedule;
-        while (s.getNextTick() < scheduleTimeFrame) {
-            ticksRepository.save(Tick.create(s));
-            s = s.nextTick();
+        Tick t = schedule.nextTick().boundTo(now());
+        while (t.getTime() < scheduleTimeFrame) {
+            ticksRepository.save(t);
+            t = t.nextTick();
         }
-        schedulesRepository.updateNextTick(s.getId(), s.getNextTick());
+
+        schedulesRepository.updateNextTick(schedule.getId(), t.getTime());
     }
 
     private List<Schedule> toBeExecutedSchedules() {
