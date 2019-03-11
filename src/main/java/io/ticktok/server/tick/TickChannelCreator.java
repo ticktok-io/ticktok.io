@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class TickChannelCreator {
-    private final TickChannelExplorer channelExplorer;
+    private final TickChannelOperations channelExplorer;
 
     public TickChannel createFor(Clock clock) {
         TickChannel tickChannel = channelExplorer.create(clock);

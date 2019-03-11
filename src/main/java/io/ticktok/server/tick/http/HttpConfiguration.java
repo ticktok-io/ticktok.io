@@ -1,6 +1,6 @@
 package io.ticktok.server.tick.http;
 
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 import io.ticktok.server.tick.TickPublisher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +19,8 @@ public class HttpConfiguration {
     }
 
     @Bean
-    public TickChannelExplorer tickChannelExplorer(HttpQueuesRepository queuesRepository) {
-        return new HttpTickChannelExplorer(queuesRepository);
+    public TickChannelOperations tickChannelExplorer(HttpQueuesRepository queuesRepository) {
+        return new HttpTickChannelOperations(queuesRepository);
     }
 
     @Bean

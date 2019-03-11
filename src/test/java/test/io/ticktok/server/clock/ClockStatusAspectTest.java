@@ -3,8 +3,7 @@ package test.io.ticktok.server.clock;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.ClockStatusAspect;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.tick.TickChannelExplorer;
-import org.junit.Before;
+import io.ticktok.server.tick.TickChannelOperations;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +28,8 @@ class ClockStatusAspectTest {
     static class TestConfiguration {
 
         @Bean
-        public TickChannelExplorer tickChannelExplorer() {
-            return mock(TickChannelExplorer.class);
+        public TickChannelOperations tickChannelExplorer() {
+            return mock(TickChannelOperations.class);
         }
 
         @Bean
@@ -47,24 +46,24 @@ class ClockStatusAspectTest {
             .build();
 
     @Autowired
-    TickChannelExplorer tickChannelExplorer;
+    TickChannelOperations tickChannelOperations;
     @Autowired
     ClocksRepository clocksRepository;
 
     @BeforeEach
     public void resetMocks() {
-        reset(clocksRepository, tickChannelExplorer);
+        reset(clocksRepository, tickChannelOperations);
     }
 
     @Test
     void pauseClockAfterClockDisable() {
-        tickChannelExplorer.disable(CLOCK);
+        tickChannelOperations.disable(CLOCK);
         verify(clocksRepository).updateStatus(CLOCK.getId(), Clock.PAUSED);
     }
 
     @Test
     void activateClockAfterClockEnable() {
-        tickChannelExplorer.enable(CLOCK);
+        tickChannelOperations.enable(CLOCK);
         verify(clocksRepository).updateStatus(CLOCK.getId(), Clock.ACTIVE);
     }
 }

@@ -2,7 +2,7 @@ package io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.logging.LogExecutionTime;
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 public class ClocksPurger {
 
     private final ClocksRepository clocksRepository;
-    private final TickChannelExplorer tickChannelExplorer;
+    private final TickChannelOperations tickChannelOperations;
 
     public ClocksPurger(ClocksRepository clocksRepository,
-                        TickChannelExplorer tickChannelExplorer) {
+                        TickChannelOperations tickChannelOperations) {
         this.clocksRepository = clocksRepository;
-        this.tickChannelExplorer = tickChannelExplorer;
+        this.tickChannelOperations = tickChannelOperations;
     }
 
     @LogExecutionTime
@@ -34,7 +34,7 @@ public class ClocksPurger {
     }
 
     private boolean isChannelNotExistsFor(Clock clock) {
-        return !tickChannelExplorer.isExists(clock);
+        return !tickChannelOperations.isExists(clock);
     }
 
 }

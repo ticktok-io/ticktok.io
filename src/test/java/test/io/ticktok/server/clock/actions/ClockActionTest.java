@@ -4,7 +4,7 @@ package test.io.ticktok.server.clock.actions;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.actions.ClockActionFactory;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -37,8 +37,8 @@ public class ClockActionTest {
         }
 
         @Bean
-        public TickChannelExplorer tickChannelExplorer() {
-            return mock(TickChannelExplorer.class);
+        public TickChannelOperations tickChannelExplorer() {
+            return mock(TickChannelOperations.class);
         }
     }
 
@@ -52,7 +52,7 @@ public class ClockActionTest {
     @Autowired
     ClocksRepository clocksRepository;
     @Autowired
-    TickChannelExplorer tickChannelExplorer;
+    TickChannelOperations tickChannelOperations;
 
     @BeforeEach
     public void findClockMock() {
@@ -71,7 +71,7 @@ public class ClockActionTest {
         @Test
         void shouldEnableClock() {
             clockActionFactory.run("resume", CLOCK.getId());
-            verify(tickChannelExplorer).enable(CLOCK);
+            verify(tickChannelOperations).enable(CLOCK);
         }
     }
 
@@ -80,7 +80,7 @@ public class ClockActionTest {
         @Test
         void invokeDisableClock() {
             clockActionFactory.run("pause", CLOCK.getId());
-            verify(tickChannelExplorer).disable(CLOCK);
+            verify(tickChannelOperations).disable(CLOCK);
         }
     }
 
