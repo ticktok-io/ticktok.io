@@ -3,6 +3,7 @@ package io.ticktok.server.schedule;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,19 +33,19 @@ public class ScheduleParser {
 
     private Integer intervalFrom(Matcher matcher) {
         Integer i = Integer.valueOf(matcher.group(1));
-        failIf(p -> i == 0, "Interval of 0 yis not supported");
+        failIf(() -> i == 0, "Interval of 0 yis not supported");
         return i;
     }
 
-    private void failIf(Predicate<Boolean> predicate, String errorMsg) {
-        if(predicate.test(false)) {
+    private void failIf(BooleanSupplier predicate, String errorMsg) {
+        if(predicate.getAsBoolean()) {
             throw new ExpressionNotValidException(errorMsg);
         }
     }
 
     private Matcher getMatcher() {
         Matcher matcher = EVERY_PATTERN.matcher(schedule);
-        failIf(p -> !matcher.find(), "Unable to understand the schedule: " + schedule);
+        failIf(() -> !matcher.find(), "Unable to understand the schedule: " + schedule);
         return matcher;
     }
 
