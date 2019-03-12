@@ -5,19 +5,19 @@ import io.ticktok.server.tick.QueueNameCreator;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.http.HttpQueue;
 import io.ticktok.server.tick.http.HttpQueuesRepository;
-import io.ticktok.server.tick.http.HttpTickChannelExplorer;
+import io.ticktok.server.tick.http.HttpTickChannelOperations;
 import org.junit.jupiter.api.Test;
 
 import static io.ticktok.server.tick.http.HttpConfiguration.POP_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class HttpTickChannelExplorerTest {
+class HttpTickChannelOperationsTest {
 
     public static final Clock CLOCK = new Clock("1122", "popo", "every.911.seconds");
 
     private HttpQueuesRepository queuesRepository = mock(HttpQueuesRepository.class);
-    private HttpTickChannelExplorer tickChannelExplorer = new HttpTickChannelExplorer(queuesRepository);
+    private HttpTickChannelOperations tickChannelExplorer = new HttpTickChannelOperations(queuesRepository);
 
     @Test
     void createNewQueue() {

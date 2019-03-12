@@ -2,14 +2,14 @@ package test.io.ticktok.server.tick;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.TickChannelCreator;
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
 class TickChannelCreatorTest {
 
-    private final TickChannelExplorer channelExplorer = mock(TickChannelExplorer.class);
+    private final TickChannelOperations channelExplorer = mock(TickChannelOperations.class);
 
     @Test
     void shouldNotEnableChannelOnPausedClock() {

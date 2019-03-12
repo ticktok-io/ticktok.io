@@ -2,21 +2,21 @@ package io.ticktok.server.clock.actions;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ResumeClockAction extends RepositoryClockAction {
-    private final TickChannelExplorer tickChannelExplorer;
+    private final TickChannelOperations tickChannelOperations;
 
-    public ResumeClockAction(ClocksRepository clocksRepository, TickChannelExplorer tickChannelExplorer) {
+    public ResumeClockAction(ClocksRepository clocksRepository, TickChannelOperations tickChannelOperations) {
         super(clocksRepository);
-        this.tickChannelExplorer = tickChannelExplorer;
+        this.tickChannelOperations = tickChannelOperations;
     }
 
     @Override
     protected void runOnClock(Clock clock) {
-        tickChannelExplorer.enable(clock);
+        tickChannelOperations.enable(clock);
     }
 
 }

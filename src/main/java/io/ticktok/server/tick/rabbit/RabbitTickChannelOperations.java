@@ -4,19 +4,19 @@ import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.QueueNameCreator;
 import io.ticktok.server.tick.TickChannel;
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 
 @Slf4j
-public class RabbitTickChannelExplorer implements TickChannelExplorer {
+public class RabbitTickChannelOperations implements TickChannelOperations {
 
     private final long queueTTL;
     private final AmqpAdmin rabbitAdmin;
     private final String consumerRabbitUri;
     private final TopicExchange exchange;
 
-    public RabbitTickChannelExplorer(
+    public RabbitTickChannelOperations(
             RabbitProperties rabbitProperties,
             AmqpAdmin rabbitAdmin,
             TopicExchange topicExchange) {

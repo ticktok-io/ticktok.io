@@ -21,5 +21,25 @@ class ScheduleParserTest {
         assertThat(new ScheduleParser("every.6.seconds").interval(), is(6));
     }
 
+    @Test
+    void retrieveIntervalForEveryXHoursInSeconds() {
+        assertThat(new ScheduleParser("every.2.hours").interval(), is(2 * 60 * 60));
+    }
 
+    @Test
+    void failOnZeroInterval() {
+        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
+                new ScheduleParser("every.0.hours").interval());
+        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
+                new ScheduleParser("every.000.hours").interval());
+    }
+
+    @Test
+    void failOnNonExactExpression() {
+        String expression = "every.1.hours";
+        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
+                new ScheduleParser(expression + "lalala").interval());
+        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
+                new ScheduleParser("www." + expression).interval());
+    }
 }

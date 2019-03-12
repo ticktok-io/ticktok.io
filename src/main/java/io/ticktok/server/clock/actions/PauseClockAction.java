@@ -2,20 +2,20 @@ package io.ticktok.server.clock.actions;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PauseClockAction extends RepositoryClockAction {
-    private final TickChannelExplorer tickChannelExplorer;
+    private final TickChannelOperations tickChannelOperations;
 
-    public PauseClockAction(ClocksRepository clocksRepository, TickChannelExplorer tickChannelExplorer) {
+    public PauseClockAction(ClocksRepository clocksRepository, TickChannelOperations tickChannelOperations) {
         super(clocksRepository);
-        this.tickChannelExplorer = tickChannelExplorer;
+        this.tickChannelOperations = tickChannelOperations;
     }
 
     @Override
     protected void runOnClock(Clock clock) {
-        tickChannelExplorer.disable(clock);
+        tickChannelOperations.disable(clock);
     }
 }

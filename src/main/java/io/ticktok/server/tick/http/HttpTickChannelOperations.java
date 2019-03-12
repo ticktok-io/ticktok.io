@@ -4,16 +4,16 @@ import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.QueueNameCreator;
 import io.ticktok.server.tick.TickChannel;
-import io.ticktok.server.tick.TickChannelExplorer;
+import io.ticktok.server.tick.TickChannelOperations;
 
 import static io.ticktok.server.tick.http.HttpConfiguration.popPathForId;
 
 
-public class HttpTickChannelExplorer implements TickChannelExplorer {
+public class HttpTickChannelOperations implements TickChannelOperations {
 
     private final HttpQueuesRepository queuesRepository;
 
-    public HttpTickChannelExplorer(HttpQueuesRepository queuesRepository) {
+    public HttpTickChannelOperations(HttpQueuesRepository queuesRepository) {
         this.queuesRepository = queuesRepository;
     }
 

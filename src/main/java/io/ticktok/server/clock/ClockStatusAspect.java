@@ -17,12 +17,12 @@ public class ClockStatusAspect {
         this.clocksRepository = clocksRepository;
     }
 
-    @AfterReturning("execution(* io.ticktok.server.tick.TickChannelExplorer.enable(..)) && args(clock)")
+    @AfterReturning("execution(* io.ticktok.server.tick.TickChannelOperations.enable(..)) && args(clock)")
     public void activateClock(JoinPoint joinPoint, Clock clock) {
         clocksRepository.updateStatus(clock.getId(), Clock.ACTIVE);
     }
 
-    @AfterReturning("execution(* io.ticktok.server.tick.TickChannelExplorer.disable(..)) && args(clock)")
+    @AfterReturning("execution(* io.ticktok.server.tick.TickChannelOperations.disable(..)) && args(clock)")
     public void pauseClock(JoinPoint joinPoint, Clock clock) {
         clocksRepository.updateStatus(clock.getId(), Clock.PAUSED);
     }
