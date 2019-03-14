@@ -1,9 +1,12 @@
 package test.io.ticktok.server.schedule;
 
 import io.ticktok.server.schedule.ScheduleParser;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,7 +26,11 @@ class ScheduleParserTest {
 
     @Test
     void retrieveIntervalForEveryXHoursInSeconds() {
-        assertThat(new ScheduleParser("every.2.hours").interval(), is(2 * 60 * 60));
+        assertThat(new ScheduleParser("every.2.hours").interval(), is(toSeconds(2, HOURS)));
+    }
+
+    private int toSeconds(int amount, TimeUnit unit) {
+        return (int) TimeUnit.SECONDS.convert(amount, unit);
     }
 
     @Test
@@ -42,4 +49,10 @@ class ScheduleParserTest {
         assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
                 new ScheduleParser("www." + expression).interval());
     }
+
+    @Test
+    void retrieveIntervalForEveryXMinutes() {
+        assertThat(new ScheduleParser("every.4.minutes").interval(), is(toSeconds(4, MINUTES)));
+    }
+
 }

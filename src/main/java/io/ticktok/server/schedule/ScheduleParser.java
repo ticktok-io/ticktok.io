@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,13 +11,14 @@ import static java.lang.String.format;
 
 public class ScheduleParser {
 
-    public static final String MATCH_UNITS = "seconds|hours";
-    public static final Pattern EVERY_PATTERN = Pattern.compile(format("^every\\.(\\d+)\\.(%s)$", MATCH_UNITS));
-
     private static final Map<String, Integer> mapUnitToSeconds = ImmutableMap.of(
             "seconds", 1,
+            "minutes", 60,
             "hours", 60 * 60
     );
+    public static final String MATCH_UNITS = String.join("|", mapUnitToSeconds.keySet());
+    public static final Pattern EVERY_PATTERN = Pattern.compile(format("^every\\.(\\d+)\\.(%s)$", MATCH_UNITS));
+
 
     private final String schedule;
 
