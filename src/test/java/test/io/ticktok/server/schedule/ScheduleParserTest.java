@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,7 +26,7 @@ class ScheduleParserTest {
 
     @Test
     void retrieveIntervalForEveryXHoursInSeconds() {
-        assertThat(new ScheduleParser("every.2.hours").interval(), is(toSeconds(2, TimeUnit.HOURS)));
+        assertThat(new ScheduleParser("every.2.hours").interval(), is(toSeconds(2, HOURS)));
     }
 
     private int toSeconds(int amount, TimeUnit unit) {
@@ -50,7 +52,7 @@ class ScheduleParserTest {
 
     @Test
     void retrieveIntervalForEveryXMinutes() {
-        assertThat(new ScheduleParser("every.4.minutes").interval(), is(toSeconds(4, TimeUnit.MINUTES)));
+        assertThat(new ScheduleParser("every.4.minutes").interval(), is(toSeconds(4, MINUTES)));
     }
 
 }
