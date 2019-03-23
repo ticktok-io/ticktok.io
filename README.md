@@ -14,7 +14,7 @@ docker run
   -e MONGO_URI=<mongo db uri>
   -e SELF_DOMAIN=<the domain name of the service>
   -e ACCESS_TOKEN=<sha1 encoded token>
-  ticktok/ticktok:0.2.0-alpha
+  ticktok/ticktok:0.2.1
 ```
 
 Documentation: https://ticktok.io/docs
