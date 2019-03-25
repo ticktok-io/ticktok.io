@@ -18,8 +18,11 @@ docker run
 
 Documentation: https://ticktok.io/docs
 	
+## Community
+Have some questions/ideas? chat with us on [Slack](https://join.slack.com/t/ticktokio/shared_invite/enQtNTE0MzExNTY5MjIzLThjNDU3NjIzYzQxZTY0YTM5ODE2OWFmMWU3YmQ1ZTViNDVmYjZkNWUzMWU5NWU0YmU5NWYxMWMxZjlmNGQ1Y2U)
+
 ## Official SDKs
 * [Java](https://github.com/ticktok-io/ticktok-java-client) (wip)
 * [Clojure](https://github.com/ticktok-io/ticktok-clojure-client) (wip)
-* [JavaScript](https://github.com/ticktok-io/ticktok-js-client) (wip)
-* [Python](https://github.com/ticktok-io/ticktok-python-client) (wip)
+* [JavaScript](https://github.com/ticktok-io/ticktok.js) (wip)
+* [Python](https://github.com/ticktok-io/ticktok-python) (wip)
