@@ -1,6 +1,6 @@
 # Ticktok.io
 [![CircleCI](https://circleci.com/gh/ticktok-io/ticktok.io.svg?style=svg)](https://circleci.com/gh/ticktok-io/ticktok.io)
-[![Release](https://img.shields.io/github/release-pre/ticktok-io/ticktok.io.svg)](https://github.com/ticktok-io/ticktok.io/releases/tag/0.2.0-alpha)
+[![Release](https://img.shields.io/github/release-pre/ticktok-io/ticktok.io.svg)](https://github.com/ticktok-io/ticktok.io/releases/0.2.1)
 
 Ticktok.io is an efficient, managed and clustered scheduler that allows 
 apps to receive accurate and reliable clock signals at scale. 
