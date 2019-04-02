@@ -13,10 +13,13 @@ public class ScheduleValidator implements ConstraintValidator<ScheduleConstraint
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         try {
-            new ScheduleParser(value).interval();
+            if(value != null) {
+                new ScheduleParser(value).interval();
+                return true;
+            }
         } catch (ScheduleParser.ExpressionNotValidException e) {
             return false;
         }
-        return true;
+        return false;
     }
 }
