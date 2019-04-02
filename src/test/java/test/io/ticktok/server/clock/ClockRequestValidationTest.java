@@ -11,10 +11,16 @@ import static org.hamcrest.core.Is.is;
 class ClockRequestValidationTest {
 
     static final ClockRequest CLOCK_WITH_NO_NAME = new ClockRequest("every.5.seconds", "");
+    static final ClockRequest CLOCK_WITH_NO_SCHEDULE = new ClockRequest(null, "kuku");
 
     @Test
     void validateNameIsNotEmpty() {
         assertThat(createSpringValidator().validate(CLOCK_WITH_NO_NAME).size(), is(1));
+    }
+
+    @Test
+    void validateSchedualeIsNotEmpty() {
+        assertThat(createSpringValidator().validate(CLOCK_WITH_NO_SCHEDULE).size(), is(1));
     }
 
     private LocalValidatorFactoryBean createSpringValidator() {
