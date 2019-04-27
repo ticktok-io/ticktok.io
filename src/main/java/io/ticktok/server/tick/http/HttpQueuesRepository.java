@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.List;
 
 public interface HttpQueuesRepository {
-    List<TickMessage> pop(String id);
+    List<TickMessage> pop(String externalId);
 
     void push(TickMessage tickMessage);
 

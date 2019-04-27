@@ -69,15 +69,6 @@ object Client {
         listeners.clear()
     }
 
-    fun failToFindQueue() {
-        await atMost Duration(4, TimeUnit.SECONDS) untilNotNull { firstListenerWithError() }
-        Assertions.assertThat(firstListenerWithError()!!.errors[0]).contains("Error: 404")
-    }
-
-    fun firstListenerWithError(): TickListener? {
-        return listeners.values.find { l -> !l.errors.isEmpty() }
-    }
-
     abstract class TickListener(val clock: Clock) {
         val messages: MutableList<JsonObject> = Collections.synchronizedList(mutableListOf())
         val errors: MutableList<String> = Collections.synchronizedList(mutableListOf())
@@ -136,7 +127,7 @@ object Client {
         }
 
         override fun stop() {
-            if (!consumerTag.isEmpty()) {
+            if (consumerTag.isNotEmpty()) {
                 channel!!.basicCancel(consumerTag)
             }
         }
@@ -149,7 +140,7 @@ object Client {
         override fun listenOn(clock: Clock) {
             val task = object : TimerTask() {
                 override fun run() {
-                    val url = "${App.appUrl}${clock.channel!!.details["path"]}?access_token=${App.ACCESS_TOKEN}"
+                    val url = clock.channel!!.details["url"]
                     actOnPopResponse(Request.Get(url).execute().returnResponse())
                 }
             }
@@ -159,6 +150,7 @@ object Client {
         fun actOnPopResponse(response: HttpResponse) {
             val content = EntityUtils.toString(response.entity)
             if (response.statusLine.statusCode != 200) {
+                println("Error: $content")
                 errors.add("Error: ${response.statusLine.statusCode} [$content]")
             } else {
                 val ticksJson = Gson().fromJson(content, JsonArray::class.java)

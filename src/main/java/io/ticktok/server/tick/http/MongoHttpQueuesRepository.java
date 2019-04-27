@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class MongoHttpQueuesRepository implements HttpQueuesRepository {
@@ -22,6 +23,7 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     public static final String SCHEDULE = "schedule";
     public static final String NAME = "name";
     public static final String QUEUE_TTL = "queueTTL";
+    public static final String EXTERNAL_ID = "externalId";
 
     private final MongoOperations mongo;
     private final long queueTTL;
@@ -49,12 +51,12 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     }
 
     @Override
-    public List<TickMessage> pop(String id) {
+    public List<TickMessage> pop(String externalId) {
         HttpQueue httpQueue = mongo.findAndModify(
-                Query.query(Criteria.where("_id").is(id)),
+                Query.query(Criteria.where(EXTERNAL_ID).is(externalId)),
                 new OnPopUpdate().create(),
                 HttpQueue.class);
-        validateQueueExists(id, httpQueue);
+        validateQueueExists(externalId, httpQueue);
         return httpQueue.getTicks();
     }
 
@@ -68,7 +70,7 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     public HttpQueue createQueue(String name) {
         return mongo.findAndModify(
                 Query.query(Criteria.where(NAME).is(name)),
-                Update.update(LAST_ACCESSED_TIME, new Date()),
+                Update.update(LAST_ACCESSED_TIME, new Date()).setOnInsert(EXTERNAL_ID, UUID.randomUUID().toString()),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 HttpQueue.class);
     }

@@ -70,7 +70,7 @@ class MongoHttpQueuesRepositoryTest {
     void createNewQueue() {
         HttpQueue queue = createQueue("kuku");
         assertThat(repository.isQueueExists(queue.getName())).isTrue();
-        assertThat(repository.pop(queue.getId())).isEmpty();
+        assertThat(repository.pop(queue.getExternalId())).isEmpty();
     }
 
     private HttpQueue createQueue(String name) {
@@ -84,7 +84,7 @@ class MongoHttpQueuesRepositoryTest {
         repository.updateQueueSchedule("q-name", SCHEDULE);
         repository.push(new TickMessage(SCHEDULE));
         repository.push(new TickMessage(SCHEDULE));
-        assertThat(repository.pop(queue.getId())).containsExactly(
+        assertThat(repository.pop(queue.getExternalId())).containsExactly(
                 new TickMessage("every.666.seconds"), new TickMessage("every.666.seconds"));
     }
 
@@ -92,7 +92,7 @@ class MongoHttpQueuesRepositoryTest {
     void deleteQueue() {
         HttpQueue queue = createQueue("popov");
         repository.deleteQueue("popov");
-        assertThrows(QueueNotExistsException.class, () -> repository.pop(queue.getId()));
+        assertThrows(QueueNotExistsException.class, () -> repository.pop(queue.getExternalId()));
     }
 
     @Test
@@ -106,8 +106,8 @@ class MongoHttpQueuesRepositoryTest {
         HttpQueue queue = createQueue("q-name");
         repository.updateQueueSchedule("q-name", SCHEDULE);
         repository.push(new TickMessage(SCHEDULE));
-        assertThat(repository.pop(queue.getId())).hasSize(1);
-        assertThat(repository.pop(queue.getId())).hasSize(0);
+        assertThat(repository.pop(queue.getExternalId())).hasSize(1);
+        assertThat(repository.pop(queue.getExternalId())).hasSize(0);
     }
 
     @Test
@@ -120,7 +120,7 @@ class MongoHttpQueuesRepositoryTest {
         HttpQueue queue = createQueue("q-name");
         repository.updateQueueSchedule("q-name", "");
         repository.push(new TickMessage(SCHEDULE));
-        assertThat(repository.pop(queue.getId())).isEmpty();
+        assertThat(repository.pop(queue.getExternalId())).isEmpty();
     }
 
     @Test

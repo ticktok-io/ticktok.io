@@ -22,6 +22,9 @@ public class APISecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.
+                authorizeRequests().
+                antMatchers("/api/v1/queues/**").permitAll().
+                and().
                 antMatcher("/api/**").
                 csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).

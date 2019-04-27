@@ -11,6 +11,7 @@ import static io.ticktok.server.tick.http.HttpConfiguration.popPathForId;
 
 public class HttpTickChannelOperations implements TickChannelOperations {
 
+    public static final String URL_PARAM = "url";
     private final HttpQueuesRepository queuesRepository;
 
     public HttpTickChannelOperations(HttpQueuesRepository queuesRepository) {
@@ -31,8 +32,12 @@ public class HttpTickChannelOperations implements TickChannelOperations {
         HttpQueue httpQueue = queuesRepository.createQueue(queueNameFor(clock));
         return TickChannel.builder()
                 .type(TickChannel.HTTP)
-                .details(ImmutableMap.of("path", popPathForId(httpQueue.getId())))
+                .details(ImmutableMap.of(URL_PARAM, fullUrlFor(httpQueue.getExternalId())))
                 .build();
+    }
+
+    private String fullUrlFor(String id) {
+        return "{domain}" + popPathForId(id);
     }
 
     @Override

@@ -9,6 +9,7 @@ import io.ticktok.server.tick.http.HttpTickChannelOperations;
 import org.junit.jupiter.api.Test;
 
 import static io.ticktok.server.tick.http.HttpConfiguration.POP_PATH;
+import static io.ticktok.server.tick.http.HttpTickChannelOperations.URL_PARAM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -21,11 +22,11 @@ class HttpTickChannelOperationsTest {
 
     @Test
     void createNewQueue() {
-        HttpQueue httpQueue = HttpQueue.builder().id("32415").build();
+        HttpQueue httpQueue = HttpQueue.builder().id("1212").externalId("32415").build();
         when(queuesRepository.createQueue(queueName())).thenReturn(httpQueue);
         TickChannel tickChannel = tickChannelExplorer.create(CLOCK);
-        assertThat(tickChannel.getDetails().get("path")).isEqualTo(
-                POP_PATH.replaceAll("\\{id}", httpQueue.getId()));
+        assertThat(tickChannel.getDetails().get(URL_PARAM)).isEqualTo(
+                "{domain}" + POP_PATH.replaceAll("\\{id}", httpQueue.getExternalId()));
     }
 
     private String queueName() {
