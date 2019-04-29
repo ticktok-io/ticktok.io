@@ -40,8 +40,8 @@ class QueuesControllerTest {
 
     @Test
     void failOnNonExistingQueue() throws Exception {
-       when(httpQueuesRepository.pop("tutu")).thenThrow(HttpQueuesRepository.QueueNotExistsException.class);
-       mockMvc.perform(get(popPathForId("tutu")))
+       when(httpQueuesRepository.pop("unknown")).thenThrow(HttpQueuesRepository.QueueNotExistsException.class);
+       mockMvc.perform(get(popPathForId("unknown")))
                .andExpect(status().isNotFound());
     }
 

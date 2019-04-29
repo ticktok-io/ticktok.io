@@ -17,8 +17,9 @@ public class TickChannel {
     public static final String HTTP = "http";
 
     private String type;
+    private Map<String, String> details;
+
     private String uri;
     private String queue;
-    private Map<String, String> details;
 
 }

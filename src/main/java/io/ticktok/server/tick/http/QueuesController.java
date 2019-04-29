@@ -8,16 +8,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static io.ticktok.server.tick.http.HttpConfiguration.POP_PATH;
+
 @RestController
 @Profile("http")
 public class QueuesController {
+
     private HttpQueuesRepository httpQueuesRepository;
 
     public QueuesController(HttpQueuesRepository httpQueuesRepository) {
         this.httpQueuesRepository = httpQueuesRepository;
     }
 
-    @GetMapping(HttpConfiguration.POP_PATH)
+    @GetMapping(POP_PATH)
     public List<TickMessage> pop(@PathVariable String id) {
         return httpQueuesRepository.pop(id);
     }

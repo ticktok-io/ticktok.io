@@ -22,6 +22,8 @@ public class HttpQueue {
     @Id
     private String id;
     @Indexed(unique = true)
+    private String externalId;
+    @Indexed(unique = true)
     private String name;
     private String schedule;
     private List<TickMessage> ticks = new ArrayList<>();
