@@ -4,7 +4,9 @@ package test.io.ticktok.server.clock.actions;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.actions.ClockActionFactory;
 import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickChannelOperations;
+import io.ticktok.server.tick.TickPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -40,8 +42,13 @@ public class ClockActionTest {
         public TickChannelOperations tickChannelExplorer() {
             return mock(TickChannelOperations.class);
         }
-    }
 
+        @Bean
+        public TickPublisher tickPublisher() {
+            return mock(TickPublisher.class);
+        }
+
+    }
     public static final Clock CLOCK = Clock.builder()
             .name("lulu")
             .schedule("every.12.seconds")
@@ -53,6 +60,9 @@ public class ClockActionTest {
     ClocksRepository clocksRepository;
     @Autowired
     TickChannelOperations tickChannelOperations;
+    @Autowired
+    TickPublisher tickPublisher;
+
 
     @BeforeEach
     public void findClockMock() {
@@ -65,22 +75,31 @@ public class ClockActionTest {
         Assertions.assertThrows(ClockActionFactory.ActionNotFoundException.class,
                 () -> clockActionFactory.run("non-action", "123"));
     }
-
     @Nested
-    class ResumeClockAction {
+    class ResumeClockActionTest {
         @Test
         void shouldEnableClock() {
             clockActionFactory.run("resume", CLOCK.getId());
             verify(tickChannelOperations).enable(CLOCK);
         }
-    }
 
+    }
     @Nested
-    class PauseClockAction {
+    class PauseClockActionTest {
         @Test
         void invokeDisableClock() {
             clockActionFactory.run("pause", CLOCK.getId());
             verify(tickChannelOperations).disable(CLOCK);
+        }
+
+    }
+    @Nested
+    class TickClockActionTest {
+
+        @Test
+        void manuallyTickSpecificClock() {
+            clockActionFactory.run("tick", CLOCK.getId());
+            verify(tickPublisher).publishForClock(CLOCK);
         }
     }
 
