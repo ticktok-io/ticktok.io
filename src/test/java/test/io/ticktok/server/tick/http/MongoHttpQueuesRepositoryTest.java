@@ -7,6 +7,7 @@ import io.ticktok.server.tick.http.HttpQueuesRepository;
 import io.ticktok.server.tick.http.HttpQueuesRepository.QueueNotExistsException;
 import org.awaitility.Duration;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
@@ -22,9 +23,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.IntegrationTest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,6 +37,9 @@ import static org.mockito.Mockito.mock;
 class MongoHttpQueuesRepositoryTest {
 
     public static final String SCHEDULE = "every.666.seconds";
+    public static final TickMessage TICK_MESSAGE = new TickMessage(SCHEDULE);
+    private static final String QUEUE_NAME = "q-name";
+    private HttpQueue queue;
 
     @Configuration
     @ComponentScan(basePackages = {"io.ticktok.server.tick.http"})
@@ -50,15 +51,17 @@ class MongoHttpQueuesRepositoryTest {
         }
     }
 
-    private List<String> createdQueues = new ArrayList<>();
-
     @Autowired
     private HttpQueuesRepository repository;
 
+    @BeforeEach
+    void setUp() {
+        queue = repository.createQueue(QUEUE_NAME);
+    }
+
     @AfterEach
     void tearDown() {
-        createdQueues.forEach(q -> repository.deleteQueue(q));
-        createdQueues.clear();
+        repository.deleteQueue(QUEUE_NAME);
     }
 
     @Test
@@ -68,43 +71,33 @@ class MongoHttpQueuesRepositoryTest {
 
     @Test
     void createNewQueue() {
-        HttpQueue queue = createQueue("kuku");
         assertThat(repository.isQueueExists(queue.getName())).isTrue();
         assertThat(repository.pop(queue.getExternalId())).isEmpty();
     }
 
-    private HttpQueue createQueue(String name) {
-        createdQueues.add(name);
-        return repository.createQueue(name);
-    }
-
     @Test
     void retrievePushedTicks() {
-        HttpQueue queue = createQueue("q-name");
-        repository.updateQueueSchedule("q-name", SCHEDULE);
-        repository.push(new TickMessage(SCHEDULE));
-        repository.push(new TickMessage(SCHEDULE));
+        repository.updateQueueSchedule(QUEUE_NAME, SCHEDULE);
+        repository.push(TICK_MESSAGE);
+        repository.push(TICK_MESSAGE);
         assertThat(repository.pop(queue.getExternalId())).containsExactly(
-                new TickMessage("every.666.seconds"), new TickMessage("every.666.seconds"));
+                new TickMessage(SCHEDULE), new TickMessage(SCHEDULE));
     }
 
     @Test
     void deleteQueue() {
-        HttpQueue queue = createQueue("popov");
-        repository.deleteQueue("popov");
+        repository.deleteQueue(QUEUE_NAME);
         assertThrows(QueueNotExistsException.class, () -> repository.pop(queue.getExternalId()));
     }
 
     @Test
     void ignoreRecreatingAQueue() {
-        HttpQueue queue = createQueue("popov");
-        assertThat(createQueue("popov").getId()).isEqualTo(queue.getId());
+        assertThat(repository.createQueue(QUEUE_NAME).getId()).isEqualTo(queue.getId());
     }
 
     @Test
     void popShouldClearQueue() {
-        HttpQueue queue = createQueue("q-name");
-        repository.updateQueueSchedule("q-name", SCHEDULE);
+        repository.updateQueueSchedule(QUEUE_NAME, SCHEDULE);
         repository.push(new TickMessage(SCHEDULE));
         assertThat(repository.pop(queue.getExternalId())).hasSize(1);
         assertThat(repository.pop(queue.getExternalId())).hasSize(0);
@@ -117,9 +110,8 @@ class MongoHttpQueuesRepositoryTest {
 
     @Test
     void shouldAlterAssignedSchedule() {
-        HttpQueue queue = createQueue("q-name");
-        repository.updateQueueSchedule("q-name", "");
-        repository.push(new TickMessage(SCHEDULE));
+        repository.updateQueueSchedule(QUEUE_NAME, "");
+        repository.push(TICK_MESSAGE);
         assertThat(repository.pop(queue.getExternalId())).isEmpty();
     }
 
@@ -127,7 +119,12 @@ class MongoHttpQueuesRepositoryTest {
     @DisabledIfSystemProperty(named = "scope", matches = "core")
     @Tag("slow")
     void deleteQueueIfNotInUse() {
-        createQueue("q-name");
-        await().atMost(Duration.ONE_MINUTE).until(() -> !repository.isQueueExists("q-name"));
+        await().atMost(Duration.ONE_MINUTE).until(() -> !repository.isQueueExists(QUEUE_NAME));
+    }
+
+    @Test
+    void pushTickForASpecificQueue() {
+        repository.push(QUEUE_NAME, TICK_MESSAGE);
+        assertThat(repository.pop(queue.getExternalId())).contains(TICK_MESSAGE);
     }
 }
