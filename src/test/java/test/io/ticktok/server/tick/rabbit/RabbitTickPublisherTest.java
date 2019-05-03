@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.amqp.AmqpIOException;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
@@ -23,6 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.IntegrationTest;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,13 +54,15 @@ class RabbitTickPublisherTest {
 
     @BeforeEach
     void emptyQueue() {
-        while(receivedTick() != null) {
-            receivedTick();
-        }
+        while(receivedTick() != null);
     }
 
     private Object receivedTick() {
-        return rabbitTemplate.receiveAndConvert(QUEUE_NAME, 500);
+        try {
+            return rabbitTemplate.receiveAndConvert(QUEUE_NAME, 500);
+        } catch(AmqpIOException e) {
+            return null;
+        }
     }
 
     @Test
