@@ -98,6 +98,13 @@ class CoreE2ETest : CommonAppE2ETest() {
             app().invokeUnknownActionOn(clock)
             app().retrievedNotFoundError()
         }
+
+        @Test
+        fun retrieveAllClocksByName() {
+            val clock = app().registeredAClock("lala", "every.1.minutes")
+
+
+        }
     }
 
     @Nested
