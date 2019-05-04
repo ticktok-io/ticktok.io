@@ -7,7 +7,6 @@ import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 @Slf4j
 public class RabbitTickChannelOperations implements TickChannelOperations {
