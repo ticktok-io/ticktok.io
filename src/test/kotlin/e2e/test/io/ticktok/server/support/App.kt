@@ -3,11 +3,16 @@ package e2e.test.io.ticktok.server.support
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import com.sun.jndi.toolkit.url.Uri
+import com.sun.xml.internal.ws.api.server.SDDocumentFilter
 import io.ticktok.server.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
+import org.apache.http.NameValuePair
 import org.apache.http.client.fluent.Request
+import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.ContentType
+import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import org.awaitility.Duration
 import org.awaitility.kotlin.atMost
@@ -22,7 +27,9 @@ import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.springframework.web.util.UriBuilder
 import java.lang.Thread.sleep
+import java.net.URI
 import java.util.*
 
 class App(profile: String) {
@@ -77,8 +84,11 @@ class App(profile: String) {
 
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
 
-    private fun createAuthenticatedUrlFor(slag: String): String {
-        return withAuthToken("$appUrl/$slag")
+    private fun createAuthenticatedUrlFor(slag: String, params: Map<String, String> = mapOf()): String {
+        return URIBuilder(appUrl)
+                .setPath(slag)
+                .setParameters(params.map { BasicNameValuePair(it.key, it.value) })
+                .setParameter("access_token", ACCESS_TOKEN).build().toString()
     }
 
     private fun withAuthToken(url: String?): String {
@@ -137,8 +147,13 @@ class App(profile: String) {
         assertThat(getAllClocks(), matcher)
     }
 
-    private fun getAllClocks(): List<Clock> {
-        val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks")).execute().returnContent().asString()
+    fun clocks(filter: Map<String, String>, matcher: Matcher<List<Clock>>) {
+        assertThat(getAllClocks(filter), matcher)
+    }
+
+    private fun getAllClocks(filter: Map<String, String> = mapOf()): List<Clock> {
+        val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks", filter))
+                .execute().returnContent().asString()
         return Gson().fromJson(response, Array<Clock>::class.java).asList()
     }
 
@@ -239,15 +254,14 @@ class App(profile: String) {
         currentProfile = ""
     }
 
-    class ClockMatcher(private val clock: Clock) : BaseMatcher<List<Clock>>() {
+    class ClockMatcher(private val clock: Clock, private val exclusive: Boolean = false) : BaseMatcher<List<Clock>>() {
         override fun describeTo(description: Description?) {
             description?.appendText(clock.toString())
         }
 
         override fun matches(item: Any?): Boolean {
-            return (item as List<*>).firstOrNull {
-                it == clock.copy(status = (it as Clock).status)
-            } != null
+            val clockCount = (item as List<*>).groupBy { clock.copy(status = (it as Clock).status) }.count()
+            return (!exclusive && clockCount > 0) || clockCount == 1
         }
 
         companion object {
@@ -255,6 +269,11 @@ class App(profile: String) {
                 return ClockMatcher(clock)
             }
 
+            fun containsOnly(clock: Clock) : ClockMatcher {
+                return ClockMatcher(clock, true)
+
+
+            }
         }
 
     }
