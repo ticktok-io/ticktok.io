@@ -10,4 +10,5 @@ public interface TickChannelOperations {
     void disable(Clock clock);
 
     void enable(Clock clock);
+
 }

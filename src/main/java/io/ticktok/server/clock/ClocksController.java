@@ -118,7 +118,8 @@ public class ClocksController {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> clockAction(
             @PathVariable String id,
-            @ApiParam(required = true, allowableValues = "pause,resume") @PathVariable String action) {
+            @ApiParam(required = true, allowableValues = "pause,resume,tick") @PathVariable String action) {
+        log.info("CLOCK-ACTION: {} on clock: {}", action, id);
         clockActionFactory.run(action, id);
         return ResponseEntity.noContent().build();
     }

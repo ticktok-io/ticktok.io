@@ -49,4 +49,5 @@ public class HttpTickChannelOperations implements TickChannelOperations {
     public void enable(Clock clock) {
         queuesRepository.updateQueueSchedule(queueNameFor(clock), clock.getSchedule());
     }
+
 }
