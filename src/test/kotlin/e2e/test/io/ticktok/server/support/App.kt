@@ -91,10 +91,6 @@ class App(profile: String) {
                 .setParameter("access_token", ACCESS_TOKEN).build().toString()
     }
 
-    private fun withAuthToken(url: String?): String {
-        return "$url${if (url!!.indexOf("?") > -1) "&" else "?"}access_token=$ACCESS_TOKEN"
-    }
-
     private fun createClockRequestFor(name: String, timeExpr: String): String {
         return JSONObject()
                 .put("schedule", timeExpr)
@@ -261,7 +257,7 @@ class App(profile: String) {
 
         override fun matches(item: Any?): Boolean {
             val clockCount = (item as List<*>).groupBy { clock.copy(status = (it as Clock).status) }.count()
-            return (!exclusive && clockCount > 0) || clockCount == 1
+            return (!exclusive && clockCount > 0) || (clockCount == 1 && (item as List<*>).size == 1)
         }
 
         companion object {
