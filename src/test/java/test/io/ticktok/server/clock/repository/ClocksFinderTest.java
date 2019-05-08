@@ -9,6 +9,7 @@ import io.ticktok.server.config.ApplicationConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +20,15 @@ import test.io.ticktok.server.support.RepositoryCleanupConfiguration;
 import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import static io.ticktok.server.clock.repository.ClocksRepository.not;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
@@ -39,29 +44,35 @@ class ClocksFinderTest {
     @RegisterExtension
     RepositoryCleanupExtension repositoryCleanupExtension;
 
-    @Autowired
-    ClocksRepository repository;
+    ClocksRepository repository = mock(ClocksRepository.class);
+    ArgumentCaptor<Map<String, String>> filterParameters = ArgumentCaptor.forClass(Map.class);
+
 
     @Test
     void ignorePendingClocks() {
-        repository.save(Clock.builder().name("aaa").schedule("every.X.seconds").status(Clock.PENDING).build());
-        assertTrue(new ClocksFinder(repository).find().isEmpty());
+        new ClocksFinder(repository).find();
+        verify(repository).findBy(filterParameters.capture());
+        assertThat(filterParameters.getValue().get("status")).isEqualTo(not(Clock.PENDING));
     }
 
     @Test
     void failOnNonExistingClock() {
+        when(repository.findById("non-existing-id")).thenReturn(Optional.empty());
         assertThrows(ClockNotFoundException.class,
                 () -> new ClocksFinder(repository).findById("non-existing-id"));
     }
 
     @Test
-    void findByName() {
-        List<Clock> clocks = asList(
-                repository.save(Clock.builder().name("kuku").schedule("every.1.seconds").status(Clock.ACTIVE).build()),
-                repository.save(Clock.builder().name("kuku").schedule("every.12.seconds").status(Clock.ACTIVE).build()),
-                repository.save(Clock.builder().name("popo").schedule("every.123.seconds").status(Clock.ACTIVE).build()));
-        List<Clock> result = new ClocksFinder(repository, ImmutableMap.of("name", "kuku")).find();
-        assertThat(result).hasSize(2);
-        assertThat(result).containsOnlyOnce(clocks.get(0), clocks.get(1));
+    void delegateParameterMapToRepository() {
+        new ClocksFinder(repository, ImmutableMap.of("name", "kuku")).find();
+        verify(repository).findBy(filterParameters.capture());
+        assertThat(filterParameters.getValue().get("name")).isEqualTo("kuku");
+    }
+
+    @Test
+    void delegateResultFromRepository() {
+        final Clock clock = Clock.builder().name("lala").build();
+        when(repository.findBy(any())).thenReturn(asList(clock));
+        assertThat(new ClocksFinder(repository).find()).containsOnly(clock);
     }
 }

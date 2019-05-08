@@ -28,6 +28,7 @@ public class APISecurityConfiguration extends WebSecurityConfigurerAdapter {
                 antMatcher("/api/**").
                 csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-                and().addFilter(new APIAuthFilter(authToken)).authorizeRequests().anyRequest().authenticated();
+                and().addFilter(new APIAuthFilter(authToken)).addFilterAfter(new RemoveTokenQueryParamFilter(), APIAuthFilter.class).authorizeRequests().anyRequest().authenticated();
+
     }
 }

@@ -15,6 +15,8 @@ public class APIAuthFilter extends AbstractPreAuthenticatedProcessingFilter {
         return new AuthTokenExtractor(request).extract();
     }
 
+
+
     @Override
     protected Object getPreAuthenticatedCredentials(HttpServletRequest request) {
         return "N/A";
