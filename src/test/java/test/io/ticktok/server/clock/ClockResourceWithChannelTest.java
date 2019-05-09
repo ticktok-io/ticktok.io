@@ -33,4 +33,14 @@ class ClockResourceWithChannelTest {
         assertThat(resource.getChannel().getDetails().get("popo")).isEqualTo("{unknown}/hello");
     }
 
+    @Test
+    void shouldDelegateAllChannelDetails() {
+        final TickChannel channel = TickChannel.builder()
+                .type("rabbit")
+                .queue("q1")
+                .uri("amqp://uri")
+                .details(ImmutableMap.of("k", "v")).build();
+        ClockResourceWithChannel resource = new ClockResourceWithChannel(DOMAIN, new Clock(), channel);
+        assertThat(resource.getChannel()).isEqualTo(channel);
+    }
 }
