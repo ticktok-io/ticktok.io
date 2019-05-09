@@ -34,7 +34,7 @@ public class ClocksFinder {
     private Map<String, String> filterParameterWithPendingExcluded() {
         return Stream.of(parameters, ImmutableMap.of("status", not(Clock.PENDING)))
                     .flatMap(map -> map.entrySet().stream())
-                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> left));
     }
 
     public Clock findById(String id) {
