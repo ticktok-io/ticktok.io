@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
 public class MongoHttpQueuesRepository implements HttpQueuesRepository {
 
     public static final String LAST_ACCESSED_TIME = "lastAccessedTime";
@@ -53,7 +56,7 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     @Override
     public List<TickMessage> pop(String externalId) {
         HttpQueue httpQueue = mongo.findAndModify(
-                Query.query(Criteria.where(EXTERNAL_ID).is(externalId)),
+                query(where(EXTERNAL_ID).is(externalId)),
                 new OnPopUpdate().create(),
                 HttpQueue.class);
         validateQueueExists(externalId, httpQueue);
@@ -69,7 +72,7 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     @Override
     public HttpQueue createQueue(String name) {
         return mongo.findAndModify(
-                Query.query(Criteria.where(NAME).is(name)),
+                query(where(NAME).is(name)),
                 Update.update(LAST_ACCESSED_TIME, new Date()).setOnInsert(EXTERNAL_ID, UUID.randomUUID().toString()),
                 FindAndModifyOptions.options().upsert(true).returnNew(true),
                 HttpQueue.class);
@@ -77,24 +80,34 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
 
     @Override
     public void push(TickMessage tickMessage) {
-        mongo.updateMulti(Query.query(Criteria.where(SCHEDULE).is(tickMessage.getSchedule())),
-                new Update().push("ticks", tickMessage), HttpQueue.class);
+        mongo.updateMulti(query(where(SCHEDULE).is(tickMessage.getSchedule())),
+                updateForTick(tickMessage), HttpQueue.class);
+    }
+
+    private Update updateForTick(TickMessage tickMessage) {
+        return new Update().push("ticks", tickMessage);
+    }
+
+    @Override
+    public void push(String queueName, TickMessage tickMessage) {
+        mongo.updateFirst(query(where(NAME).is(queueName)),
+                updateForTick(tickMessage), HttpQueue.class);
     }
 
     @Override
     public void deleteQueue(String name) {
-        mongo.remove(Query.query(Criteria.where(NAME).is(name)), HttpQueue.class);
+        mongo.remove(query(where(NAME).is(name)), HttpQueue.class);
     }
 
     @Override
     public boolean isQueueExists(String queueName) {
-        return mongo.exists(Query.query(Criteria.where(NAME).is(queueName)), HttpQueue.class);
+        return mongo.exists(query(where(NAME).is(queueName)), HttpQueue.class);
     }
 
     @Override
     public void updateQueueSchedule(String queueName, String schedule) {
         mongo.upsert(
-                Query.query(Criteria.where(NAME).is(queueName)),
+                query(where(NAME).is(queueName)),
                 Update.update(SCHEDULE, schedule),
                 HttpQueue.class);
     }
