@@ -25,6 +25,8 @@ public class ClockResourceWithChannel extends ClockResource {
     private TickChannel channelWithPlaceHolders(String domain, TickChannel channel) {
         return TickChannel.builder()
                 .type(channel.getType())
+                .uri(channel.getUri())
+                .queue(channel.getQueue())
                 .details(detailsWith(domain, channel.getDetails()))
                 .build();
     }
