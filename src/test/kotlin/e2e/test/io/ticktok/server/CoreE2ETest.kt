@@ -4,6 +4,7 @@ import e2e.test.io.ticktok.server.pages.Browser
 import e2e.test.io.ticktok.server.pages.ClockListPage
 import e2e.test.io.ticktok.server.support.App
 import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsClock
+import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsOnly
 import e2e.test.io.ticktok.server.support.Client
 import e2e.test.io.ticktok.server.support.Client.CLOCK_EXPR
 import e2e.test.io.ticktok.server.support.Clock
@@ -97,6 +98,13 @@ class CoreE2ETest : CommonAppE2ETest() {
             val clock = app().registeredAClock("stam", "every.1.seconds")
             app().invokeUnknownActionOn(clock)
             app().retrievedNotFoundError()
+        }
+
+        @Test
+        fun retrieveAllClocksByName() {
+            app().registeredAClock("hop", "every.1.minutes")
+            val clock = app().registeredAClock("lala", "every.1.minutes")
+            app().clocks(mapOf("name" to "lala"), containsOnly(clock));
         }
     }
 
