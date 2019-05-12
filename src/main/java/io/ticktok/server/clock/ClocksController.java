@@ -21,6 +21,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -101,8 +102,8 @@ public class ClocksController {
 
     @GetMapping
     @ApiOperation("Get all defined clocks")
-    public List<ClockResource> findAll() {
-        return new ClocksFinder(clocksRepository).find()
+    public List<ClockResource> findAll(@RequestParam Map<String, String> queryParams) {
+        return new ClocksFinder(clocksRepository, queryParams).find()
                 .stream().map(this::createClockResourceFor).collect(Collectors.toList());
     }
 

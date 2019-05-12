@@ -1,10 +1,10 @@
 package test.io.ticktok.server.clock.repository;
 
+import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.schedule.repository.SchedulesRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -16,10 +16,10 @@ import test.io.ticktok.server.support.IntegrationTest;
 import test.io.ticktok.server.support.RepositoryCleanupConfiguration;
 import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -48,22 +48,23 @@ class ClocksRepositoryTest {
     @Test
     void updateModifiedDate() {
         Clock savedClock = repository.saveClock("eli", "every.30.seconds");
-        assertThat(repository.findById(savedClock.getId()).get().getLastModifiedDate(), is(systemClock.millis()));
+        assertThat(repository.findById(savedClock.getId()).get().getLastModifiedDate())
+                .isEqualTo(systemClock.millis());
     }
 
     @Test
     void updateClockByNameAndSchedule() {
         String clockName = "kuku";
         Clock clock = repository.saveClock(clockName, "every.5.seconds");
-        assertThat(clock.getId(), is(repository.saveClock(clockName, "every.5.seconds").getId()));
-        assertThat(clock.getId(), is(not(repository.saveClock(clockName, "every.2.seconds").getId())));
+        assertThat(clock.getId()).isEqualTo(repository.saveClock(clockName, "every.5.seconds").getId());
+        assertThat(clock.getId()).isNotEqualTo(repository.saveClock(clockName, "every.2.seconds").getId());
     }
 
     @Test
     void deleteClock() {
         Clock clock = repository.saveClock("popov", "every.6.seconds");
         repository.deleteClock(clock);
-        assertFalse(repository.findById(clock.getId()).isPresent());
+        assertThat(repository.findById(clock.getId())).isNotPresent();
     }
 
     @Test
@@ -82,14 +83,14 @@ class ClocksRepositoryTest {
     @Test
     void clockShouldCreatedAsPending() {
         Clock clock = repository.saveClock("lili", "every.11.seconds");
-        assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.PENDING));
+        assertThat(repository.findById(clock.getId()).get().getStatus()).isEqualTo(Clock.PENDING);
     }
 
     @Test
     void updateClockStatus() {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
         repository.updateStatus(clock.getId(), Clock.ACTIVE);
-        assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.ACTIVE));
+        assertThat(repository.findById(clock.getId()).get().getStatus()).isEqualTo(Clock.ACTIVE);
     }
 
     @Test
@@ -106,11 +107,29 @@ class ClocksRepositoryTest {
     }
 
     @Test
-    void shouldNotChangeStateWhenSavingAnexistingClock() {
+    void shouldNotChangeStateWhenSavingExistingClock() {
         Clock clock = repository.saveClock("popov", "every.13.seconds");
         repository.updateStatus(clock.getId(), Clock.ACTIVE);
         repository.saveClock("popov", "every.13.seconds");
-        assertThat(repository.findById(clock.getId()).get().getStatus(), is(Clock.ACTIVE));
+        assertThat(repository.findById(clock.getId()).get().getStatus()).isEqualTo(Clock.ACTIVE);
     }
 
+    @Test
+    void retrieveAllExceptWithValue() {
+        List<Clock> clocks = Arrays.asList(
+                repository.save(Clock.builder().name("kuku").schedule("every.22.seconds").status(Clock.PENDING).build()),
+                repository.save(Clock.builder().name("bobo").schedule("every.11.seconds").status(Clock.ACTIVE).build()));
+        List<Clock> foundClocks = repository.findBy(ImmutableMap.of("status", ClocksRepository.not(Clock.PENDING)));
+        assertThat(foundClocks).containsOnly(clocks.get(1));
+    }
+
+    @Test
+    void retrieveAllWithSpecifyValue() {
+        List<Clock> clocks = Arrays.asList(
+                repository.save(Clock.builder().name("kuku").schedule("every.22.seconds").status(Clock.PENDING).build()),
+                repository.save(Clock.builder().name("kuku").schedule("every.21.seconds").status(Clock.PENDING).build()),
+                repository.save(Clock.builder().name("bobo").schedule("every.11.seconds").status(Clock.ACTIVE).build()));
+        List<Clock> foundClocks = repository.findBy(ImmutableMap.of("name", "kuku"));
+        assertThat(foundClocks).containsOnly(clocks.get(0), clocks.get(1));
+    }
 }
