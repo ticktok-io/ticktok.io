@@ -25,7 +25,7 @@ public class AccessTokenAuthenticationManager implements AuthenticationManager {
     }
 
     private void validateToken(String token) {
-        if(!authToken.equalsIgnoreCase(sha1(token))) {
+        if(!authToken.equals(token)) {
             throw new BadCredentialsException("The access token was not found or is not the expected value.");
         }
     }
