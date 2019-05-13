@@ -114,7 +114,8 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
 
     public static class OnPopUpdate {
         public Update create() {
-            return Update.update("ticks", new ArrayList<>())
+            return new Update()
+                    .unset("ticks")
                     .set(LAST_ACCESSED_TIME, now());
         }
 
