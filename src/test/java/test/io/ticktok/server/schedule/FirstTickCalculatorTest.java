@@ -21,8 +21,4 @@ class FirstTickCalculatorTest {
         assertThat(calculator.calcFor(new Clock("kuku", "@never"))).isEqualTo(Long.MAX_VALUE);
     }
 
-    @Test
-    void ignoreCaseOfNever() {
-        assertThat(calculator.calcFor(new Clock("kuku", "@nEveR"))).isEqualTo(Long.MAX_VALUE);
-    }
 }

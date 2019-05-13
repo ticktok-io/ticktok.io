@@ -1,32 +1,32 @@
 package test.io.ticktok.server.schedule;
 
 import io.ticktok.server.schedule.ScheduleParser;
+import io.ticktok.server.schedule.ScheduleParser.ExpressionNotValidException;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ScheduleParserTest {
 
     @Test
     void shouldFailOnInvalidExpression() {
-        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
-                new ScheduleParser("invalid schedule").interval());
+        assertThatThrownBy(() -> new ScheduleParser("invalid schedule").interval())
+                .isInstanceOf(ExpressionNotValidException.class);
     }
 
     @Test
     void retrieveIntervalForEveryXSecs() {
-        assertThat(new ScheduleParser("every.6.seconds").interval(), is(6));
+        assertThat(new ScheduleParser("every.6.seconds").interval()).isEqualTo(6);
     }
 
     @Test
     void retrieveIntervalForEveryXHoursInSeconds() {
-        assertThat(new ScheduleParser("every.2.hours").interval(), is(toSeconds(2, HOURS)));
+        assertThat(new ScheduleParser("every.2.hours").interval()).isEqualTo(toSeconds(2, HOURS));
     }
 
     private int toSeconds(int amount, TimeUnit unit) {
@@ -35,24 +35,28 @@ class ScheduleParserTest {
 
     @Test
     void failOnZeroInterval() {
-        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
-                new ScheduleParser("every.0.hours").interval());
-        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
-                new ScheduleParser("every.000.hours").interval());
+        assertThatThrownBy(() -> new ScheduleParser("every.0.hours").interval())
+                .isInstanceOf(ExpressionNotValidException.class);
+        assertThatThrownBy(() -> new ScheduleParser("every.000.hours").interval())
+                .isInstanceOf(ExpressionNotValidException.class);
     }
 
     @Test
     void failOnNonExactExpression() {
         String expression = "every.1.hours";
-        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
-                new ScheduleParser(expression + "lalala").interval());
-        assertThrows(ScheduleParser.ExpressionNotValidException.class, () ->
-                new ScheduleParser("www." + expression).interval());
+        assertThatThrownBy(() -> new ScheduleParser(expression + "lalala").interval())
+                .isInstanceOf(ExpressionNotValidException.class);
+        assertThatThrownBy(() -> new ScheduleParser("www." + expression).interval())
+                .isInstanceOf(ExpressionNotValidException.class);
     }
 
     @Test
     void retrieveIntervalForEveryXMinutes() {
-        assertThat(new ScheduleParser("every.4.minutes").interval(), is(toSeconds(4, MINUTES)));
+        assertThat(new ScheduleParser("every.4.minutes").interval()).isEqualTo(toSeconds(4, MINUTES));
     }
 
+    @Test
+    void retrieveIntervalForNever() {
+        assertThat(new ScheduleParser("@never").interval()).isEqualTo(0);
+    }
 }

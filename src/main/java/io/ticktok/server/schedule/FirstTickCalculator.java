@@ -10,7 +10,7 @@ public class FirstTickCalculator {
     }
 
     public long calcFor(Clock clock) {
-        if(clock.getSchedule().toLowerCase().equals("@never")) {
+        if(new ScheduleParser(clock.getSchedule()).interval() == 0) {
             return Long.MAX_VALUE;
         }
         return systemClock.millis();
