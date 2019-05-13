@@ -62,6 +62,10 @@ class SchedulesRepositoryTest {
         assertThat(createdSchedule.getClocks(), contains(CLOCK_11.getId()));
     }
 
+    private long now() {
+        return 9283674;
+    }
+
     @Test
     void increaseClockCountOnAddingExistingSchedule() {
         schedulesRepository.addClock(CLOCK_11, now());
@@ -89,10 +93,6 @@ class SchedulesRepositoryTest {
         assertThat(schedules.size(), is(2));
         assertThat(schedules.get(0).getSchedule(), is("every.8.seconds"));
         assertThat(schedules.get(1).getSchedule(), is("every.9.seconds"));
-    }
-
-    private long now() {
-        return 9283674;
     }
 
     @Test
