@@ -96,7 +96,7 @@ class ClocksRepositoryTest {
     @Test
     void addScheduleUponClockSave() {
         Clock clock = repository.saveClock("lulu", "every.11.seconds");
-        verify(schedulesRepository, times(1)).addClock(clock);
+        verify(schedulesRepository, times(1)).addClock(clock, systemClock.millis());
     }
 
     @Test

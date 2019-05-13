@@ -22,21 +22,19 @@ public class SchedulesRepositoryImpl implements CustomSchedulesRepository {
     public static final String SCHEDULE = "schedule";
 
     private final MongoOperations mongo;
-    private final Clock systemTime;
 
-    public SchedulesRepositoryImpl(MongoOperations mongoOperations, Clock systemTime) {
+    public SchedulesRepositoryImpl(MongoOperations mongoOperations) {
         this.mongo = mongoOperations;
-        this.systemTime = systemTime;
     }
 
 
     @Override
     @Retryable(value = {DuplicateKeyException.class}, maxAttempts = 2, backoff = @Backoff(delay = 50))
-    public void addClock(io.ticktok.server.clock.Clock clock) {
+    public void addClock(io.ticktok.server.clock.Clock clock, long firstTick) {
         mongo.findAndModify(
                 Query.query(Criteria.where(SCHEDULE).is(clock.getSchedule())),
                 new Update()
-                        .setOnInsert(NEXT_TICK, systemTime.millis())
+                        .setOnInsert(NEXT_TICK, firstTick)
                         .addToSet(CLOCKS, clock.getId()),
                 FindAndModifyOptions.options().upsert(true),
                 Schedule.class);

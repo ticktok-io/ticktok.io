@@ -17,7 +17,7 @@ public class ScheduleParser {
             "hours", 60 * 60
     );
     public static final String MATCH_UNITS = String.join("|", mapUnitToSeconds.keySet());
-    public static final Pattern EVERY_PATTERN = Pattern.compile(format("^every\\.(\\d+)\\.(%s)$", MATCH_UNITS));
+    public static final Pattern EVERY_PATTERN = Pattern.compile(format("^((\\@never)|(every\\.(\\d+)\\.(%s)))$", MATCH_UNITS));
 
 
     private final String schedule;
@@ -27,26 +27,28 @@ public class ScheduleParser {
     }
 
     public int interval() {
-        Matcher matcher = getMatcher();
-        return intervalFrom(matcher) * mapUnitToSeconds.get(matcher.group(2));
-    }
-
-    private Integer intervalFrom(Matcher matcher) {
-        Integer i = Integer.valueOf(matcher.group(1));
-        failIf(() -> i == 0, "Interval of 0 yis not supported");
-        return i;
-    }
-
-    private void failIf(BooleanSupplier predicate, String errorMsg) {
-        if(predicate.getAsBoolean()) {
-            throw new ExpressionNotValidException(errorMsg);
-        }
+        return intervalFrom(getMatcher());
     }
 
     private Matcher getMatcher() {
         Matcher matcher = EVERY_PATTERN.matcher(schedule);
         failIf(() -> !matcher.find(), "Unable to understand the schedule: " + schedule);
         return matcher;
+    }
+
+    private Integer intervalFrom(Matcher matcher) {
+        if(matcher.group(2) != null) {
+            return 0;
+        }
+        Integer i = Integer.valueOf(matcher.group(4));
+        failIf(() -> i == 0, "Interval of 0 is not supported");
+        return i * mapUnitToSeconds.get(matcher.group(5));
+    }
+
+    private void failIf(BooleanSupplier predicate, String errorMsg) {
+        if(predicate.getAsBoolean()) {
+            throw new ExpressionNotValidException(errorMsg);
+        }
     }
 
     public static class ExpressionNotValidException extends RuntimeException {
