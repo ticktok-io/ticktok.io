@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 
 @Configuration
 @EnableMongoRepositories(basePackages = {"io.ticktok.server.clock.repository"})
-@ComponentScan(basePackages = {"io.ticktok.server.clock.repository", "io.ticktok.server.schedule.repository"},
+@ComponentScan(basePackages = {"io.ticktok.server.clock.repository", "io.ticktok.server.schedule"},
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = SchedulesRepository.class),
                 @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Purger.*")})

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CustomSchedulesRepository {
 
-    void addClock(Clock clock);
+    void addClock(Clock clock, long firstTick);
 
     void removeClock(Clock clock);
 
