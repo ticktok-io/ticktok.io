@@ -4,7 +4,7 @@ rabbit:
     ttl: 120000
 
 http:
-  auth-token: ${ACCESS_TOKEN:41082cd7e33aa93ee76635820ded697f2c0b1b32}
+  auth-token: ${ACCESS_TOKEN:ticktok-zY3wpR}
 
 spring:
   profiles:
