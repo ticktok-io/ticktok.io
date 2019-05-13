@@ -1,6 +1,6 @@
 # Ticktok.io
 [![CircleCI](https://circleci.com/gh/ticktok-io/ticktok.io.svg?style=svg)](https://circleci.com/gh/ticktok-io/ticktok.io)
-[![Release](https://img.shields.io/github/release-pre/ticktok-io/ticktok.io.svg)](https://github.com/ticktok-io/ticktok.io/releases/0.2.1)
+[![Release](https://img.shields.io/github/release/ticktok-io/ticktok.io.svg)](https://github.com/ticktok-io/ticktok.io/releases/0.2.4)
 [![License](http://img.shields.io/:license-apache2.0-red.svg)](http://doge.mit-license.org)
 [![Gitter](https://badges.gitter.im/ticktok-io/community.svg)](https://gitter.im/ticktok-io/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
