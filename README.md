@@ -2,6 +2,7 @@
 [![CircleCI](https://circleci.com/gh/ticktok-io/ticktok.io.svg?style=svg)](https://circleci.com/gh/ticktok-io/ticktok.io)
 [![Release](https://img.shields.io/github/release-pre/ticktok-io/ticktok.io.svg)](https://github.com/ticktok-io/ticktok.io/releases/0.2.1)
 [![License](http://img.shields.io/:license-apache2.0-red.svg)](http://doge.mit-license.org)
+[![Gitter](https://badges.gitter.im/ticktok-io/community.svg)](https://gitter.im/ticktok-io/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Ticktok.io is an efficient, managed and clustered scheduler that allows 
 apps to receive accurate and reliable clock signals at scale. 
@@ -14,13 +15,13 @@ docker run
   -e RABBIT_URI=<rabbit uri for messaging bus>
   -e MONGO_URI=<mongo db uri>
   -e ACCESS_TOKEN=<sha1 encoded token>
-  ticktok/ticktok:0.2.1
+  ticktok/ticktok:0.2.4
 ```
 
 Documentation: https://ticktok.io/docs
 	
 ## Community
-Have some questions/ideas? chat with us on [Slack](https://join.slack.com/t/ticktokio/shared_invite/enQtNTE0MzExNTY5MjIzLThjNDU3NjIzYzQxZTY0YTM5ODE2OWFmMWU3YmQ1ZTViNDVmYjZkNWUzMWU5NWU0YmU5NWYxMWMxZjlmNGQ1Y2U)
+Have some questions/ideas? Come and chat with us on [Gitter](https://gitter.im/ticktok-io/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link) 
 
 ## Official SDKs
 * [ticktok-io/ticktok-java-client](https://github.com/ticktok-io/ticktok-java-client)
