@@ -4,7 +4,7 @@ rabbit:
     ttl: 1000
 
 http:
-  auth-token: a5f98e2b068ee51f90fd81c530e7fb4e306e7f42
+  auth-token: ct-auth-token
 
 spring:
   profiles:
