@@ -8,7 +8,7 @@ http:
 
 server:
   port: 9643
-  
+
 spring:
   profiles:
     active: rabbit
