@@ -6,6 +6,9 @@ rabbit:
 http:
   auth-token: ct-auth-token
 
+server:
+  port: 9643
+  
 spring:
   profiles:
     active: rabbit
