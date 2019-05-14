@@ -4,7 +4,7 @@ services:
   app:
     image: app
     ports:
-    - 8080:9643
+    - 9643:9643
     environment:
     - RABBIT_URI=amqp://rabbit
     - MONGO_URI=mongodb://mongo/e2e-test
