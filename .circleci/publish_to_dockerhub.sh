@@ -20,7 +20,7 @@ else
     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
     push_image app $IMAGE
 
-    if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
-        push_image app $IMAGE_NAME:latest
-    fi
+#    if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
+#        push_image app $IMAGE_NAME:latest
+#    fi
 fi

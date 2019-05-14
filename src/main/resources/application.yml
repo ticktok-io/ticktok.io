@@ -6,6 +6,9 @@ rabbit:
 http:
   auth-token: ${ACCESS_TOKEN:ticktok-zY3wpR}
 
+server:
+  port: 9643
+
 spring:
   profiles:
     active: rabbit
