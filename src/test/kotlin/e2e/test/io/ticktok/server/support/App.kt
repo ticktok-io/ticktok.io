@@ -36,7 +36,7 @@ class App(profile: String) {
 
     companion object {
         const val ACCESS_TOKEN = "ct-auth-token"
-        var appUrl = System.getenv("APP_URL") ?: "http://localhost:8080"
+        var appUrl = System.getenv("APP_URL") ?: "http://localhost:9643"
         var startApp = System.getProperty("startApp", "yes") != "no"
         private var appInstance: App? = null
 
