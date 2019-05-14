@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 
-port=${PORT:-6943}
+port=${PORT:-9643}
 
 if [[ -z "${MONGO_URI}" ]]; then
     export MONGO_URI=mongodb://localhost/ticktok

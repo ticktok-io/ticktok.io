@@ -10,6 +10,6 @@ RUN chmod +x /opt/app/entrypoint.sh
 
 WORKDIR /opt/app
 
-EXPOSE 6943
+EXPOSE 9643
 
 CMD ["./entrypoint.sh"]
