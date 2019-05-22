@@ -4,8 +4,8 @@
 [![License](http://img.shields.io/:license-apache2.0-red.svg)](http://doge.mit-license.org)
 [![Gitter](https://badges.gitter.im/ticktok-io/community.svg)](https://gitter.im/ticktok-io/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Ticktok.io is an efficient, managed and clustered scheduler that allows 
-apps to receive accurate and reliable clock signals at scale. 
+Ticktok.io is an efficient, managed and cluster ready time based events dispatcher that allows 
+apps to receive accurate and reliable tick signals at scale. 
 
 ![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clocks_list_v2.png)
 
