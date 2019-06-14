@@ -200,7 +200,7 @@ class App(profile: String) {
         resumeAllPausedClocks()
         sleep(500)
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
-        sleep(500)
+        sleep(1000)
         assertThat(response.statusLine.statusCode, `is`(204))
     }
 
