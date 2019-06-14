@@ -19,11 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.IntegrationTest;
 
 import static java.lang.Thread.sleep;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {RabbitConfiguration.class})
@@ -53,14 +49,14 @@ class RabbitTickChannelOperationsTest {
 
     @Test
     void retrieveTrueWhenQueueExists() {
-        assertTrue(tickChannelExplorer.isExists(CLOCK));
+        assertThat(tickChannelExplorer.isExists(CLOCK)).isTrue();
     }
 
     @Test
     void createQueueForConsumer() {
         tickChannelExplorer.enable(CLOCK);
         sendTick();
-        assertThat(receivedTick(), is(TICK_MSG));
+        assertThat(receivedTick()).isEqualTo(TICK_MSG);
     }
 
     private void sendTick() {
@@ -74,7 +70,7 @@ class RabbitTickChannelOperationsTest {
     @Test
     void channelShouldBeDeletedIfUnused() throws InterruptedException {
         sleep(600);
-        assertNull(amqpAdmin.getQueueProperties(channel.getQueue()));
+        assertThat(amqpAdmin.getQueueProperties(channel.getQueue())).isNull();
     }
 
     @Test
@@ -82,19 +78,25 @@ class RabbitTickChannelOperationsTest {
         tickChannelExplorer.enable(CLOCK);
         tickChannelExplorer.disable(CLOCK);
         sendTick();
-        assertNull(receivedTick());
+        assertThat(receivedTick()).isNull();
     }
 
     @Test
     void shouldBindQueueOnEnable() {
         tickChannelExplorer.enable(CLOCK);
         sendTick();
-        assertThat(receivedTick(), is(TICK_MSG));
+        assertThat(receivedTick()).isEqualTo(TICK_MSG);
     }
 
     @Test
     void ignoreEnableFailureIfQueueNotExists() {
         tickChannelExplorer.enable(new Clock("papa", "every.321.seconds"));
         // pass
+    }
+
+    @Test
+    void shouldNotDeleteQueueImmediatelyAfterClientDisconnect() {
+        receivedTick();
+        assertThat(amqpAdmin.getQueueProperties(channel.getQueue())).isNotNull();
     }
 }
