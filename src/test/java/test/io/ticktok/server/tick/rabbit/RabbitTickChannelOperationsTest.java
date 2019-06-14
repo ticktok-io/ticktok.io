@@ -18,6 +18,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.IntegrationTest;
 
+import java.util.Properties;
+
 import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -70,7 +72,11 @@ class RabbitTickChannelOperationsTest {
     @Test
     void channelShouldBeDeletedIfUnused() throws InterruptedException {
         sleep(600);
-        assertThat(amqpAdmin.getQueueProperties(channel.getQueue())).isNull();
+        assertThat(queueExists()).isFalse();
+    }
+
+    private boolean queueExists() {
+        return amqpAdmin.getQueueProperties(channel.getQueue()) != null;
     }
 
     @Test
@@ -97,6 +103,6 @@ class RabbitTickChannelOperationsTest {
     @Test
     void shouldNotDeleteQueueImmediatelyAfterClientDisconnect() {
         receivedTick();
-        assertThat(amqpAdmin.getQueueProperties(channel.getQueue())).isNotNull();
+        assertThat(queueExists()).isTrue();
     }
 }
