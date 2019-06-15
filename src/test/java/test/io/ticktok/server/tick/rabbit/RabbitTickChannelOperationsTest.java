@@ -18,8 +18,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.IntegrationTest;
 
-import java.util.Properties;
-
 import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 
