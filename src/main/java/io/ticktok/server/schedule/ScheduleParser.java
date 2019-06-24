@@ -27,7 +27,7 @@ public class ScheduleParser {
     }
 
     public int interval() {
-        return intervalFrom(getMatcher());
+        return intervalFrom(getMatcher()) * 1000;
     }
 
     private Matcher getMatcher() {

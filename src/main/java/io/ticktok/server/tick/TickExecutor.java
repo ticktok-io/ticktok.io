@@ -21,7 +21,7 @@ public class TickExecutor {
     public void execute() {
         ticksRepository.findByStatusAndTimeLessThanEqual(Tick.PENDING, now()).forEach(t -> {
             ticksRepository.updateTickStatus(t.getId(), Tick.IN_PROGRESS);
-            tickPublisher.publish(t.getSchedule());
+            tickPublisher.publish(t);
             ticksRepository.updateTickStatus(t.getId(), Tick.PUBLISHED);
         });
     }

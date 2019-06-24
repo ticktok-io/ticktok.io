@@ -28,7 +28,7 @@ class TickExecutorTest {
                 Tick.create(new Schedule("every.4.seconds", 2000L))
         };
         executeGivenTick(ticks);
-        Arrays.stream(ticks).forEach(t -> verify(tickPublisher).publish(t.getSchedule()));
+        Arrays.stream(ticks).forEach(t -> verify(tickPublisher).publish(t));
     }
 
     private void executeGivenTick(Tick... ticks) {

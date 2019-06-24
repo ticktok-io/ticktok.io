@@ -2,6 +2,7 @@ package io.ticktok.server.tick.http;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.QueueNameCreator;
+import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
 
@@ -13,8 +14,8 @@ public class HttpTickPublisher implements TickPublisher {
     }
 
     @Override
-    public void publish(String schedule) {
-        queuesRepository.push(new TickMessage(schedule));
+    public void publish(Tick tick) {
+        queuesRepository.push(new TickMessage(tick.getSchedule()));
     }
 
     @Override

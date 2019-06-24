@@ -21,16 +21,16 @@ class ScheduleParserTest {
 
     @Test
     void retrieveIntervalForEveryXSecs() {
-        assertThat(new ScheduleParser("every.6.seconds").interval()).isEqualTo(6);
+        assertThat(new ScheduleParser("every.6.seconds").interval()).isEqualTo(6000);
     }
 
     @Test
     void retrieveIntervalForEveryXHoursInSeconds() {
-        assertThat(new ScheduleParser("every.2.hours").interval()).isEqualTo(toSeconds(2, HOURS));
+        assertThat(new ScheduleParser("every.2.hours").interval()).isEqualTo(toMillis(2, HOURS));
     }
 
-    private int toSeconds(int amount, TimeUnit unit) {
-        return (int) TimeUnit.SECONDS.convert(amount, unit);
+    private int toMillis(int amount, TimeUnit unit) {
+        return (int) TimeUnit.MILLISECONDS.convert(amount, unit);
     }
 
     @Test
@@ -52,7 +52,7 @@ class ScheduleParserTest {
 
     @Test
     void retrieveIntervalForEveryXMinutes() {
-        assertThat(new ScheduleParser("every.4.minutes").interval()).isEqualTo(toSeconds(4, MINUTES));
+        assertThat(new ScheduleParser("every.4.minutes").interval()).isEqualTo(toMillis(4, MINUTES));
     }
 
     @Test
