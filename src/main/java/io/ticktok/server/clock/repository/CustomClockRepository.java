@@ -14,5 +14,4 @@ public interface CustomClockRepository {
     void updateStatus(String id, String status);
 
     List<Clock> findBy(Map<String, String> filter);
-
 }
