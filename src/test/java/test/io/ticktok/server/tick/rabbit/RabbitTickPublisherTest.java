@@ -64,7 +64,7 @@ class RabbitTickPublisherTest {
     void shouldDelegateSchedule() {
         bindWith("every.10.seconds");
         tickPublisher.publish(Tick.create("every.10.seconds", 0));
-        final TickMessage tickMessage = new Gson().fromJson((String) rabbitTemplate.receiveAndConvert(QUEUE_NAME), TickMessage.class);
+        final TickMessage tickMessage = new Gson().fromJson((String) receivedTick(), TickMessage.class);
         assertThat(tickMessage.getSchedule()).isEqualTo("every.10.seconds");
     }
 
@@ -86,6 +86,6 @@ class RabbitTickPublisherTest {
         bindWith("every.1.seconds");
         tickPublisher.publish(Tick.create("every.1.seconds", 0));
         sleep(1000);
-        assertThat(rabbitTemplate.receiveAndConvert(QUEUE_NAME)).isNull();
+        assertThat(receivedTick()).isNull();
     }
 }
