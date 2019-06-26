@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @IntegrationTest
 class RabbitTickPublisherTest {
 
-    public static final Clock CLOCK = new Clock("koko", "every.911..seconds");
+    public static final Clock CLOCK = new Clock("koko", "every.999.seconds");
     public static final String QUEUE_NAME = new QueueNameCreator(CLOCK).create();
     public static final Queue QUEUE = new Queue(QUEUE_NAME, false, false, true);
     @Autowired
