@@ -3,22 +3,16 @@ package e2e.test.io.ticktok.server.support
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import com.sun.jndi.toolkit.url.Uri
-import com.sun.xml.internal.ws.api.server.SDDocumentFilter
 import io.ticktok.server.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
-import org.apache.http.NameValuePair
 import org.apache.http.client.fluent.Request
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.ContentType
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import org.awaitility.Duration
-import org.awaitility.kotlin.atMost
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.until
-import org.awaitility.kotlin.withPollInterval
+import org.awaitility.kotlin.*
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -27,9 +21,7 @@ import org.hamcrest.core.Is.`is`
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.springframework.web.util.UriBuilder
 import java.lang.Thread.sleep
-import java.net.URI
 import java.util.*
 
 class App(profile: String) {
@@ -48,7 +40,7 @@ class App(profile: String) {
                 }
                 appInstance?.waitForAppToBeHealthy()
             }
-            return appInstance as App;
+            return appInstance as App
         }
     }
 
@@ -140,7 +132,9 @@ class App(profile: String) {
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
-        assertThat(getAllClocks(), matcher)
+        await atMost(Duration.FIVE_SECONDS) untilAsserted  {
+            assertThat(getAllClocks(), matcher)
+        }
     }
 
     fun clocks(filter: Map<String, String>, matcher: Matcher<List<Clock>>) {
@@ -200,8 +194,8 @@ class App(profile: String) {
         resumeAllPausedClocks()
         sleep(500)
         val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
-        sleep(500)
         assertThat(response.statusLine.statusCode, `is`(204))
+        sleep(1000)
     }
 
     private fun resumeAllPausedClocks() {
@@ -220,11 +214,11 @@ class App(profile: String) {
 
     fun pauseClock(clock: Clock) {
         val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/pause")).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(204));
+        assertThat(response.statusLine.statusCode, `is`(204))
     }
 
     fun clock(id: String): Clock {
-        val result = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks/${id}")).execute().returnContent().asString()
+        val result = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks/$id")).execute().returnContent().asString()
         return Gson().fromJson(result, Clock::class.java)
     }
 
@@ -257,7 +251,7 @@ class App(profile: String) {
 
         override fun matches(item: Any?): Boolean {
             val clockCount = (item as List<*>).groupBy { clock.copy(status = (it as Clock).status) }.count()
-            return (!exclusive && clockCount > 0) || (clockCount == 1 && (item as List<*>).size == 1)
+            return (!exclusive && clockCount > 0) || (clockCount == 1 && item.size == 1)
         }
 
         companion object {

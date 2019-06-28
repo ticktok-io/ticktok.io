@@ -48,7 +48,7 @@ public class RabbitTickChannelOperations implements TickChannelOperations {
     }
 
     private Queue queueFor(Clock clock) {
-        return new Queue(nameFor(clock), true, false, true, queueOptions());
+        return new Queue(nameFor(clock), true, false, false, queueOptions());
     }
 
     private ImmutableMap<String, Object> queueOptions() {

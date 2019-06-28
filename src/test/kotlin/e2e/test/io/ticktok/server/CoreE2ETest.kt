@@ -51,7 +51,7 @@ class CoreE2ETest : CommonAppE2ETest() {
         }
 
         @Test
-        fun purgeClocks() {
+        fun purgeClocksWithNoConsumers() {
             val clock = app().registeredAClock("purger", CLOCK_EXPR)
             Client.stop()
             app().purge()
