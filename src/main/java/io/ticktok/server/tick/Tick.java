@@ -35,7 +35,7 @@ public class Tick {
     }
 
     public Tick nextTick() {
-        long nextTick = this.time + new ScheduleParser(schedule).interval() * 1000;
+        long nextTick = this.time + new ScheduleParser(schedule).interval();
         return new Tick(null, schedule, nextTick, PENDING);
     }
 
@@ -45,5 +45,9 @@ public class Tick {
 
     private long boundedTimeTo(long boundTime) {
         return time < boundTime ? boundTime : time;
+    }
+
+    public int ttl() {
+        return new ScheduleParser(schedule).interval() - 1;
     }
 }

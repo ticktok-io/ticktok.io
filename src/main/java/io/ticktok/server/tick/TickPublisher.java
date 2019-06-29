@@ -4,7 +4,7 @@ import io.ticktok.server.clock.Clock;
 
 public interface TickPublisher {
 
-    void publish(String schedule);
+    void publish(Tick tick);
 
     void publishForClock(Clock clock);
 }

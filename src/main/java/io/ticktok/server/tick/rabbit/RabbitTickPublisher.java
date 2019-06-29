@@ -3,9 +3,13 @@ package io.ticktok.server.tick.rabbit;
 import com.google.gson.Gson;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.QueueNameCreator;
+import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitOperations;
 
 public class RabbitTickPublisher implements TickPublisher {
@@ -19,8 +23,16 @@ public class RabbitTickPublisher implements TickPublisher {
     }
 
     @Override
-    public void publish(String schedule) {
-        rabbitOperations.convertAndSend(exchange.getName(), schedule, tickMessageFor(schedule));
+    public void publish(Tick tick) {
+        rabbitOperations.convertAndSend(
+                exchange.getName(),
+                tick.getSchedule(),
+                tickMessageFor(tick.getSchedule()),
+                new TicktokMessagePostProcessor(tick.ttl()));
+    }
+
+    private String tickMessageFor(String schedule) {
+        return new Gson().toJson(new TickMessage(schedule));
     }
 
     @Override
@@ -28,7 +40,18 @@ public class RabbitTickPublisher implements TickPublisher {
         rabbitOperations.convertAndSend(new QueueNameCreator(clock).create(), tickMessageFor(clock.getSchedule()));
     }
 
-    private String tickMessageFor(String schedule) {
-        return new Gson().toJson(new TickMessage(schedule));
+    private class TicktokMessagePostProcessor implements MessagePostProcessor {
+
+        private final int ttl;
+
+        public TicktokMessagePostProcessor(int ttl) {
+            this.ttl = ttl;
+        }
+
+        @Override
+        public Message postProcessMessage(Message message) throws AmqpException {
+            message.getMessageProperties().setExpiration(String.valueOf(ttl));
+            return message;
+        }
     }
 }

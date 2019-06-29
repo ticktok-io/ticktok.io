@@ -2,6 +2,7 @@ package test.io.ticktok.server.tick.http;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.QueueNameCreator;
+import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.http.HttpQueuesRepository;
 import io.ticktok.server.tick.http.HttpTickPublisher;
@@ -17,7 +18,7 @@ class HttpTickPublisherTest {
 
     @Test
     void addNewTicksToQueue() {
-        httpTickPublisher.publish("schedule");
+        httpTickPublisher.publish(Tick.create("schedule", 0));
         verify(queuesRepository).push(new TickMessage("schedule"));
     }
 
