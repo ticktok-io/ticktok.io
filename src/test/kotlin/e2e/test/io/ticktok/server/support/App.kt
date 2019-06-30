@@ -18,6 +18,7 @@ import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
+import org.hamcrest.core.IsNull
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -132,7 +133,7 @@ class App(profile: String) {
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
-        await atMost(Duration.FIVE_SECONDS) untilAsserted  {
+        await atMost (Duration.FIVE_SECONDS) untilAsserted {
             assertThat(getAllClocks(), matcher)
         }
     }
@@ -192,10 +193,7 @@ class App(profile: String) {
 
     fun purge() {
         resumeAllPausedClocks()
-        sleep(500)
-        val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(204))
-        sleep(1000)
+        sleep(1500)
     }
 
     private fun resumeAllPausedClocks() {
@@ -212,9 +210,20 @@ class App(profile: String) {
         assertThat(failedRequestsCount, `is`(0))
     }
 
-    fun pauseClock(clock: Clock) {
-        val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/pause")).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(204))
+    fun pauseClock(clock: Clock) : Clock {
+        return dispatchActionOn("pause", clock)
+    }
+
+    private fun dispatchActionOn(action: String, clock: Clock) : Clock {
+        val pauseUrl = clock.linkFor(action)
+        val response = Request.Put(withAccessToken((pauseUrl as String?)!!)).execute().returnResponse()
+        assertThat(response.statusLine.statusCode, `is`(200))
+        return Gson().fromJson<Clock>(bodyOf(response))
+    }
+
+    private fun withAccessToken(url: String): String {
+        return URIBuilder(url)
+                .setParameter("access_token", ACCESS_TOKEN).build().toString()
     }
 
     fun clock(id: String): Clock {
@@ -244,6 +253,15 @@ class App(profile: String) {
         currentProfile = ""
     }
 
+    fun pauseActionIsNotAvailableFor(clock: Clock) {
+        val updatedClock = clock(clock.id)
+        assertThat(updatedClock.linkFor("pause"), IsNull())
+    }
+
+    fun tick(clock: Clock) {
+        dispatchActionOn("tick", clock)
+    }
+
     class ClockMatcher(private val clock: Clock, private val exclusive: Boolean = false) : BaseMatcher<List<Clock>>() {
         override fun describeTo(description: Description?) {
             description?.appendText(clock.toString())
@@ -259,7 +277,7 @@ class App(profile: String) {
                 return ClockMatcher(clock)
             }
 
-            fun containsOnly(clock: Clock) : ClockMatcher {
+            fun containsOnly(clock: Clock): ClockMatcher {
                 return ClockMatcher(clock, true)
 
 

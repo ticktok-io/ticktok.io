@@ -1,5 +1,6 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.repository;
 
+import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;

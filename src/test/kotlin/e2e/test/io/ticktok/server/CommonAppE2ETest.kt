@@ -2,12 +2,10 @@ package e2e.test.io.ticktok.server
 
 import e2e.test.io.ticktok.server.support.App
 import e2e.test.io.ticktok.server.support.Client
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Tag("ct")
 abstract class CommonAppE2ETest {
 
     @AfterEach

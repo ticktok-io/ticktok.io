@@ -20,7 +20,7 @@ public class RabbitTickChannelOperations implements TickChannelOperations {
             RabbitProperties rabbitProperties,
             AmqpAdmin rabbitAdmin,
             TopicExchange topicExchange) {
-        this.queueTTL = Long.valueOf(rabbitProperties.queueTTL());
+        this.queueTTL = Long.parseLong(rabbitProperties.queueTTL());
         this.rabbitAdmin = rabbitAdmin;
         this.consumerRabbitUri = rabbitProperties.getConsumerUri();
         this.exchange = topicExchange;

@@ -1,6 +1,6 @@
 package test.io.ticktok.server.clock;
 
-import io.ticktok.server.clock.ClockRequest;
+import io.ticktok.server.clock.control.ClockRequest;
 import org.hibernate.validator.HibernateValidator;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;

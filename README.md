@@ -15,10 +15,10 @@ docker run
   -e RABBIT_URI=<rabbit uri for messaging bus>
   -e MONGO_URI=<mongo db uri>
   -e ACCESS_TOKEN=<sha1 encoded token>
-  ticktok/ticktok:0.2.6
+  ticktok/ticktok
 ```
 
-Documentation: https://ticktok.io/docs
+Documentation: https://ticktok.io/docs/overview
 	
 ## Community
 Have some questions/ideas? Come and chat with us on [Gitter](https://gitter.im/ticktok-io/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link) 

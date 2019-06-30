@@ -19,7 +19,6 @@ spring:
 queues:
   ttl: 120000
 
-
 management:
   health:
     defaults:

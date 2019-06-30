@@ -1,5 +1,6 @@
 package io.ticktok.server.clock.actions;
 
+import io.ticktok.server.clock.Clock;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -24,15 +25,22 @@ public class ClockActionFactory {
                 .toLowerCase();
     }
 
-    public void run(String actionName, String id) {
+    public ClockAction create(String actionName) {
         validateActionExists(actionName);
-        actions.get(actionName).run(id);
+        return actions.get(actionName);
     }
 
     private void validateActionExists(String actionName) {
         if(!actions.containsKey(actionName)) {
             throw new ActionNotFoundException("Failed to find action for: " + actionName);
         }
+    }
+
+    public List<String> availableActionsFor(Clock clock) {
+        return actions.values().stream()
+                .filter(a -> a.availableFor(clock))
+                .map(this::actionNameFor)
+                .collect(Collectors.toList());
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Action not supported")
