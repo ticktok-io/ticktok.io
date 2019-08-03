@@ -1,7 +1,7 @@
 package io.ticktok.server.clock.actions;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.repository.ClocksFinder;
+import io.ticktok.server.clock.repository.RepositoryClocksFinder;
 import io.ticktok.server.clock.repository.ClocksRepository;
 
 public abstract class RepositoryClockAction implements ClockAction {
@@ -14,7 +14,7 @@ public abstract class RepositoryClockAction implements ClockAction {
 
     @Override
     public void run(String id) {
-        Clock clock = new ClocksFinder(clocksRepository).findById(id);
+        Clock clock = new RepositoryClocksFinder(clocksRepository).findById(id);
         runOnClock(clock);
     }
 
