@@ -34,7 +34,7 @@ public class RepositoryClocksFinder implements ClocksFinder {
 
     public Clock findById(String id) {
         return repository.findById(id).orElseThrow(
-                () -> new ClockNotFoundException("Failed to findBy clock with id: " + id));
+                () -> new ClockNotFoundException("Failed to find clock with id: " + id));
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Clock not found")
