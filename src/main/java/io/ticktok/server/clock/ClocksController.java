@@ -2,7 +2,7 @@ package io.ticktok.server.clock;
 
 import io.swagger.annotations.*;
 import io.ticktok.server.clock.actions.ClockActionFactory;
-import io.ticktok.server.clock.repository.ClocksFinder;
+import io.ticktok.server.clock.repository.RepositoryClocksFinder;
 import io.ticktok.server.clock.repository.ClocksPurger;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/clocks")
 public class ClocksController {
+
+    public static final int CACHE_TTL = 1;
 
     private final ClocksRepository clocksRepository;
     private final TickChannelOperations tickChannelOperations;
@@ -93,7 +95,7 @@ public class ClocksController {
     @GetMapping("/{id}")
     @ApiOperation("Retrieve a specific clock")
     public ClockResource findOne(@PathVariable("id") String id) {
-        return createClockResourceFor(new ClocksFinder(clocksRepository).findById(id));
+        return createClockResourceFor(new RepositoryClocksFinder(clocksRepository).findById(id));
     }
 
     private ClockResource createClockResourceFor(Clock clock) {
@@ -103,8 +105,11 @@ public class ClocksController {
     @GetMapping
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll(@RequestParam Map<String, String> queryParams) {
-        return new ClocksFinder(clocksRepository, queryParams).find()
-                .stream().map(this::createClockResourceFor).collect(Collectors.toList());
+        return findClocksBy(queryParams).stream().map(this::createClockResourceFor).collect(Collectors.toList());
+    }
+
+    private List<Clock> findClocksBy(@RequestParam Map<String, String> queryParams) {
+        return new CachedClocksFinder(new RepositoryClocksFinder(clocksRepository), CACHE_TTL).findBy(queryParams);
     }
 
     @PostMapping("/purge")

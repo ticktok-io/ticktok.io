@@ -2,12 +2,13 @@ package test.io.ticktok.server.clock.repository;
 
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.repository.ClocksFinder;
-import io.ticktok.server.clock.repository.ClocksFinder.ClockNotFoundException;
+import io.ticktok.server.clock.repository.RepositoryClocksFinder;
+import io.ticktok.server.clock.repository.RepositoryClocksFinder.ClockNotFoundException;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ class ClocksFinderTest {
 
     @Test
     void ignorePendingClocks() {
-        new ClocksFinder(repository).find();
+        new RepositoryClocksFinder(repository).findBy(new HashMap<>());
         verify(repository).findBy(filterParameters.capture());
         assertThat(filterParameters.getValue().get("status")).isEqualTo(not(Clock.PENDING));
     }
@@ -34,7 +35,7 @@ class ClocksFinderTest {
     void failOnNonExistingClock() {
         when(repository.findById("non-existing-id")).thenReturn(Optional.empty());
         assertThrows(ClockNotFoundException.class,
-                () -> new ClocksFinder(repository).findById("non-existing-id"));
+                () -> new RepositoryClocksFinder(repository).findById("non-existing-id"));
     }
 
     @Test
@@ -44,15 +45,15 @@ class ClocksFinderTest {
         assertThat(filterParameters.getValue().get("name")).isEqualTo("kuku");
     }
 
-    private void findBy(String name, String kuku) {
-        new ClocksFinder(repository, ImmutableMap.of(name, kuku)).find();
+    private void findBy(String name, String value) {
+        new RepositoryClocksFinder(repository).findBy(ImmutableMap.of(name, value));
     }
 
     @Test
     void delegateResultFromRepository() {
         final Clock clock = Clock.builder().name("lala").build();
         when(repository.findBy(any())).thenReturn(asList(clock));
-        assertThat(new ClocksFinder(repository).find()).containsOnly(clock);
+        assertThat(new RepositoryClocksFinder(repository).findBy(new HashMap<>())).containsOnly(clock);
     }
 
     @Test
