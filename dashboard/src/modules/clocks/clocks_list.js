@@ -16,6 +16,7 @@ export class ClocksList extends Component {
   }
 
   componentDidMount() {
+    this._tick();
     this.timer = setInterval(this._tick, 2000)
   }
 

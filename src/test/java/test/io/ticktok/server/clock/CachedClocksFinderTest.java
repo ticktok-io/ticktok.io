@@ -6,6 +6,7 @@ import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.ClocksFinder;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,9 +36,12 @@ class CachedClocksFinderTest {
 
     @Test
     void shouldNotDelegateASecondTimeOnConsecutiveCalls() {
-        cachedClocksFinder.findBy(PARAMS);
-        cachedClocksFinder.findBy(PARAMS);
+        List<List<Clock>> results = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            results.add(cachedClocksFinder.findBy(PARAMS));
+        }
         verify(clocksFinder, times(1)).findBy(PARAMS);
+        assertThat(results.stream().allMatch(e -> e.equals(results.get(0)))).isTrue();
     }
 
     @Test
