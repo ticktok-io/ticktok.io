@@ -192,10 +192,7 @@ class App(profile: String) {
 
     fun purge() {
         resumeAllPausedClocks()
-        sleep(500)
-        val response = Request.Post(createAuthenticatedUrlFor("/api/v1/clocks/purge")).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(204))
-        sleep(1000)
+        sleep(1500)
     }
 
     private fun resumeAllPausedClocks() {
