@@ -34,12 +34,14 @@ public class ClocksController {
 
     private final ClocksRepository clocksRepository;
     private final TickChannelOperations tickChannelOperations;
+    private final ClocksFinder clocksFinder;
 
 
     public ClocksController(ClocksRepository clocksRepository,
                             TickChannelOperations tickChannelOperations) {
         this.clocksRepository = clocksRepository;
         this.tickChannelOperations = tickChannelOperations;
+        this.clocksFinder = new CachedClocksFinder(new RepositoryClocksFinder(clocksRepository), CACHE_TTL);
     }
 
     @PostMapping
@@ -99,12 +101,8 @@ public class ClocksController {
     @GetMapping
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll(@RequestParam Map<String, String> queryParams) {
-        return findClocksBy(queryParams).stream().map(this::createClockResourceFor).collect(Collectors.toList());
+        return clocksFinder.findBy(queryParams)
+                .stream().map(this::createClockResourceFor).collect(Collectors.toList());
     }
-
-    private List<Clock> findClocksBy(@RequestParam Map<String, String> queryParams) {
-        return new CachedClocksFinder(new RepositoryClocksFinder(clocksRepository), CACHE_TTL).findBy(queryParams);
-    }
-
 }
 
