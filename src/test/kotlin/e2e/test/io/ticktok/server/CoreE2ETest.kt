@@ -8,6 +8,7 @@ import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsOnl
 import e2e.test.io.ticktok.server.support.Client
 import e2e.test.io.ticktok.server.support.Client.CLOCK_EXPR
 import e2e.test.io.ticktok.server.support.Clock
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -54,7 +55,7 @@ class CoreE2ETest : CommonAppE2ETest() {
         fun purgeClocksWithNoConsumers() {
             val clock = app().registeredAClock("purger", CLOCK_EXPR)
             Client.stop()
-            app().purge()
+            sleep(1500)
             app().clocks(not(containsClock(clock)))
         }
 

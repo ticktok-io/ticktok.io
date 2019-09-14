@@ -34,18 +34,14 @@ public class ClocksController {
 
     private final ClocksRepository clocksRepository;
     private final TickChannelOperations tickChannelOperations;
-    private final ClocksPurger clocksPurger;
-    private final ClockActionFactory clockActionFactory;
+    private final ClocksFinder clocksFinder;
 
 
     public ClocksController(ClocksRepository clocksRepository,
-                            TickChannelOperations tickChannelOperations,
-                            ClocksPurger clocksPurger,
-                            ClockActionFactory clockActionFactory) {
+                            TickChannelOperations tickChannelOperations) {
         this.clocksRepository = clocksRepository;
         this.tickChannelOperations = tickChannelOperations;
-        this.clocksPurger = clocksPurger;
-        this.clockActionFactory = clockActionFactory;
+        this.clocksFinder = new CachedClocksFinder(new RepositoryClocksFinder(clocksRepository), CACHE_TTL);
     }
 
     @PostMapping
@@ -105,30 +101,8 @@ public class ClocksController {
     @GetMapping
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll(@RequestParam Map<String, String> queryParams) {
-        return findClocksBy(queryParams).stream().map(this::createClockResourceFor).collect(Collectors.toList());
+        return clocksFinder.findBy(queryParams)
+                .stream().map(this::createClockResourceFor).collect(Collectors.toList());
     }
-
-    private List<Clock> findClocksBy(@RequestParam Map<String, String> queryParams) {
-        return new CachedClocksFinder(new RepositoryClocksFinder(clocksRepository), CACHE_TTL).findBy(queryParams);
-    }
-
-    @PostMapping("/purge")
-    @ApiOperation("Purge clocks with no active schedules")
-    public ResponseEntity<Void> purge() {
-        clocksPurger.purge();
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{id}/{action}")
-    @ApiOperation(value = "Run an action on a specific clock")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> clockAction(
-            @PathVariable String id,
-            @ApiParam(required = true, allowableValues = "pause,resume,tick") @PathVariable String action) {
-        log.info("CLOCK-ACTION: {} on clock: {}", action, id);
-        clockActionFactory.run(action, id);
-        return ResponseEntity.noContent().build();
-    }
-
 }
 
