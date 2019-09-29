@@ -132,7 +132,7 @@ class App(profile: String) {
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
-        await atMost(Duration.FIVE_SECONDS) untilAsserted  {
+        await atMost (Duration.FIVE_SECONDS) untilAsserted {
             assertThat(getAllClocks(), matcher)
         }
     }
@@ -210,8 +210,14 @@ class App(profile: String) {
     }
 
     fun pauseClock(clock: Clock) {
-        val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/pause")).execute().returnResponse()
+        val pauseUrl = (clock._links!!["pause"] as Map<String, String>?)!!["href"]
+        val response = Request.Put(withAccessToken(pauseUrl!!)).execute().returnResponse()
         assertThat(response.statusLine.statusCode, `is`(204))
+    }
+
+    private fun withAccessToken(url: String): String {
+        return URIBuilder(url)
+                .setParameter("access_token", ACCESS_TOKEN).build().toString()
     }
 
     fun clock(id: String): Clock {
@@ -256,7 +262,7 @@ class App(profile: String) {
                 return ClockMatcher(clock)
             }
 
-            fun containsOnly(clock: Clock) : ClockMatcher {
+            fun containsOnly(clock: Clock): ClockMatcher {
                 return ClockMatcher(clock, true)
 
 
