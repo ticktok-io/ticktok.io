@@ -18,4 +18,9 @@ public class PauseClockAction extends RepositoryClockAction {
     protected void runOnClock(Clock clock) {
         tickChannelOperations.disable(clock);
     }
+
+    @Override
+    public boolean availableFor(Clock clock) {
+        return !clock.getStatus().equals(Clock.PAUSED);
+    }
 }

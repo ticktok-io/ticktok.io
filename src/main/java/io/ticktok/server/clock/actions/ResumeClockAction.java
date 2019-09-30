@@ -19,4 +19,8 @@ public class ResumeClockAction extends RepositoryClockAction {
         tickChannelOperations.enable(clock);
     }
 
+    @Override
+    public boolean availableFor(Clock clock) {
+        return clock.getStatus().equals(Clock.PAUSED);
+    }
 }

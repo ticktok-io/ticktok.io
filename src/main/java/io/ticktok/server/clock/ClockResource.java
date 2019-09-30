@@ -2,25 +2,30 @@ package io.ticktok.server.clock;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.ticktok.server.tick.TickChannel;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Links;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.AbstractMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 
 @AllArgsConstructor
 @Getter
 @ToString
-public class ClockResourceV2 extends ResourceSupport {
+public class ClockResource extends ResourceSupport {
 
     private String clockId;
     private String name;
     private String schedule;
     private String status;
-    private String url;
     private TickChannel channel;
 
     @JsonProperty("id")
@@ -36,6 +41,7 @@ public class ClockResourceV2 extends ResourceSupport {
         private Clock clock;
         private TickChannel channel;
         private String domain;
+        private List<String> actions;
 
         public ClockResourceBuilder clock(Clock clock) {
             this.clock = clock;
@@ -52,24 +58,40 @@ public class ClockResourceV2 extends ResourceSupport {
             return this;
         }
 
-        public ClockResourceV2 build() {
-            return new ClockResourceV2(
+        public ClockResourceBuilder actions(List<String> actions) {
+            this.actions = actions;
+            return this;
+        }
+
+        public ClockResource build() {
+            final ClockResource clockResource = new ClockResource(
                     clock.getId(),
                     clock.getName(),
                     clock.getSchedule(),
                     clock.getStatus(),
-                    createSelfUri(),
                     createChannel());
+            clockResource.add(selfLink());
+            clockResource.add(actionLinks());
+            return clockResource;
         }
 
-        private String createSelfUri() {
-            return UriComponentsBuilder.fromHttpUrl(domain)
-                    .path("/api/v1/clocks/{id}")
-                    .buildAndExpand(clock.getId()).toUriString();
+        private Link selfLink() {
+            return linkTo(methodOn(ClocksController.class).findOne(clock.getId())).withSelfRel();
+        }
+
+        private List<Link> actionLinks() {
+            if (actions != null) {
+                return actions.stream().map(this::actionLinkFor).collect(toList());
+            }
+            return new ArrayList<>();
+        }
+
+        private Link actionLinkFor(String a) {
+            return linkTo(methodOn(ClockController.class).clockAction(clock.getId(), a)).withRel(a);
         }
 
         private TickChannel createChannel() {
-            if(channel == null) {
+            if (channel == null) {
                 return null;
             }
             return TickChannel.builder()

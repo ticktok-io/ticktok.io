@@ -4,7 +4,6 @@ package test.io.ticktok.server.clock.actions;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.actions.ClockActionFactory;
 import io.ticktok.server.clock.repository.ClocksRepository;
-import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickChannelOperations;
 import io.ticktok.server.tick.TickPublisher;
 import org.junit.jupiter.api.Assertions;
@@ -22,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -83,6 +83,17 @@ public class ClockActionTest {
             verify(tickChannelOperations).enable(CLOCK);
         }
 
+        @Test
+        void shouldNotBeAvailableWhenClockIsActive() {
+            final Clock activeClock = Clock.builder().status(Clock.ACTIVE).build();
+            assertThat(clockActionFactory.availableActionsFor(activeClock)).doesNotContain("resume");
+        }
+
+        @Test
+        void souldBeAvailableWhenClockIsPaused() {
+            final Clock pausedClock = Clock.builder().status(Clock.PAUSED).build();
+            assertThat(clockActionFactory.availableActionsFor(pausedClock)).contains("resume");
+        }
     }
     @Nested
     class PauseClockActionTest {

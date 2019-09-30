@@ -18,6 +18,7 @@ import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
+import org.hamcrest.core.IsNull
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -210,8 +211,12 @@ class App(profile: String) {
     }
 
     fun pauseClock(clock: Clock) {
-        val pauseUrl = (clock._links!!["pause"] as Map<String, String>?)!!["href"]
-        val response = Request.Put(withAccessToken(pauseUrl!!)).execute().returnResponse()
+        dispatchActionOn("pause", clock)
+    }
+
+    private fun dispatchActionOn(action: String, clock: Clock) {
+        val pauseUrl = (clock._links!![action] as Map<*, *>?)!!["href"]
+        val response = Request.Put(withAccessToken((pauseUrl as String?)!!)).execute().returnResponse()
         assertThat(response.statusLine.statusCode, `is`(204))
     }
 
@@ -245,6 +250,15 @@ class App(profile: String) {
         }
         appInstance = null
         currentProfile = ""
+    }
+
+    fun pauseActionIsNotAvailableFor(clock: Clock) {
+        val updatedClock = clock(clock.id)
+        assertThat(updatedClock._links!!["pause"], IsNull())
+    }
+
+    fun tick(clock: Clock) {
+        dispatchActionOn("tick", clock)
     }
 
     class ClockMatcher(private val clock: Clock, private val exclusive: Boolean = false) : BaseMatcher<List<Clock>>() {

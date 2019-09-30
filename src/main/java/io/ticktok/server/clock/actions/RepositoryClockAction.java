@@ -19,4 +19,9 @@ public abstract class RepositoryClockAction implements ClockAction {
     }
 
     protected abstract void runOnClock(Clock clock);
+
+    @Override
+    public boolean availableFor(Clock clock) {
+        return true;
+    }
 }

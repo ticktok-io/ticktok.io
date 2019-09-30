@@ -3,7 +3,6 @@ package io.ticktok.server.clock;
 import io.swagger.annotations.*;
 import io.ticktok.server.clock.actions.ClockActionFactory;
 import io.ticktok.server.clock.repository.RepositoryClocksFinder;
-import io.ticktok.server.clock.repository.ClocksPurger;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelCreator;
@@ -20,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,13 +34,16 @@ public class ClocksController {
 
     private final ClocksRepository clocksRepository;
     private final TickChannelOperations tickChannelOperations;
+    private final ClockActionFactory clockActionFactory;
     private final ClocksFinder clocksFinder;
 
 
     public ClocksController(ClocksRepository clocksRepository,
-                            TickChannelOperations tickChannelOperations) {
+                            TickChannelOperations tickChannelOperations,
+                            ClockActionFactory clockActionFactory) {
         this.clocksRepository = clocksRepository;
         this.tickChannelOperations = tickChannelOperations;
+        this.clockActionFactory = clockActionFactory;
         this.clocksFinder = new CachedClocksFinder(new RepositoryClocksFinder(clocksRepository), CACHE_TTL);
     }
 
@@ -53,22 +56,27 @@ public class ClocksController {
                     responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)}),
             @ApiResponse(code = 400,
                     message = "Bad request")})
-    public ResponseEntity<ClockResourceV2> create(@Valid @RequestBody ClockRequest clockRequest) {
+    public ResponseEntity<ClockResource> create(@Valid @RequestBody ClockRequest clockRequest) {
         log.info("CLOCK-REQUEST: {}", clockRequest.toString());
         Clock savedClock = clocksRepository.saveClock(clockRequest.getName(), clockRequest.getSchedule());
         TickChannel channel = new TickChannelCreator(tickChannelOperations).createFor(savedClock);
         return createdClockEntity(savedClock, channel);
     }
 
-    private ResponseEntity<ClockResourceV2> createdClockEntity(Clock clock, TickChannel channel) {
-        final ClockResourceV2 resource = ClockResourceV2.builder()
-                .domain(host())
-                .clock(clock)
+    private ResponseEntity<ClockResource> createdClockEntity(Clock clock, TickChannel channel) {
+        ClockResource resource = clockBuilderFor(clock)
                 .channel(channel)
                 .build();
         return ResponseEntity
-                .created(withAuthToken(resource.getUrl(), userPrincipal()))
+                .created(withAuthToken(resource.getId().getHref(), userPrincipal()))
                 .body(resource);
+    }
+
+    private ClockResource.ClockResourceBuilder clockBuilderFor(Clock clock) {
+        return ClockResource.builder()
+                .domain(host())
+                .clock(clock)
+                .actions(clockActionFactory.availableActionsFor(clock));
     }
 
     private String host() {
@@ -93,19 +101,15 @@ public class ClocksController {
 
     @GetMapping("/{id}")
     @ApiOperation("Retrieve a specific clock")
-    public ClockResourceV2 findOne(@PathVariable("id") String id) {
-        return createClockResourceFor(new RepositoryClocksFinder(clocksRepository).findById(id));
-    }
-
-    private ClockResourceV2 createClockResourceFor(Clock clock) {
-        return ClockResourceV2.builder().domain(host()).clock(clock).build();
+    public ClockResource findOne(@PathVariable("id") String id) {
+        return clockBuilderFor(new RepositoryClocksFinder(clocksRepository).findById(id)).build();
     }
 
     @GetMapping
     @ApiOperation("Get all defined clocks")
-    public List<ClockResourceV2> findAll(@RequestParam Map<String, String> queryParams) {
+    public List<ClockResource> findAll(@RequestParam Map<String, String> queryParams) {
         return clocksFinder.findBy(queryParams)
-                .stream().map(this::createClockResourceFor).collect(Collectors.toList());
+                .stream().map(c -> clockBuilderFor(c).build()).collect(Collectors.toList());
     }
 }
 

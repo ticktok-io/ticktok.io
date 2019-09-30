@@ -8,7 +8,6 @@ import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsOnl
 import e2e.test.io.ticktok.server.support.Client
 import e2e.test.io.ticktok.server.support.Client.CLOCK_EXPR
 import e2e.test.io.ticktok.server.support.Clock
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -92,6 +91,7 @@ class CoreE2ETest : CommonAppE2ETest() {
             val clock = app().registeredAClock("to-be-disabled", "every.2.seconds")
             app().pauseClock(clock)
             Client.receivesNoMoreTicks()
+            app().pauseActionIsNotAvailableFor(clock)
         }
 
         @Test
@@ -106,6 +106,13 @@ class CoreE2ETest : CommonAppE2ETest() {
             app().registeredAClock("hop", "every.1.minutes")
             val clock = app().registeredAClock("lala", "every.1.minutes")
             app().clocks(mapOf("name" to "lala"), containsOnly(clock));
+        }
+
+        @Test
+        fun sendTickToAnExistingClock() {
+            val clock = app().registeredAClock("disabled", "@never")
+            app().tick(clock)
+            Client.receivedTicksFor(clock)
         }
     }
 
