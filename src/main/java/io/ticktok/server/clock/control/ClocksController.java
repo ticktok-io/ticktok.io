@@ -1,6 +1,9 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.control;
 
 import io.swagger.annotations.*;
+import io.ticktok.server.clock.CachedClocksFinder;
+import io.ticktok.server.clock.Clock;
+import io.ticktok.server.clock.ClocksFinder;
 import io.ticktok.server.clock.actions.ClockActionFactory;
 import io.ticktok.server.clock.repository.RepositoryClocksFinder;
 import io.ticktok.server.clock.repository.ClocksRepository;
@@ -19,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

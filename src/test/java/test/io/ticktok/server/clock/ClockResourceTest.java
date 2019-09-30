@@ -2,7 +2,7 @@ package test.io.ticktok.server.clock;
 
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.ClockResource;
+import io.ticktok.server.clock.control.ClockResource;
 import io.ticktok.server.tick.TickChannel;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;

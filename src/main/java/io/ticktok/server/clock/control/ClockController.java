@@ -1,4 +1,4 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.control;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

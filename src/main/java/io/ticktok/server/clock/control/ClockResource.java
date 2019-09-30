@@ -1,12 +1,12 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.control;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.TickChannel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Links;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.*;
