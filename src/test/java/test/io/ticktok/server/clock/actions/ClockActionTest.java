@@ -34,11 +34,6 @@ public class ClockActionTest {
     static class TestConfiguration {
 
         @Bean
-        public ClocksRepository clocksRepository() {
-            return mock(ClocksRepository.class);
-        }
-
-        @Bean
         public TickChannelOperations tickChannelExplorer() {
             return mock(TickChannelOperations.class);
         }
@@ -57,29 +52,22 @@ public class ClockActionTest {
     @Autowired
     ClockActionFactory clockActionFactory;
     @Autowired
-    ClocksRepository clocksRepository;
-    @Autowired
     TickChannelOperations tickChannelOperations;
     @Autowired
     TickPublisher tickPublisher;
 
 
-    @BeforeEach
-    public void findClockMock() {
-        when(clocksRepository.findById(CLOCK.getId())).thenReturn(Optional.of(CLOCK));
-    }
-
-
     @Test
     void failOnNonExistingAction() {
         Assertions.assertThrows(ClockActionFactory.ActionNotFoundException.class,
-                () -> clockActionFactory.run("non-action", "123"));
+                () -> clockActionFactory.create("non-action"));
     }
+
     @Nested
     class ResumeClockActionTest {
         @Test
         void shouldEnableClock() {
-            clockActionFactory.run("resume", CLOCK.getId());
+            clockActionFactory.create("resume").run(CLOCK);
             verify(tickChannelOperations).enable(CLOCK);
         }
 
@@ -90,26 +78,27 @@ public class ClockActionTest {
         }
 
         @Test
-        void souldBeAvailableWhenClockIsPaused() {
+        void shouldBeAvailableWhenClockIsPaused() {
             final Clock pausedClock = Clock.builder().status(Clock.PAUSED).build();
             assertThat(clockActionFactory.availableActionsFor(pausedClock)).contains("resume");
         }
     }
+
     @Nested
     class PauseClockActionTest {
         @Test
         void invokeDisableClock() {
-            clockActionFactory.run("pause", CLOCK.getId());
+            clockActionFactory.create("pause").run(CLOCK);
             verify(tickChannelOperations).disable(CLOCK);
         }
 
     }
+
     @Nested
     class TickClockActionTest {
-
         @Test
         void manuallyTickSpecificClock() {
-            clockActionFactory.run("tick", CLOCK.getId());
+            clockActionFactory.create("tick").run(CLOCK);
             verify(tickPublisher).publishForClock(CLOCK);
         }
     }

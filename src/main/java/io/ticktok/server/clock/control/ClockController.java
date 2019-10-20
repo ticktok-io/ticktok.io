@@ -29,20 +29,21 @@ public class ClockController {
     @ApiOperation(value = "Run an action on a specific clock")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> clockAction(
-            @PathVariable String id,
+            Model model,
             @ApiParam(required = true, allowableValues = "pause,resume,tick") @PathVariable String action) {
-        log.info("CLOCK-ACTION: {} on clock: {}", action, id);
-        clockActionFactory.run(action, id);
+        final Clock clock = clockFrom(model);
+        log.info("CLOCK-ACTION: {} on clock: {}", action, clock.getId());
+        clockActionFactory.create(action).run(clock);
         return ResponseEntity.noContent().build();
+    }
+
+    private Clock clockFrom(Model model) {
+        return (Clock) model.asMap().get("clock");
     }
 
     @GetMapping()
     @ApiOperation("Retrieve a specific clock")
     public ClockResource findOne(Model model) {
         return clockResourceFactory.create(clockFrom(model));
-    }
-
-    private Clock clockFrom(Model model) {
-        return (Clock) model.asMap().get("clock");
     }
 }

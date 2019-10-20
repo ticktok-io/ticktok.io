@@ -5,12 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.util.Arrays.asList;
 
 @Component
 public class ClockActionFactory {
@@ -28,9 +25,9 @@ public class ClockActionFactory {
                 .toLowerCase();
     }
 
-    public void run(String actionName, String id) {
+    public ClockAction create(String actionName) {
         validateActionExists(actionName);
-        actions.get(actionName).run(id);
+        return actions.get(actionName);
     }
 
     private void validateActionExists(String actionName) {

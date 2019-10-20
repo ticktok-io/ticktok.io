@@ -85,7 +85,7 @@ class RabbitTickPublisherTest {
     void shouldDeleteMessageOnTTL() throws InterruptedException {
         bindWith("every.1.seconds");
         tickPublisher.publish(Tick.create("every.1.seconds", 0));
-        sleep(1000);
+        sleep(1100);
         assertThat(receivedTick()).isNull();
     }
 }

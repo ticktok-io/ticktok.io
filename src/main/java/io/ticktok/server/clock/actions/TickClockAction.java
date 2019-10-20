@@ -6,17 +6,21 @@ import io.ticktok.server.tick.TickPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TickClockAction extends RepositoryClockAction {
+public class TickClockAction implements ClockAction {
 
     private final TickPublisher tickPublisher;
 
-    public TickClockAction(ClocksRepository clocksRepository, TickPublisher tickPublisher) {
-        super(clocksRepository);
+    public TickClockAction(TickPublisher tickPublisher) {
         this.tickPublisher = tickPublisher;
     }
 
     @Override
-    protected void runOnClock(Clock clock) {
+    public void run(Clock clock) {
         tickPublisher.publishForClock(clock);
+    }
+
+    @Override
+    public boolean availableFor(Clock clock) {
+        return true;
     }
 }

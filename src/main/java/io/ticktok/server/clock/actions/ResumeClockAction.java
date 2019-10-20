@@ -6,16 +6,14 @@ import io.ticktok.server.tick.TickChannelOperations;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ResumeClockAction extends RepositoryClockAction {
+public class ResumeClockAction implements ClockAction {
     private final TickChannelOperations tickChannelOperations;
 
-    public ResumeClockAction(ClocksRepository clocksRepository, TickChannelOperations tickChannelOperations) {
-        super(clocksRepository);
+    public ResumeClockAction(TickChannelOperations tickChannelOperations) {
         this.tickChannelOperations = tickChannelOperations;
     }
 
-    @Override
-    protected void runOnClock(Clock clock) {
+    public void run(Clock clock) {
         tickChannelOperations.enable(clock);
     }
 
