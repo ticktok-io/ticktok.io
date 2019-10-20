@@ -14,17 +14,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.ticktok.server.clock.control.HttpRequestUtil.host;
+import static io.ticktok.server.clock.control.HttpRequestUtil.userPrincipal;
 
 @Slf4j
 @Api(tags = {"clocks"})
@@ -36,8 +36,8 @@ public class ClocksController {
 
     private final ClocksRepository clocksRepository;
     private final TickChannelOperations tickChannelOperations;
-    private final ClockActionFactory clockActionFactory;
     private final ClocksFinder clocksFinder;
+    private final ClockResourceFactory clockResourceFactory;
 
 
     public ClocksController(ClocksRepository clocksRepository,
@@ -45,8 +45,8 @@ public class ClocksController {
                             ClockActionFactory clockActionFactory) {
         this.clocksRepository = clocksRepository;
         this.tickChannelOperations = tickChannelOperations;
-        this.clockActionFactory = clockActionFactory;
         this.clocksFinder = new CachedClocksFinder(new RepositoryClocksFinder(clocksRepository), CACHE_TTL);
+        this.clockResourceFactory = new ClockResourceFactory(clockActionFactory);
     }
 
     @PostMapping
@@ -66,33 +66,10 @@ public class ClocksController {
     }
 
     private ResponseEntity<ClockResource> createdClockEntity(Clock clock, TickChannel channel) {
-        ClockResource resource = clockBuilderFor(clock)
-                .channel(channel)
-                .build();
+        ClockResource resource = clockResourceFactory.createWithChannel(clock, channel);
         return ResponseEntity
                 .created(withAuthToken(resource.getId().getHref(), userPrincipal()))
                 .body(resource);
-    }
-
-    private ClockResource.ClockResourceBuilder clockBuilderFor(Clock clock) {
-        return ClockResource.builder()
-                .domain(host())
-                .clock(clock)
-                .actions(clockActionFactory.availableActionsFor(clock));
-    }
-
-    private String host() {
-        HttpServletRequest currentRequest = currentRequest();
-        return currentRequest.getRequestURL().toString().replaceAll(currentRequest.getRequestURI(), "");
-    }
-
-    private HttpServletRequest currentRequest() {
-        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                .getRequest();
-    }
-
-    private Principal userPrincipal() {
-        return currentRequest().getUserPrincipal();
     }
 
     private URI withAuthToken(String clockUrl, Principal principal) {
@@ -101,17 +78,11 @@ public class ClocksController {
                 .build().toUri();
     }
 
-    @GetMapping("/{id}")
-    @ApiOperation("Retrieve a specific clock")
-    public ClockResource findOne(@PathVariable("id") String id) {
-        return clockBuilderFor(new RepositoryClocksFinder(clocksRepository).findById(id)).build();
-    }
-
     @GetMapping
     @ApiOperation("Get all defined clocks")
     public List<ClockResource> findAll(@RequestParam Map<String, String> queryParams) {
         return clocksFinder.findBy(queryParams)
-                .stream().map(c -> clockBuilderFor(c).build()).collect(Collectors.toList());
+                .stream().map(clockResourceFactory::create).collect(Collectors.toList());
     }
 }
 

@@ -76,7 +76,7 @@ public class ClockResource extends ResourceSupport {
         }
 
         private Link selfLink() {
-            return linkTo(methodOn(ClocksController.class).findOne(clock.getId())).withSelfRel();
+            return linkTo(ClockController.class, clock.getId()).withSelfRel();
         }
 
         private List<Link> actionLinks() {
@@ -87,7 +87,7 @@ public class ClockResource extends ResourceSupport {
         }
 
         private Link actionLinkFor(String a) {
-            return linkTo(methodOn(ClockController.class).clockAction(clock.getId(), a)).withRel(a);
+            return linkTo(ClockController.class, clock.getId()).slash(a).withRel(a);
         }
 
         private TickChannel createChannel() {
