@@ -15,7 +15,7 @@ public class HttpRequestUtil {
         return currentRequest.getRequestURL().toString().replaceAll(currentRequest.getRequestURI(), "");
     }
 
-    static public HttpServletRequest currentRequest() {
+    static private HttpServletRequest currentRequest() {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest();
     }
