@@ -5,7 +5,8 @@ data class Clock(
         val name: String,
         val schedule: String,
         val url: String?,
-        val status: String) {
+        val status: String,
+        val _links: Map<String, Any>?) {
 
 
     companion object {
@@ -15,7 +16,13 @@ data class Clock(
     // This is here so it wont be included in comparision
     var channel: ClockChannel? = null
 
-    constructor(id: String, name: String, schedule: String, url: String, status: String, channel: ClockChannel) : this(id, name, schedule, url, status) {
+    constructor(id: String,
+                name: String,
+                schedule: String,
+                url: String,
+                status: String,
+                _links: Map<String, Any>,
+                channel: ClockChannel) : this(id, name, schedule, url, status, _links) {
         this.channel = channel
     }
 }

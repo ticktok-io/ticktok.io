@@ -1,6 +1,10 @@
 package io.ticktok.server.clock.actions;
 
+import io.ticktok.server.clock.Clock;
+
 public interface ClockAction {
 
-    void run(String id);
+    void run(Clock clock);
+
+    boolean availableFor(Clock clock);
 }

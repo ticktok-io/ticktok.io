@@ -1,4 +1,4 @@
-package io.ticktok.server.clock;
+package io.ticktok.server.clock.control;
 
 import io.ticktok.server.schedule.ScheduleConstraint;
 import lombok.*;
