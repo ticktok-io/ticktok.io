@@ -27,4 +27,3 @@ Have some questions/ideas? Come and chat with us on [Gitter](https://gitter.im/t
 * [ticktok-io/ticktok-java-client](https://github.com/ticktok-io/ticktok-java-client)
 * [ticktok-io/ticktok-clojure-client](https://github.com/ticktok-io/ticktok-clojure-client)
 * [ticktok-io/ticktok.js](https://github.com/ticktok-io/ticktok.js)
-* [ticktok-io/ticktok-python](https://github.com/ticktok-io/ticktok-python)
