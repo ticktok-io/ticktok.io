@@ -279,11 +279,7 @@ class App(profile: String) {
 
             fun containsOnly(clock: Clock): ClockMatcher {
                 return ClockMatcher(clock, true)
-
-
             }
         }
-
     }
-
 }

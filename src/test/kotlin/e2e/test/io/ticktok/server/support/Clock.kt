@@ -8,7 +8,6 @@ data class Clock(
         val status: String,
         val links: List<Map<String, *>>?) {
 
-
     companion object {
         const val ACTIVE = "ACTIVE"
     }

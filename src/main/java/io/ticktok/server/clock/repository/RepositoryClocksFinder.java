@@ -3,6 +3,8 @@ package io.ticktok.server.clock.repository;
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.ClocksFinder;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -30,4 +32,16 @@ public class RepositoryClocksFinder implements ClocksFinder {
                     .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> left));
     }
 
+    public Clock findById(String id) {
+        return repository.findById(id).orElseThrow(
+                () -> new ClockNotFoundException("Failed to find clock with id: " + id));
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Clock not found")
+    public static class ClockNotFoundException extends RuntimeException {
+
+        public ClockNotFoundException(String message) {
+            super(message);
+        }
+    }
 }
