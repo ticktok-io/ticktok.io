@@ -57,7 +57,10 @@ public class ClocksController {
     @ApiResponses(value = {
             @ApiResponse(code = 201,
                     message = "Clock created successfully",
-                    responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)}),
+                    responseHeaders = {@ResponseHeader(
+                            name = "Location",
+                            description = "Url to the newly created clock",
+                            response = String.class)}),
             @ApiResponse(code = 400,
                     message = "Bad request")})
     public ResponseEntity<ClockResource> create(@Valid @RequestBody ClockRequest clockRequest) {
@@ -82,9 +85,9 @@ public class ClocksController {
 
     @GetMapping
     @ApiOperation("Get all defined clocks")
-    public ResponseEntity<List<ClockResource>> findAll(@RequestParam Map<String, String> queryParams) {
-        return ResponseEntity.ok(clocksFinder.findBy(queryParams)
-                .stream().map(clockResourceFactory::create).collect(Collectors.toList()));
+    public List<ClockResource> findAll(@RequestParam Map<String, String> queryParams) {
+        return clocksFinder.findBy(queryParams)
+                .stream().map(clockResourceFactory::create).collect(Collectors.toList());
     }
 }
 
