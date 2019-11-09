@@ -7,7 +7,7 @@
 Ticktok.io is an efficient, managed and cluster ready time based events dispatcher that allows 
 apps to receive accurate and reliable tick signals at scale. 
 
-![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clocks_list_v2.png)
+![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clock_list_v26.png)
 
 ## Quick start
 ```
@@ -15,10 +15,10 @@ docker run
   -e RABBIT_URI=<rabbit uri for messaging bus>
   -e MONGO_URI=<mongo db uri>
   -e ACCESS_TOKEN=<sha1 encoded token>
-  ticktok/ticktok:0.2.6
+  ticktok/ticktok
 ```
 
-Documentation: https://ticktok.io/docs
+Documentation: https://ticktok.io/docs/overview
 	
 ## Community
 Have some questions/ideas? Come and chat with us on [Gitter](https://gitter.im/ticktok-io/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link) 
@@ -27,4 +27,3 @@ Have some questions/ideas? Come and chat with us on [Gitter](https://gitter.im/t
 * [ticktok-io/ticktok-java-client](https://github.com/ticktok-io/ticktok-java-client)
 * [ticktok-io/ticktok-clojure-client](https://github.com/ticktok-io/ticktok-clojure-client)
 * [ticktok-io/ticktok.js](https://github.com/ticktok-io/ticktok.js)
-* [ticktok-io/ticktok-python](https://github.com/ticktok-io/ticktok-python)

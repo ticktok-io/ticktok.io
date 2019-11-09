@@ -30,8 +30,6 @@ public class Clock {
     private String schedule;
     @Indexed
     private String status;
-
-    @JsonIgnore
     private long lastModifiedDate;
 
     public Clock(String id, String name, String schedule) {

@@ -1,7 +1,7 @@
 package test.io.ticktok.server.clock;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.ClockStatusAspect;
+import io.ticktok.server.clock.repository.ClockStatusAspect;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelOperations;
 import org.junit.jupiter.api.BeforeEach;

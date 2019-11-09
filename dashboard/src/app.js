@@ -8,8 +8,8 @@ class App extends Component {
     return (
       <div>
         <div className="pos-f-t">
-          <nav className="navbar navbar-dark bg-dark">
-            <h4>Ticktok.io</h4>
+          <nav className="navbar navbar-dark">
+            <h4>ticktok.io</h4>
           </nav>
           <div className="main">
             <ClocksList apiKey={key}/>

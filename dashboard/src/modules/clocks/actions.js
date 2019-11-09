@@ -22,10 +22,11 @@ export function fetchClocks(apiKey) {
   };
 }
 
-export function pauseResumeClock(clock, apiKey) {
-  const action = clock.status === ACTIVE ? 'pause' : 'resume';
-  const request = axios.put(`/api/v1/clocks/${clock.id}/${action}?access_token=${apiKey}`).then((res) => {
-    return {id: clock.id, status: clock.status === ACTIVE ? PAUSED : ACTIVE}
+export function invokeAction(actionUrl, apiKey) {
+  const url = new URL(actionUrl);
+  url.searchParams.append('access_token', apiKey);
+  const request = axios.put(url.pathname + '?' + url.searchParams).then((res) => {
+    return res.data
   });
 
   return {
