@@ -8,6 +8,7 @@ import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsOnl
 import e2e.test.io.ticktok.server.support.Client
 import e2e.test.io.ticktok.server.support.Client.CLOCK_EXPR
 import e2e.test.io.ticktok.server.support.Clock
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
@@ -88,9 +89,10 @@ class CoreE2ETest : CommonAppE2ETest() {
 
         @Test
         fun stopTicksOnClockPause() {
-            val clock = app().registeredAClock("to-be-disabled", "every.2.seconds")
-            app().pauseClock(clock)
+            var clock = app().registeredAClock("to-be-disabled", "every.2.seconds")
+            clock = app().pauseClock(clock)
             Client.receivesNoMoreTicks()
+            assertThat(clock.status).isEqualTo("PAUSED")
             app().pauseActionIsNotAvailableFor(clock)
         }
 
@@ -141,8 +143,15 @@ class CoreE2ETest : CommonAppE2ETest() {
         @Test
         fun pauseAClock() {
             app().registeredAClock("kuku", "every.922.seconds")
-            clockListPage.clockNamed("kuku").clickAction()
+            clockListPage.clockNamed("kuku").click("pause")
             clockListPage.clockNamed("kuku").actionIs("Resume")
+        }
+
+        @Test
+        fun tickAClock() {
+            val clock = app().registeredAClock("manual clock", "@never")
+            clockListPage.clockNamed("manual clock").click("tick")
+            Client.receivedTicksFor(clock)
         }
 
         @AfterEach

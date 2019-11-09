@@ -5,8 +5,8 @@ import io.ticktok.server.clock.CachedClocksFinder;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.ClocksFinder;
 import io.ticktok.server.clock.actions.ClockActionFactory;
-import io.ticktok.server.clock.repository.RepositoryClocksFinder;
 import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.clock.repository.RepositoryClocksFinder;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelCreator;
 import io.ticktok.server.tick.TickChannelOperations;
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.ticktok.server.clock.control.HttpRequestUtil.host;
 import static io.ticktok.server.clock.control.HttpRequestUtil.userPrincipal;
 
 @Slf4j
@@ -55,7 +54,10 @@ public class ClocksController {
     @ApiResponses(value = {
             @ApiResponse(code = 201,
                     message = "Clock created successfully",
-                    responseHeaders = {@ResponseHeader(name = "Location", description = "Url to the newly created clock", response = String.class)}),
+                    responseHeaders = {@ResponseHeader(
+                            name = "Location",
+                            description = "Url to the newly created clock",
+                            response = String.class)}),
             @ApiResponse(code = 400,
                     message = "Bad request")})
     public ResponseEntity<ClockResource> create(@Valid @RequestBody ClockRequest clockRequest) {

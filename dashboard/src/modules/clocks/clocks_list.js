@@ -1,19 +1,13 @@
 import React, {Component} from 'react';
-import {ACTIVE, fetchClocks, pauseResumeClock} from "./actions";
+import {ACTIVE, fetchClocks, invokeAction} from "./actions";
 import {connect} from 'react-redux';
 import _ from 'lodash';
+import {ClockActions} from "./clock_actions";
 
-export const PAUSED_BTN = 'Pause';
-export const RESUME_BTN = 'Resume';
 
 export class ClocksList extends Component {
 
-  static NO_CLOCKS_MSG = "No clocks are configured yet!";
-
-  constructor(props) {
-    super(props);
-    this.onPauseResumeClick = this.onPauseResumeClick.bind(this);
-  }
+  static NO_CLOCKS_MSG = "No clocks are configured yet";
 
   componentDidMount() {
     this._tick();
@@ -31,12 +25,12 @@ export class ClocksList extends Component {
   render() {
     return (
       <div>
-        <table className="table">
+        <table className="table table-bordered">
           <thead className="thead-light">
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Schedule</th>
-            <th scope="col" className="actions"/>
+            <th scope="col" className="actions">Actions</th>
           </tr>
           </thead>
           <tbody>
@@ -66,15 +60,10 @@ export class ClocksList extends Component {
           <td>{clock.name}</td>
           <td>{clock.schedule}</td>
           <td>
-            <button
-              type="button"
-              className={this.actionClassName(clock)}
-              data-toggle="button"
-              onClick={() => {
-                this.onPauseResumeClick(clock)
-              }}>
-              {this.actionText(clock)}
-            </button>
+            <ClockActions
+              apiKey={this.props.apiKey}
+              clock={clock}
+              invokeAction={this.props.invokeAction}/>
           </td>
         </tr>
       );
@@ -84,22 +73,10 @@ export class ClocksList extends Component {
   clockRowClass(clock) {
     return `clock-row ${clock.status === ACTIVE ? '' : 'paused'}`;
   }
-
-  actionClassName(clock) {
-    return `btn ${clock.status === ACTIVE ? 'btn-outline-primary' : 'btn-outline-warning'}`;
-  }
-
-  actionText(clock) {
-    return clock.status === ACTIVE ? PAUSED_BTN : RESUME_BTN;
-  }
-
-  onPauseResumeClick(clock) {
-    this.props.pauseResumeClock(clock, this.props.apiKey);
-  }
 }
 
 function mapStateToProps(state) {
   return {clocks: state.clocks}
 }
 
-export default connect(mapStateToProps, {fetchClocks, pauseResumeClock})(ClocksList)
+export default connect(mapStateToProps, {fetchClocks, invokeAction})(ClocksList)

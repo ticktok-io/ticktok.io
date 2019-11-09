@@ -20,8 +20,8 @@ class ClockListPage(private val browser: Browser) {
 
     class ClockRow(val row: WebElement?) {
 
-        fun clickAction() {
-            row!!.findElement(By.tagName("button")).click()
+        fun click(actionName: String) {
+            row!!.findElement(By.name(actionName)).click()
         }
 
         fun contains(s: String) {
@@ -29,7 +29,7 @@ class ClockListPage(private val browser: Browser) {
         }
 
         fun actionIs(name: String) {
-            await atMost Duration.ONE_SECOND until { row!!.findElement(By.tagName("button")).text == name }
+            await atMost Duration.FIVE_SECONDS until { row!!.findElement(By.name("resume")).isDisplayed }
         }
     }
 }

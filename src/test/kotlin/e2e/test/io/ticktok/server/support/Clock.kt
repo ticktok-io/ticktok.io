@@ -6,8 +6,7 @@ data class Clock(
         val schedule: String,
         val url: String?,
         val status: String,
-        val _links: Map<String, Any>?) {
-
+        val links: List<Map<String, *>>?) {
 
     companion object {
         const val ACTIVE = "ACTIVE"
@@ -21,9 +20,18 @@ data class Clock(
                 schedule: String,
                 url: String,
                 status: String,
-                _links: Map<String, Any>,
-                channel: ClockChannel) : this(id, name, schedule, url, status, _links) {
+                links: List<Map<String, *>>,
+                channel: ClockChannel) : this(id, name, schedule, url, status, links) {
         this.channel = channel
+    }
+
+    fun linkFor(action: String): String? {
+        val linksForAction = links?.filter { l -> l["rel"] == action }
+        if(linksForAction == null || linksForAction.isEmpty()) {
+            return null
+        }
+        return linksForAction.single()["href"] as String?
+
     }
 }
 

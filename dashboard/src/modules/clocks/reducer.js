@@ -8,6 +8,7 @@ export default function (state = [], action) {
     case UPDATE_STATUS:
       const updatedClock = state[action.payload.id];
       updatedClock.status = action.payload.status;
+      updatedClock.links = action.payload.links;
       return {...state, [updatedClock.id]: updatedClock};
     default:
       return state;

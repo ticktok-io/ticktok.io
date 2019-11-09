@@ -210,14 +210,15 @@ class App(profile: String) {
         assertThat(failedRequestsCount, `is`(0))
     }
 
-    fun pauseClock(clock: Clock) {
-        dispatchActionOn("pause", clock)
+    fun pauseClock(clock: Clock) : Clock {
+        return dispatchActionOn("pause", clock)
     }
 
-    private fun dispatchActionOn(action: String, clock: Clock) {
-        val pauseUrl = (clock._links!![action] as Map<*, *>?)!!["href"]
+    private fun dispatchActionOn(action: String, clock: Clock) : Clock {
+        val pauseUrl = clock.linkFor(action)
         val response = Request.Put(withAccessToken((pauseUrl as String?)!!)).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(204))
+        assertThat(response.statusLine.statusCode, `is`(200))
+        return Gson().fromJson<Clock>(bodyOf(response))
     }
 
     private fun withAccessToken(url: String): String {
@@ -254,7 +255,7 @@ class App(profile: String) {
 
     fun pauseActionIsNotAvailableFor(clock: Clock) {
         val updatedClock = clock(clock.id)
-        assertThat(updatedClock._links!!["pause"], IsNull())
+        assertThat(updatedClock.linkFor("pause"), IsNull())
     }
 
     fun tick(clock: Clock) {
@@ -278,11 +279,7 @@ class App(profile: String) {
 
             fun containsOnly(clock: Clock): ClockMatcher {
                 return ClockMatcher(clock, true)
-
-
             }
         }
-
     }
-
 }

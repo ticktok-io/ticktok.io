@@ -5,14 +5,30 @@
     padding: 0;
 }
 
+body {
+    font-family: "Rubik", "sans-serif";
+}
+
 .nav {
-    display:table;
-    width:100%;
+    display: table;
+    width: 100%;
     margin: 0;
+    vertical-align: middle;
+    padding: 10px;
 }
 
 nav h4 {
-    color: #BDBDBD;
+    font-family: Quicksand, sans-serif;
+    color: #ededed;
+    font-weight: 600;
+    font-size: 1.4em;
+    margin-bottom: 0;
+    margin-left: 20px
+}
+
+.navbar {
+    background-color: #0d466c !important;
+    padding: 12px;
 }
 
 .form-inline {
@@ -30,12 +46,23 @@ nav h4 {
     margin-top: 30px
 }
 
-.table .btn {
-    width: 100%;
+.table thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 0;
+    font-weight: 600;
 }
 
-.table td {
+.table thead > tr > th, .table tbody > tr > th, .table tfoot > tr > th, .table thead > tr > td, .table tbody > tr > td, .table tfoot > tr > td {
+    padding: 8px;
+    line-height: 1.428571429;
     vertical-align: middle;
+    border-top: 0
+}
+
+.table tr > td {
+    font-weight: 400;
+    border-left-width: 0;
+    border-right-width: 0;
 }
 
 .clock-row.paused {
@@ -44,7 +71,7 @@ nav h4 {
 }
 
 th.actions {
-    width: 15%;
+    width: 30%;
 }
 
 .noClocksMsg {
@@ -53,5 +80,28 @@ th.actions {
     text-align: center;
     margin: 60px;
 }
+
+.clockActions {
+    width: 100%
+}
+
+.clockActions button {
+    margin-left: 6px;
+    margin-right: 6px;
+    width: 100%;
+}
+
+.clockActions .btn-outline-primary {
+    color: #328CC1
+}
+
+.clockActions .btn-outline-danger {
+    color: #a31f1e
+}
+
+.clockActions .btn-outline-success {
+    color: #2c8a65
+}
+
 
 

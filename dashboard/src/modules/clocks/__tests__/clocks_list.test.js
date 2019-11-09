@@ -1,5 +1,5 @@
 import React from 'react';
-import ClocksList, {PAUSED_BTN, RESUME_BTN} from "../clocks_list";
+import ClocksList from "../clocks_list";
 import {cleanup, render, wait, fireEvent} from "react-testing-library";
 import "jest-dom/extend-expect"
 import axios from 'axios';
@@ -48,24 +48,34 @@ let getClockRowsFor = async function (clocks) {
 
 test("Show paused clocks", async () => {
   let clocks = [
-    {id: '1', name: '3232', schedule: "every.2.seconds", status: PAUSED},
-    {id: '2', name: '3232', schedule: "every.2.seconds", status: ACTIVE}
+    {id: '1', name: '3232', schedule: "every.2.seconds", status: PAUSED, links: [{rel: 'resume', href:'http://resume'}]},
+    {id: '2', name: '3232', schedule: "every.2.seconds", status: ACTIVE, links: [{rel: 'pause', href:'http://pause'}]}
   ];
   const rows = await getClockRowsFor(clocks);
-  expect(rows[0].cells[2]).toHaveTextContent(RESUME_BTN);
-  expect(rows[1].cells[2]).toHaveTextContent(PAUSED_BTN);
+  expect(rows[0].cells[2]).toHaveTextContent('Resume');
+  expect(rows[1].cells[2]).toHaveTextContent('Pause');
 });
 
 test("Resume a paused clock", async () => {
   let clocks = [
-    {id: '1', name: '3232', schedule: "every.2.seconds", status: PAUSED},
+    {
+      id: '1',
+      name: '3232',
+      schedule: "every.2.seconds",
+      status: 'PAUSED',
+      links: [{rel: 'resume', href: 'http://localhost:3000/api/v1/clocks/1/resume'}]
+    },
   ];
-  backend.onPut(`/api/v1/clocks/1/resume?access_token=${apiKey}`).reply(200);
+  backend.onPut(`/api/v1/clocks/1/resume?access_token=${apiKey}`).reply(200, {
+    id: '1',
+    status: 'ACTIVE',
+    links: [{rel: 'pause', href: 'http://localhost:3000/api/v1/clocks/1/pause'}]
+  });
 
   const {getAllByTestId} = await givenTheClocks(clocks);
 
-  fireEvent.click(getAllByTestId('clock-row')[0].querySelector('.btn'));
-  await wait(() => expect(getAllByTestId('clock-row')[0].querySelector('.btn')).toHaveTextContent(PAUSED_BTN));
+  fireEvent.click(getAllByTestId('clock-row')[0].querySelector('button[name="resume"]'));
+  await wait(() => expect(getAllByTestId('clock-row')[0]).toHaveTextContent('Pause'));
 
   expect(backend.history.put.length).toBe(1);
 });
