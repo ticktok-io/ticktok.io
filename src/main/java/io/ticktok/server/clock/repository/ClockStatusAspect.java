@@ -1,9 +1,7 @@
 package io.ticktok.server.clock.repository;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.clock.repository.ClocksRepository;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;

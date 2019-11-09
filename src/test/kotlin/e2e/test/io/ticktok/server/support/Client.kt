@@ -7,12 +7,10 @@ import com.rabbitmq.client.*
 import org.apache.http.HttpResponse
 import org.apache.http.client.fluent.Request
 import org.apache.http.util.EntityUtils
-import org.assertj.core.api.Assertions
 import org.awaitility.Duration
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
-import org.awaitility.kotlin.untilNotNull
 import java.lang.Thread.sleep
 import java.nio.charset.Charset
 import java.util.*
