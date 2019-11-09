@@ -5,14 +5,12 @@ import io.ticktok.server.clock.CachedClocksFinder;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.ClocksFinder;
 import io.ticktok.server.clock.actions.ClockActionFactory;
-import io.ticktok.server.clock.repository.RepositoryClocksFinder;
 import io.ticktok.server.clock.repository.ClocksRepository;
+import io.ticktok.server.clock.repository.RepositoryClocksFinder;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelCreator;
 import io.ticktok.server.tick.TickChannelOperations;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.loader.ResourceEntry;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.ticktok.server.clock.control.HttpRequestUtil.host;
 import static io.ticktok.server.clock.control.HttpRequestUtil.userPrincipal;
 
 @Slf4j
