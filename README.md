@@ -7,7 +7,7 @@
 Ticktok.io is an efficient, managed and cluster ready time based events dispatcher that allows 
 apps to receive accurate and reliable tick signals at scale. 
 
-![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clocks_list_v2.png)
+![screenshot](https://raw.githubusercontent.com/ticktok-io/brand/master/screenshots/screenshot_clocks_list_v26.png)
 
 ## Quick start
 ```
