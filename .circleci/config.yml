@@ -1,5 +1,47 @@
 version: 2
+
+defaults: &defaults
+  working_directory: ~/repo
+
 jobs:
+  checkout:
+    <<: *defaults
+    steps:
+      - checkout
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
+  build-dashboard:
+    <<: *defaults
+    docker:
+      - image: circleci/node:8
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - restore_cache:
+          keys:
+            # when lock file changes, use increasingly general patterns to restore cache
+            - node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
+            - node-v1-{{ .Branch }}-
+            - node-v1-
+
+      - run: .circleci/run_npm.sh install
+
+      - save_cache:
+          paths:
+            - dashboard/node_modules  # location depends on npm version
+          key: node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
+
+      - run:
+          name: Build Dashboard
+          command: PUBLIC_URL=' ' .circleci/run_npm.sh run build
+
+  build:
+
+
+
   build:
     machine:
       # specify the version you desire here
@@ -28,7 +70,6 @@ jobs:
         name: Start Selenium
         command: java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
         background: true
-
 
     - restore_cache:
         keys:
@@ -133,6 +174,16 @@ jobs:
           if [[ "${CIRCLE_BRANCH}" == "master" ]] || [[ "${CIRCLE_BRANCH}" == realease-* ]]; then
             .circleci/publish_to_dockerhub.sh
           fi
+
+
+
+workflow:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      -
+
 
 
 
