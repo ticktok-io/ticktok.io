@@ -7,7 +7,7 @@ jobs:
   checkout:
     <<: *defaults
     docker:
-      image: alpine:3
+      - image: alpine:3
     steps:
       - checkout
       - run: mkdir test-reports
