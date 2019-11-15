@@ -12,7 +12,7 @@ jobs:
           root: ~/repo
           paths: .
 
-  build-dashboard:
+  dashboard-install:
     <<: *defaults
     docker:
       - image: circleci/node:8
@@ -34,11 +34,32 @@ jobs:
             - dashboard/node_modules  # location depends on npm version
           key: node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
 
+      - persist_to_workspace:
+          root: ~/repo
+          paths: dashboard
+
+  dashboard-build:
+    <<: *defaults
+    docker:
+      - image: circleci/node:8
+    steps:
+      - attach_workspace:
+          at: ~/repo
       - run:
           name: Build Dashboard
           command: PUBLIC_URL=' ' .circleci/run_npm.sh run build
+      - persist_to_workspace:
+          root: ~/repo
+          paths: dashboard
 
-  build:
+  backend-install:
+    <<: *defaults
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
 
 
 
