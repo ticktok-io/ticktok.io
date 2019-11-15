@@ -8,6 +8,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - run: mkdir test-reports
       - persist_to_workspace:
           root: ~/repo
           paths: .
@@ -55,155 +56,141 @@ jobs:
   backend-install:
     <<: *defaults
     docker:
-      - image: circleci/openjdk:8
+      image: circleci/openjdk:8
     steps:
       - attach_workspace:
           at: ~/repo
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: ./gradlew dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
 
-
-
-
-  build:
+  backend-build:
+    <<: *defaults
     machine:
-      # specify the version you desire here
       image: circleci/classic:201808-01
-
-    working_directory: ~/repo
-
-    environment:
-      # Customize the JVM maximum heap limit
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
-      APP: ticktok
-
     steps:
-    - checkout
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Start mongo & rabbit
+          command: .circleci/run_compose.sh up -d mongo rabbit
+      - run:
+          name: Download Selenium
+          command: curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
+      - run:
+          name: Start Selenium
+          command: java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
+          background: true
+      - run:
+          name: Server's UT & IT
+          command: ./gradlew test --tests test.*
+      - store_test_results:
+          path: build/test-results
+      - run:
+          name: Build server
+          command: ./gradlew build -x test
+      - run:
+          name: Build application Docker image
+          command: docker build -t app .
+      - run:
+          name: Start app
+          command: .circleci/run_compose.sh up -d
+      - run:
+          name: E2E tests against dockered app
+          command: ./gradlew test -Ptags=core-tests -DstartApp=no --scan
+      - store_test_results:
+          path: build/test-results
+      - run:
+          name: Stop app
+          command: .circleci/run_compose.sh down
+      - run:
+          name: Start as sandbox
+          command: .circleci/run_compose_sandbox.sh up -d app
+      - run:
+          name: Sandbox sanity testing
+          command: ./gradlew test -Ptags=http-broker-tests -DstartApp=no --scan
+      - run:
+          name: Collect app logs
+          command: .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
+          when: on_fail
+      - store_artifacts:
+          path: /tmp/ticktok-artifacts
+      - store_artifacts:
+          path: test-reports
+      - store_test_results:
+          path: build/test-results
 
-    - run:
-        name: Start mongo & rabbit
-        command: .circleci/run_compose.sh up -d mongo rabbit
+  heroku-deploy:
+    <<: *defaults
+    docker:
+      image: circleci/node:latest
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Setup heroku
+          command: .circleci/heroku_setup.sh
+      - run:
+          name: Deploy ticktok server (Heroku)
+          no_output_timeout: 5m
+          command: .circleci/deploy_to_heroku.sh
 
-    - run: mkdir test-reports
-    - run:
-        name: Download Selenium
-        command: curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
-    - run:
-        name: Start Selenium
-        command: java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
-        background: true
-
-    - restore_cache:
-        keys:
-        # when lock file changes, use increasingly general patterns to restore cache
-        - node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
-        - node-v1-{{ .Branch }}-
-        - node-v1-
-
-    - run: .circleci/run_npm.sh install
-
-    - save_cache:
-        paths:
-        - dashboard/node_modules  # location depends on npm version
-        key: node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
-
-
-    - restore_cache:
-        keys:
-        - v1-dependencies-{{ checksum "build.gradle" }}
-        # fallback to using the latest cache if no exact match is found
-        - v1-dependencies-
-
-    - run: ./gradlew dependencies
-
-    - save_cache:
-        paths:
-        - ~/.gradle
-        key: v1-dependencies-{{ checksum "build.gradle" }}
-
-    - run:
-        name: Build Dashboard
-        command: PUBLIC_URL=' ' .circleci/run_npm.sh run build
-
-    - run:
-        name: Server's UT & IT
-        command: ./gradlew test --tests test.*
-
-    - store_test_results:
-        path: build/test-results
-
-    - run:
-        name: Build server
-        command: ./gradlew build -x test
-
-    - run:
-        name: Build application Docker image
-        command: docker build -t app .
-
-    - run:
-        name: Start app
-        command: .circleci/run_compose.sh up -d
-
-    - run:
-        name: E2E tests against dockered app
-        command: ./gradlew test -Ptags=core-tests -DstartApp=no --scan
-
-    - store_test_results:
-        path: build/test-results
-
-    - run:
-        name: Stop app
-        command: .circleci/run_compose.sh down
-
-    - run:
-        name: Start as sandbox
-        command: .circleci/run_compose_sandbox.sh up -d app
-
-    - run:
-        name: Sandbox sanity testing
-        command: ./gradlew test -Ptags=http-broker-tests -DstartApp=no --scan
-
-    - run:
-        name: Collect app logs
-        command: .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
-        when: on_fail
-
-    - store_artifacts:
-        path: /tmp/ticktok-artifacts
-
-    - store_artifacts:
-        path: test-reports
-
-    - store_test_results:
-        path: build/test-results
-
-    - run:
-        name: Setup heroku
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-            .circleci/heroku_setup.sh
-          fi
-    - run:
-        name: Deploy ticktok server (Heroku)
-        no_output_timeout: 5m
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-            .circleci/deploy_to_heroku.sh
-          fi
-    - run:
-        name: Publish to dockerhub
-        command: |
-          if [[ "${CIRCLE_BRANCH}" == "master" ]] || [[ "${CIRCLE_BRANCH}" == realease-* ]]; then
-            .circleci/publish_to_dockerhub.sh
-          fi
-
+  dockerhub-publish:
+    <<: *defaults
+    docker:
+      image: buildpack-deps:trusty
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Publish to dockerhub
+          command: |
+            if [[ "${CIRCLE_BRANCH}" == "master" ]] || [[ "${CIRCLE_BRANCH}" == realease-* ]]; then
+              .circleci/publish_to_dockerhub.sh
+            fi
 
 
 workflow:
   version: 2
   build-and-deploy:
     jobs:
-      - build
-      -
+      - checkout
+      - dashboard-install:
+          requires:
+            - checkout
+      - dashboard-build:
+          requires:
+            - dashboard-install
+      - backend-install:
+          requires:
+            - checkout
+      - backend-build:
+          requires:
+            - dashboard-build
+            - backend-install
+      - heroku-deploy:
+          requires:
+            - backend-build
+          filters:
+            branches:
+              only:
+                - master
+      - dockerhub-publish:
+          requires:
+            - backend-build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
 
 
 
