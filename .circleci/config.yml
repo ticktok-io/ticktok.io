@@ -210,16 +210,23 @@ workflows:
           requires:
             - dashboard-build
             - backend-install
-      - heroku-deploy:
+      - e2e-tests:
           requires:
             - backend-build
+      - sanity-tests:
+          requires:
+            - backend-build
+      - heroku-deploy:
+          requires:
+            - e2e-tests
+            - sanity-tests
           filters:
             branches:
               only:
                 - master
       - dockerhub-publish:
           requires:
-            - backend-build
+            - heroku-deploy
           filters:
             branches:
               ignore: /.*/
