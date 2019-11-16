@@ -7,7 +7,6 @@ import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.actions.ClockActionFactory;
 import io.ticktok.server.clock.repository.ClocksRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +29,6 @@ public class ClockController {
 
     @PutMapping("/{action}")
     @ApiOperation(value = "Run an action on a specific clock")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public ResponseEntity<ClockResource> clockAction(
             Model model,
             @ApiParam(required = true, allowableValues = "pause,resume,tick") @PathVariable String action) {

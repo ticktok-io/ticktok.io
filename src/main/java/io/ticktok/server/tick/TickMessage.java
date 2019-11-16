@@ -1,8 +1,6 @@
 package io.ticktok.server.tick;
 
 import lombok.*;
-import org.springframework.amqp.core.MessagePostProcessor;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
 
 
 @AllArgsConstructor

@@ -3,11 +3,9 @@ package test.io.ticktok.server.clock.actions;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.actions.ClockActionFactory;
-import io.ticktok.server.clock.repository.ClocksRepository;
 import io.ticktok.server.tick.TickChannelOperations;
 import io.ticktok.server.tick.TickPublisher;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +17,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
