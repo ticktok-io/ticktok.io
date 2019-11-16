@@ -5,7 +5,7 @@ defaults: &defaults
 
 fast-checkout: &attach-workspace
   attach_workspace:
-    at: /root
+    at: ~/repo
 
 jobs:
   checkout:
