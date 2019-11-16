@@ -3,11 +3,15 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
 
+fast-checkout: &attach-workspace
+  attach_workspace:
+    at: /root
+
 jobs:
   checkout:
     <<: *defaults
     docker:
-      - image: alpine:3
+      - image: node
     steps:
       - checkout
       - run: mkdir test-reports
@@ -20,8 +24,7 @@ jobs:
     docker:
       - image: circleci/node:8
     steps:
-      - attach_workspace:
-          at: ~/repo
+      - *attach-workspace
 
       - restore_cache:
           keys:
@@ -46,8 +49,7 @@ jobs:
     docker:
       - image: circleci/node:8
     steps:
-      - attach_workspace:
-          at: ~/repo
+      - *attach-workspace
       - run:
           name: Build Dashboard
           command: PUBLIC_URL=' ' .circleci/run_npm.sh run build
@@ -60,8 +62,7 @@ jobs:
     docker:
       - image: circleci/openjdk:8
     steps:
-      - attach_workspace:
-          at: ~/repo
+      - *attach-workspace
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
@@ -78,8 +79,7 @@ jobs:
     machine:
       image: circleci/classic:201808-01
     steps:
-      - attach_workspace:
-          at: ~/repo
+      - *attach-workspace
       - run:
           name: Start mongo & rabbit
           command: .circleci/run_compose.sh up -d mongo rabbit
@@ -134,8 +134,7 @@ jobs:
     docker:
       - image: circleci/node:latest
     steps:
-      - attach_workspace:
-          at: ~/repo
+      - *attach-workspace
       - run:
           name: Setup heroku
           command: .circleci/heroku_setup.sh
@@ -149,8 +148,7 @@ jobs:
     docker:
       - image: buildpack-deps:trusty
     steps:
-      - attach_workspace:
-          at: ~/repo
+      - *attach-workspace
       - setup_remote_docker
       - run:
           name: Publish to dockerhub
