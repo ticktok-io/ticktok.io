@@ -80,8 +80,7 @@ jobs:
 
   backend-build:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    machine: true
     steps:
       - *attach-workspace
       - setup_remote_docker
