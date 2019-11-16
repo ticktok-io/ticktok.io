@@ -216,7 +216,7 @@ class App(profile: String) {
 
     private fun dispatchActionOn(action: String, clock: Clock) : Clock {
         val pauseUrl = clock.linkFor(action)
-        val response = Request.Put(withAccessToken((pauseUrl as String?)!!)).execute().returnResponse()
+        val response = Request.Put(withAccessToken(pauseUrl!!)).execute().returnResponse()
         assertThat(response.statusLine.statusCode, `is`(200))
         return Gson().fromJson<Clock>(bodyOf(response))
     }

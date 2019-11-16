@@ -96,7 +96,7 @@ jobs:
           name: Build server
           command: ./gradlew build -x test
       - run:
-          name: Build application Docker image
+          name: Build app Docker image
           command: docker build -t app .
       - run:
           name: Persist app image
@@ -127,9 +127,6 @@ jobs:
           command: ./gradlew test -Ptags=core-tests -DstartApp=no --scan
       - store_test_results:
           path: build/test-results
-      - run:
-          name: Stop app
-          command: .circleci/run_compose.sh down
       - store_artifacts:
           path: /tmp/ticktok-artifacts
       - store_artifacts:

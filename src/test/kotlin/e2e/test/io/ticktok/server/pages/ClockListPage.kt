@@ -29,7 +29,7 @@ class ClockListPage(private val browser: Browser) {
         }
 
         fun actionIs(name: String) {
-            await atMost Duration.FIVE_SECONDS until { row!!.findElement(By.name("resume")).isDisplayed }
+            await atMost Duration.FIVE_SECONDS until { row!!.findElement(By.name(name)).isDisplayed }
         }
     }
 }
