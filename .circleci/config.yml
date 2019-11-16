@@ -34,7 +34,7 @@ jobs:
             - node-v1-{{ .Branch }}-
             - node-v1-
 
-      - run: .circleci/run_npm.sh install
+      - run: npm ci --prefix dashboard
 
       - save_cache:
           paths:
