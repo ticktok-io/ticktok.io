@@ -213,13 +213,13 @@ workflows:
       - e2e-tests:
           requires:
             - backend-build
-      - sanity-tests:
+      - sandbox-tests:
           requires:
             - backend-build
       - heroku-deploy:
           requires:
             - e2e-tests
-            - sanity-tests
+            - sandbox-tests
           filters:
             branches:
               only:
