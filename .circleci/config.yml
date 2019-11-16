@@ -7,6 +7,10 @@ fast-checkout: &attach-workspace
   attach_workspace:
     at: ~/repo
 
+restore-app-image: &restore-app-image
+  - run:
+      name: Restore app image
+      command: docker load -i app-image.tar
 
 jobs:
   checkout:
@@ -103,6 +107,24 @@ jobs:
           name: Build application Docker image
           command: docker build -t app .
       - run:
+          name: Persist app image
+          command: docker save -o app-image.tar app
+
+  e2e-tests:
+    <<: *defaults
+    machine: true
+    steps:
+      - *attach-workspace
+      - *restore-app-image
+      - run:
+          name: Download Selenium
+          command: curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
+      - run: mkdir test-reports
+      - run:
+          name: Start Selenium
+          command: java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
+          background: true
+      - run:
           name: Start app
           command: .circleci/run_compose.sh up -d
       - run:
@@ -113,6 +135,18 @@ jobs:
       - run:
           name: Stop app
           command: .circleci/run_compose.sh down
+      - store_artifacts:
+          path: /tmp/ticktok-artifacts
+      - store_artifacts:
+          path: test-reports
+      - store_test_results:
+          path: build/test-results
+
+  sandbox-tests:
+    <<: *defaults
+    machine: true
+    steps:
+      - *restore-app-image
       - run:
           name: Start as sandbox
           command: .circleci/run_compose_sandbox.sh up -d app
@@ -125,8 +159,6 @@ jobs:
           when: on_fail
       - store_artifacts:
           path: /tmp/ticktok-artifacts
-      - store_artifacts:
-          path: test-reports
       - store_test_results:
           path: build/test-results
 
@@ -136,6 +168,7 @@ jobs:
       - image: circleci/node:latest
     steps:
       - *attach-workspace
+      - *restore-app-image
       - run:
           name: Setup heroku
           command: .circleci/heroku_setup.sh
@@ -150,6 +183,7 @@ jobs:
       - image: buildpack-deps:trusty
     steps:
       - *attach-workspace
+      - *restore-app-image
       - setup_remote_docker
       - run:
           name: Publish to dockerhub
