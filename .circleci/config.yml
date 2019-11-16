@@ -108,6 +108,9 @@ jobs:
       - run:
           name: Persist app image
           command: docker save -o app-image.tar app
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
 
   e2e-tests:
     <<: *defaults
