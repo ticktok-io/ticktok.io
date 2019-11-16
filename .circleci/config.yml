@@ -80,20 +80,11 @@ jobs:
 
   backend-build:
     <<: *defaults
-    machine: true
-    environment:
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
+    docker:
+      - image: circleci/openjdk:8
     steps:
       - *attach-workspace
-      - run:
-          name: Start mongo & rabbit
-          command: .circleci/run_compose.sh up -d mongo rabbit
-      - run:
-          name: Server's UT & IT
-          command: ./gradlew test --tests test.*
-      - store_test_results:
-          path: build/test-results
+      - setup_remote_docker
       - run:
           name: Build server
           command: ./gradlew build -x test
@@ -106,6 +97,23 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
+
+  backend-unit-tests:
+    <<: *defaults
+      machine: true
+      environment:
+        JVM_OPTS: -Xmx3200m
+        TERM: dumb
+      steps:
+        - *attach-workspace
+        - run:
+            name: Start mongo & rabbit
+            command: .circleci/run_compose.sh up -d mongo rabbit
+        - run:
+            name: Server's UT & IT
+            command: ./gradlew test --tests test.*
+        - store_test_results:
+            path: build/test-results
 
   e2e-tests:
     <<: *defaults
@@ -213,6 +221,9 @@ workflows:
           requires:
             - dashboard-build
             - backend-install
+      - backend-unit-tests:
+          requires:
+            - backend-build
       - e2e-tests:
           requires:
             - backend-build
@@ -221,6 +232,7 @@ workflows:
             - backend-build
       - heroku-deploy:
           requires:
+            - backend-unit-tests
             - e2e-tests
             - sandbox-tests
           filters:
