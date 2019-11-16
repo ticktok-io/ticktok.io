@@ -241,7 +241,9 @@ workflows:
                 - master
       - dockerhub-publish:
           requires:
-            - heroku-deploy
+            - backend-unit-tests
+            - e2e-tests
+            - sandbox-tests
           filters:
             branches:
               ignore: /.*/
