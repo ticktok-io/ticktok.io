@@ -83,7 +83,6 @@ jobs:
     machine: true
     steps:
       - *attach-workspace
-      - setup_remote_docker
       - run:
           name: Start mongo & rabbit
           command: .circleci/run_compose.sh up -d mongo rabbit
