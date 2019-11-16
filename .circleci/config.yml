@@ -1,7 +1,7 @@
 version: 2
 
 defaults: &defaults
-  working_directory: ~/repo
+  working_directory: /home/circleci/repo
 
 jobs:
   checkout:
