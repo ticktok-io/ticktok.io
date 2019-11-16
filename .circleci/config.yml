@@ -8,9 +8,9 @@ fast-checkout: &attach-workspace
     at: ~/repo
 
 restore-app-image: &restore-app-image
-  - run:
-      name: Restore app image
-      command: docker load -i app-image.tar
+  run:
+    name: Restore app image
+    command: docker load -i app-image.tar
 
 jobs:
   checkout:
@@ -19,7 +19,6 @@ jobs:
       - image: node
     steps:
       - checkout
-      - run: mkdir test-reports
       - persist_to_workspace:
           root: ~/repo
           paths: .
