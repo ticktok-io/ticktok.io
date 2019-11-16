@@ -107,7 +107,7 @@ jobs:
   e2e-tests:
     <<: *defaults
     machine:
-      - image: circleci/ubuntu-1604:201903-01
+      image: circleci/ubuntu-1604:201903-01
     steps:
       - *attach-workspace
       - *restore-app-image
