@@ -80,10 +80,11 @@ jobs:
 
   backend-build:
     <<: *defaults
-    machine:
-      image: circleci/classic:201808-01
+    docker:
+      - image: circleci/openjdk:8
     steps:
       - *attach-workspace
+      - setup_remote_docker
       - run:
           name: Start mongo & rabbit
           command: .circleci/run_compose.sh up -d mongo rabbit
