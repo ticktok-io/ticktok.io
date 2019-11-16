@@ -1,7 +1,7 @@
 version: 2
 
 defaults: &defaults
-  working_directory: /home/circleci/repo
+  working_directory: ~/repo
 
 jobs:
   checkout:
@@ -12,6 +12,7 @@ jobs:
       - checkout
       - run: mkdir test-reports
       - persist_to_workspace:
+          root: ~/repo
           paths: .
 
   dashboard-install:
