@@ -144,7 +144,7 @@ class CoreE2ETest : CommonAppE2ETest() {
         fun pauseAClock() {
             app().registeredAClock("kuku", "every.922.seconds")
             clockListPage.clockNamed("kuku").click("pause")
-            clockListPage.clockNamed("kuku").actionIs("Resume")
+            clockListPage.clockNamed("kuku").actionIs("resume")
         }
 
         @Test
