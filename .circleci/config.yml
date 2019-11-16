@@ -53,7 +53,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Build Dashboard
-          command: PUBLIC_URL=' ' .circleci/run_npm.sh run build
+          command: PUBLIC_URL=' ' npm run build --prefix dashboard
       - persist_to_workspace:
           root: ~/repo
           paths: dashboard
