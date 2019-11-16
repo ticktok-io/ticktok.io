@@ -12,7 +12,6 @@ jobs:
       - checkout
       - run: mkdir test-reports
       - persist_to_workspace:
-          root: ~/repo
           paths: .
 
   dashboard-install:
