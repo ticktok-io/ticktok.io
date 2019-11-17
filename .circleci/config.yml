@@ -177,6 +177,7 @@ jobs:
     docker:
       - image: circleci/node:latest
     steps:
+      - setup_remote_docker
       - *attach-workspace
       - *restore-app-image
       - run:
@@ -192,9 +193,9 @@ jobs:
     docker:
       - image: buildpack-deps:trusty
     steps:
+      - setup_remote_docker
       - *attach-workspace
       - *restore-app-image
-      - setup_remote_docker
       - run:
           name: Publish to dockerhub
           command: |
