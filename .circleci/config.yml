@@ -175,7 +175,7 @@ jobs:
   heroku-deploy:
     <<: *defaults
     docker:
-      - image: circleci/node:latest
+      - image: circleci/openjdk:8
     steps:
       - setup_remote_docker
       - *attach-workspace
