@@ -10,7 +10,7 @@ push_image() {
     echo $2 uploaded to Dockerhub
 }
 
-TAG=`git describe --tags --abbrev=0`
+TAG=`git describe --tags --abbrev=0 | cut -d "v" -f 2`
 IMAGE=$IMAGE_NAME:$TAG
 
 if [[ `docker pull $IMAGE` ]]; then
