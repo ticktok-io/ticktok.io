@@ -191,7 +191,7 @@ jobs:
   dockerhub-publish:
     <<: *defaults
     docker:
-      - image: buildpack-deps:trusty
+      - image: circleci/openjdk:8
     steps:
       - setup_remote_docker
       - *attach-workspace
