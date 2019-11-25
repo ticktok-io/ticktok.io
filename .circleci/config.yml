@@ -208,29 +208,53 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - checkout
+      - checkout:
+          filters:
+            tags:
+              only: /.*/
       - dashboard-install:
           requires:
             - checkout
+          filters:
+            tags:
+              only: /.*/
       - dashboard-build:
           requires:
             - dashboard-install
+          filters:
+            tags:
+              only: /.*/
       - backend-install:
           requires:
             - checkout
+          filters:
+            tags:
+              only: /.*/
       - backend-build:
           requires:
             - dashboard-build
             - backend-install
+          filters:
+            tags:
+              only: /.*/
       - backend-unit-tests:
           requires:
             - backend-build
+          filters:
+            tags:
+              only: /.*/
       - e2e-tests:
           requires:
             - backend-build
+          filters:
+            tags:
+              only: /.*/
       - sandbox-tests:
           requires:
             - backend-build
+          filters:
+            tags:
+              only: /.*/
       - heroku-deploy:
           requires:
             - backend-unit-tests
