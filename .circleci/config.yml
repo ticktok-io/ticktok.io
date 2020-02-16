@@ -26,37 +26,10 @@ jobs:
   dashboard-install:
     <<: *defaults
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:12
     steps:
       - *attach-workspace
-
-      - restore_cache:
-          keys:
-            # when lock file changes, use increasingly general patterns to restore cache
-            - node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
-            - node-v1-{{ .Branch }}-
-            - node-v1-
-
-      - run: npm ci --prefix dashboard
-
-      - save_cache:
-          paths:
-            - dashboard/node_modules  # location depends on npm version
-          key: node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
-
-      - persist_to_workspace:
-          root: ~/repo
-          paths: dashboard
-
-  dashboard-build:
-    <<: *defaults
-    docker:
-      - image: circleci/node:8
-    steps:
-      - *attach-workspace
-      - run:
-          name: Build Dashboard
-          command: PUBLIC_URL=' ' npm run build --prefix dashboard
+      - run: npm pack ticktok-dashboard@0.0.8 && tar zxvf ticktok-dashboard-0.0.8.tgz && mv package dashboard
       - persist_to_workspace:
           root: ~/repo
           paths: dashboard

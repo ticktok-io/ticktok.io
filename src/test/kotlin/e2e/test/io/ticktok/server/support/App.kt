@@ -210,11 +210,11 @@ class App(profile: String) {
         assertThat(failedRequestsCount, `is`(0))
     }
 
-    fun pauseClock(clock: Clock) : Clock {
+    fun pauseClock(clock: Clock): Clock {
         return dispatchActionOn("pause", clock)
     }
 
-    private fun dispatchActionOn(action: String, clock: Clock) : Clock {
+    private fun dispatchActionOn(action: String, clock: Clock): Clock {
         val pauseUrl = clock.linkFor(action)
         val response = Request.Put(withAccessToken(pauseUrl!!)).execute().returnResponse()
         assertThat(response.statusLine.statusCode, `is`(200))
@@ -241,13 +241,16 @@ class App(profile: String) {
     }
 
     fun invokeUnknownActionOn(clock: Clock) {
-        val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/unknown")).execute().returnResponse()
+        val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/unknown"))
+                .execute().returnResponse()
         lastResponses.add(response)
     }
 
     fun shutdown() {
         if (startApp) {
-            assertThat(Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse().statusLine.statusCode, `is`(200))
+            assertThat(
+                    Request.Post("$appUrl/mgmt/shutdown")
+                            .execute().returnResponse().statusLine.statusCode, `is`(200))
         }
         appInstance = null
         currentProfile = ""
