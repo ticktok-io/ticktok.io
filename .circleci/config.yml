@@ -23,7 +23,7 @@ jobs:
           root: ~/repo
           paths: .
 
-  dashboard-install:
+  dashboard-pach:
     <<: *defaults
     docker:
       - image: circleci/node:12
@@ -185,15 +185,9 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - dashboard-install:
+      - dashboard-pack:
           requires:
             - checkout
-          filters:
-            tags:
-              only: /.*/
-      - dashboard-build:
-          requires:
-            - dashboard-install
           filters:
             tags:
               only: /.*/
@@ -205,7 +199,7 @@ workflows:
               only: /.*/
       - backend-build:
           requires:
-            - dashboard-build
+            - dashboard-pack
             - backend-install
           filters:
             tags:
