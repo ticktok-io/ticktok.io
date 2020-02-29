@@ -10,17 +10,21 @@ push_image() {
     echo $2 uploaded to Dockerhub
 }
 
-TAG=`git describe --tags --abbrev=0 | cut -d "v" -f 2`
-IMAGE=$IMAGE_NAME:$TAG
+publish_current_tag() {
+    if [[ `docker pull $1` ]]; then
+        echo $1 already exists
+        exit 1
+    else
+        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+        push_image app $1
+    fi
+}
 
-if [[ `docker pull $IMAGE` ]]; then
-    echo $IMAGE already exists
-    exit 1
+if [[ $# -eq 0 ]]; then
+    TAG=`git describe --tags --abbrev=0 | cut -d "v" -f 2`
+    publish_current_tag $IMAGE_NAME:$TAG
+elif [[ $1 == "master" ]]; then
+    push_image app $IMAGE_NAME:master
 else
-    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-    push_image app $IMAGE
-
-#    if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
-#        push_image app $IMAGE_NAME:latest
-#    fi
+    echo $1 tag isn\'t supported
 fi

@@ -188,6 +188,18 @@ jobs:
           no_output_timeout: 5m
           command: .circleci/deploy_to_heroku.sh
 
+  dockerhub-publish-master:
+    <<: *defaults
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - setup_remote_docker
+      - *attach-workspace
+      - *restore-app-image
+      - run:
+          name: Publish master to dockerhub
+          command: .circleci/publish_to_dockerhub.sh master
+
   dockerhub-publish:
     <<: *defaults
     docker:
@@ -198,10 +210,7 @@ jobs:
       - *restore-app-image
       - run:
           name: Publish to dockerhub
-          command: |
-            if [[ "${CIRCLE_BRANCH}" == "master" ]] || [[ "${CIRCLE_BRANCH}" == realease-* ]]; then
-              .circleci/publish_to_dockerhub.sh
-            fi
+          command: .circleci/publish_to_dockerhub.sh
 
 
 workflows:
@@ -256,6 +265,15 @@ workflows:
             tags:
               only: /.*/
       - heroku-deploy:
+          requires:
+            - backend-unit-tests
+            - e2e-tests
+            - sandbox-tests
+          filters:
+            branches:
+              only:
+                - master
+      - dockerhub-publish-master:
           requires:
             - backend-unit-tests
             - e2e-tests
