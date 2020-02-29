@@ -5,6 +5,7 @@ set -e
 IMAGE_NAME=ticktok/ticktok
 
 push_image() {
+    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
     docker tag $1 $2
     docker push $2
     echo $2 uploaded to Dockerhub
@@ -15,7 +16,6 @@ publish_current_tag() {
         echo $1 already exists
         exit 1
     else
-        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
         push_image app $1
     fi
 }
