@@ -24,3 +24,4 @@ else
 #        push_image app $IMAGE_NAME:latest
 #    fi
 fi
+push_image app $IMAGE_NAME:master
