@@ -188,6 +188,18 @@ jobs:
           no_output_timeout: 5m
           command: .circleci/deploy_to_heroku.sh
 
+  dockerhub-publish-master:
+    <<: *defaults
+    docker:
+      - image: circleci/openjdk:8
+    steps:
+      - setup_remote_docker
+      - *attach-workspace
+      - *restore-app-image
+      - run:
+          name: Publish master to dockerhub
+          command: .circleci/publish_to_dockerhub.sh master
+
   dockerhub-publish:
     <<: *defaults
     docker:
