@@ -99,9 +99,6 @@ jobs:
       - *attach-workspace
       - *restore-app-image
       - run:
-          name: Install node@v12.14.0
-          command: .circleci/upgrade_node.sh
-      - run:
           name: Download Selenium
           command: curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
       - run: mkdir test-reports
@@ -115,6 +112,29 @@ jobs:
       - run:
           name: E2E tests against dockered app
           command: ./gradlew test -Ptags=core-tests -DstartApp=no --scan
+      - store_test_results:
+          path: build/test-results
+      - store_artifacts:
+          path: /tmp/ticktok-artifacts
+      - store_artifacts:
+          path: test-reports
+
+  dashboard-tests:
+    <<: *defaults
+    machine: true
+    steps:
+      - *attach-workspace
+      - *restore-app-image
+      - run:
+          name: Install node@v12.14.0
+          command: .circleci/upgrade_node.sh
+      - run: mkdir test-reports
+      - run:
+          name: Start app
+          command: .circleci/run_compose.sh up -d
+      - run:
+          name: Install dependencies
+          command: npm install --only=dev --prefix dashboard
       - run:
           name: Dashboard tests
           command: HOST=http://localhost:9643 npm run spec --prefix dashboard
@@ -124,9 +144,6 @@ jobs:
           path: /tmp/ticktok-artifacts
       - store_artifacts:
           path: test-reports
-      - store_test_results:
-          path: build/test-results
-
   sandbox-tests:
     <<: *defaults
     machine: true
@@ -217,6 +234,12 @@ workflows:
             tags:
               only: /.*/
       - e2e-tests:
+          requires:
+            - backend-build
+          filters:
+            tags:
+              only: /.*/
+      - dashboard-tests:
           requires:
             - backend-build
           filters:
