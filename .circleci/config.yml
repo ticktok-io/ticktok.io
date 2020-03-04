@@ -134,7 +134,7 @@ jobs:
           command: .circleci/run_compose.sh up -d
       - run:
           name: Install dependencies
-          command: npm ci --only=dev --prefix dashboard
+          command: npm ci --prefix dashboard
       - run:
           name: Dashboard tests
           command: HOST=http://localhost:9643 npm run spec --prefix dashboard
