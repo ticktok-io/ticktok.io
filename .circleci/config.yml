@@ -131,7 +131,7 @@ jobs:
       - run: mkdir test-reports
       - run:
           name: Start app
-          command: .circleci/run_compose.sh up -d
+          command: TICKTOK_IMAGE=app docker-compose -f dashboard/docker-compose.yml up -d
       - run:
           name: Install dependencies
           command: npm ci --prefix dashboard
