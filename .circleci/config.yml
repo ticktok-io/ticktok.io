@@ -139,7 +139,7 @@ jobs:
           name: Dashboard tests
           command: HOST=http://localhost:9643 npm run spec --prefix dashboard
       - store_test_results:
-          path: build/test-results
+          path: test-results
       - store_artifacts:
           path: /tmp/ticktok-artifacts
       - store_artifacts:
@@ -164,9 +164,9 @@ jobs:
           command: .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
           when: on_fail
       - store_artifacts:
-          path: /tmp/ticktok-artifacts
+          path: dashboard/screenshots
       - store_test_results:
-          path: build/test-results
+          path: dashboard/test-results
 
   heroku-deploy:
     <<: *defaults
