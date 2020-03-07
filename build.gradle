@@ -27,7 +27,7 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-springBoot {
+bootJar {
     mainClassName = 'io.ticktok.server.Application'
 }
 

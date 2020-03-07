@@ -4,7 +4,7 @@ VOLUME /tmp
 
 RUN apk add mongodb
 
-ADD build/libs/ticktok-*.jar /opt/app/app.jar
+ADD build/libs/ticktok.ios.jar /opt/app/app.jar
 ADD entrypoint.sh /opt/app
 RUN chmod +x /opt/app/entrypoint.sh
 
