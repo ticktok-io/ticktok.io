@@ -27,6 +27,11 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+springBoot {
+    mainClassName = 'io.ticktok.server.Application'
+}
+
+
 repositories {
     mavenCentral()
     jcenter()
