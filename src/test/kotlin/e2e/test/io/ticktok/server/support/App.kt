@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
 import java.time.Duration
+import java.time.Duration.ofMinutes
 import java.time.Duration.ofSeconds
 import java.util.*
 
@@ -55,7 +56,7 @@ class App(profile: String) {
 
     private fun waitForAppToBeHealthy() {
         println("Waiting for app($appUrl) to be healthy...")
-        await withPollInterval (ofSeconds(1)) atMost (Duration.ofMinutes(5)) until { isAppHealthy() }
+        await withPollInterval ofSeconds(1) atMost ofMinutes(5) until { isAppHealthy() }
     }
 
     fun reset() {
