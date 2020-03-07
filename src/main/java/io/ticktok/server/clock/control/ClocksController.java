@@ -70,7 +70,7 @@ public class ClocksController {
     private ResponseEntity<ClockResource> createdClockEntity(Clock clock, TickChannel channel) {
         ClockResource resource = clockResourceFactory.createWithChannel(clock, channel);
         return ResponseEntity
-                .created(withAuthToken(resource.getId().getHref(), userPrincipal()))
+                .created(withAuthToken(resource.getLink("self").get().getHref(), userPrincipal()))
                 .body(resource);
     }
 

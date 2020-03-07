@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.WebHandler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -16,13 +18,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 
 @AllArgsConstructor
 @Getter
 @ToString
-public class ClockResource extends ResourceSupport {
+public class ClockResource extends RepresentationModel<ClockResource> {
 
     private String clockId;
     private String name;

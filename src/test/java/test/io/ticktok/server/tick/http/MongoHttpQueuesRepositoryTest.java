@@ -5,7 +5,6 @@ import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.http.HttpQueue;
 import io.ticktok.server.tick.http.HttpQueuesRepository;
 import io.ticktok.server.tick.http.HttpQueuesRepository.QueueNotExistsException;
-import org.awaitility.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -23,6 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.IntegrationTest;
 
+import static java.time.Duration.ofMinutes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -119,7 +119,7 @@ class MongoHttpQueuesRepositoryTest {
     @DisabledIfSystemProperty(named = "scope", matches = "core")
     @Tag("slow")
     void deleteQueueIfNotInUse() {
-        await().atMost(Duration.ONE_MINUTE).until(() -> !repository.isQueueExists(QUEUE_NAME));
+        await().atMost(ofMinutes(1)).until(() -> !repository.isQueueExists(QUEUE_NAME));
     }
 
     @Test

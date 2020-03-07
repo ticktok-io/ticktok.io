@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = QueuesController.class, secure = false)
+@WebMvcTest(controllers = QueuesController.class)
 @ContextConfiguration(classes = {QueuesControllerTest.TestConfiguration.class})
 @ActiveProfiles({"http"})
 @IntegrationTest
@@ -38,6 +39,7 @@ class QueuesControllerTest {
     @MockBean
     private HttpQueuesRepository httpQueuesRepository;
 
+    @WithMockUser("spring")
     @Test
     void failOnNonExistingQueue() throws Exception {
        when(httpQueuesRepository.pop("unknown")).thenThrow(HttpQueuesRepository.QueueNotExistsException.class);

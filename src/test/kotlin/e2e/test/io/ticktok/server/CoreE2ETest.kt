@@ -1,7 +1,5 @@
 package e2e.test.io.ticktok.server
 
-import e2e.test.io.ticktok.server.pages.Browser
-import e2e.test.io.ticktok.server.pages.ClockListPage
 import e2e.test.io.ticktok.server.support.App
 import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsClock
 import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsOnly
@@ -10,9 +8,10 @@ import e2e.test.io.ticktok.server.support.Client.CLOCK_EXPR
 import e2e.test.io.ticktok.server.support.Clock
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.not
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import java.lang.Thread.sleep
 
 @Tag("core-tests")
@@ -117,54 +116,6 @@ class CoreE2ETest : CommonAppE2ETest() {
             Client.receivedTicksFor(clock)
         }
     }
-
-    @Nested
-    @DisabledIfSystemProperty(named = "scope", matches = "core")
-    @TestInstance(PER_CLASS)
-    @Tag("ui")
-    inner class DashboardTests {
-
-        private val browser = Browser()
-        private var clockListPage = ClockListPage(browser)
-
-        @BeforeAll
-        fun startBrowser() {
-            browser.start()
-        }
-
-        @Test
-        fun showConfiguredClocks() {
-            app().registeredAClock("row1", "every.911.seconds")
-            app().registeredAClock("row2", "every.888.seconds")
-            clockListPage.clockNamed("row1").contains("every.911.seconds")
-            clockListPage.clockNamed("row2").contains("every.888.seconds")
-        }
-
-        @Test
-        fun pauseAClock() {
-            app().registeredAClock("kuku", "every.922.seconds")
-            clockListPage.clockNamed("kuku").click("pause")
-            clockListPage.clockNamed("kuku").actionIs("resume")
-        }
-
-        @Test
-        fun tickAClock() {
-            val clock = app().registeredAClock("manual clock", "@never")
-            clockListPage.clockNamed("manual clock").click("tick")
-            Client.receivedTicksFor(clock)
-        }
-
-        @AfterEach
-        fun takeScreenShot() {
-            browser.takeScreenshot()
-        }
-
-        @AfterAll
-        fun stopBrowser() {
-            browser.stop()
-        }
-    }
-
 }
 
 

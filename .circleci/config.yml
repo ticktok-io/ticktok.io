@@ -23,40 +23,13 @@ jobs:
           root: ~/repo
           paths: .
 
-  dashboard-install:
+  dashboard-pack:
     <<: *defaults
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:12
     steps:
       - *attach-workspace
-
-      - restore_cache:
-          keys:
-            # when lock file changes, use increasingly general patterns to restore cache
-            - node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
-            - node-v1-{{ .Branch }}-
-            - node-v1-
-
-      - run: npm ci --prefix dashboard
-
-      - save_cache:
-          paths:
-            - dashboard/node_modules  # location depends on npm version
-          key: node-v1-{{ .Branch }}-{{ checksum "dashboard/package-lock.json" }}
-
-      - persist_to_workspace:
-          root: ~/repo
-          paths: dashboard
-
-  dashboard-build:
-    <<: *defaults
-    docker:
-      - image: circleci/node:8
-    steps:
-      - *attach-workspace
-      - run:
-          name: Build Dashboard
-          command: PUBLIC_URL=' ' npm run build --prefix dashboard
+      - run: .circleci/get-dashboard.sh
       - persist_to_workspace:
           root: ~/repo
           paths: dashboard
@@ -126,14 +99,6 @@ jobs:
       - *attach-workspace
       - *restore-app-image
       - run:
-          name: Download Selenium
-          command: curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
-      - run: mkdir test-reports
-      - run:
-          name: Start Selenium
-          command: java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
-          background: true
-      - run:
           name: Start app
           command: .circleci/run_compose.sh up -d
       - run:
@@ -141,13 +106,29 @@ jobs:
           command: ./gradlew test -Ptags=core-tests -DstartApp=no --scan
       - store_test_results:
           path: build/test-results
-      - store_artifacts:
-          path: /tmp/ticktok-artifacts
-      - store_artifacts:
-          path: test-reports
-      - store_test_results:
-          path: build/test-results
 
+  dashboard-tests:
+    <<: *defaults
+    machine: true
+    steps:
+      - *attach-workspace
+      - *restore-app-image
+      - run:
+          name: Install node@v12.14.0
+          command: .circleci/upgrade_node.sh
+      - run:
+          name: Start app
+          command: TICKTOK_IMAGE=app docker-compose -f dashboard/docker-compose.yml up -d
+      - run:
+          name: Install dependencies
+          command: npm ci --prefix dashboard
+      - run:
+          name: Dashboard tests
+          command: HOST=http://localhost:9643 npm run spec --prefix dashboard
+      - store_test_results:
+          path: dashoard/test-results
+      - store_artifacts:
+          path: dashoard/screenshots
   sandbox-tests:
     <<: *defaults
     machine: true
@@ -221,15 +202,9 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - dashboard-install:
+      - dashboard-pack:
           requires:
             - checkout
-          filters:
-            tags:
-              only: /.*/
-      - dashboard-build:
-          requires:
-            - dashboard-install
           filters:
             tags:
               only: /.*/
@@ -241,7 +216,7 @@ workflows:
               only: /.*/
       - backend-build:
           requires:
-            - dashboard-build
+            - dashboard-pack
             - backend-install
           filters:
             tags:
@@ -253,6 +228,12 @@ workflows:
             tags:
               only: /.*/
       - e2e-tests:
+          requires:
+            - backend-build
+          filters:
+            tags:
+              only: /.*/
+      - dashboard-tests:
           requires:
             - backend-build
           filters:
