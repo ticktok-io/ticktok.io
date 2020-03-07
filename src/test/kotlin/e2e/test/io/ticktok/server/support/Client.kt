@@ -7,15 +7,14 @@ import com.rabbitmq.client.*
 import org.apache.http.HttpResponse
 import org.apache.http.client.fluent.Request
 import org.apache.http.util.EntityUtils
-import org.awaitility.Duration
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
 import java.lang.Thread.sleep
 import java.nio.charset.Charset
+import java.time.Duration.ofSeconds
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.test.assertTrue
 
 
 object Client {
@@ -24,7 +23,7 @@ object Client {
     private val listeners = hashMapOf<String, TickListener>()
 
     fun receivedTicksFor(clock: Clock) {
-        await atMost Duration(4, TimeUnit.SECONDS) until {
+        await atMost ofSeconds(4) until {
             listeners[clock.id]?.messages?.isNotEmpty()!! &&
                     listeners[clock.id]?.messages?.filter { m -> m.get("schedule").asString == clock.schedule }!!.any()
         }
@@ -35,7 +34,7 @@ object Client {
         reset()
         sleep(2000)
         listeners.values.forEach { v ->
-            assertTrue(v.messages.isEmpty(), "received ticks for ${v.name()}")
+            assertThat(v.messages).`as`("received ticks for %s", v.name()).isEmpty()
         }
     }
 

@@ -13,9 +13,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class TicksRepositoryImpl implements UpdateTicksRepository {
@@ -53,7 +55,7 @@ public class TicksRepositoryImpl implements UpdateTicksRepository {
 
     private List<String> getLastXPublishedTicksPerSchedule(int count) {
         MatchOperation matchPublished = match(Criteria.where("status").is(Tick.PUBLISHED));
-        SortOperation sortByTime = sort(new Sort(Sort.Direction.DESC, "time"));
+        SortOperation sortByTime = sort(Sort.by(Sort.Direction.DESC, "time"));
         GroupOperation groupBySchedule = group("schedule").push("_id").as("tickId");
         ProjectionOperation topX = project().and("tickId").slice(count).as("tickId");
         UnwindOperation unwind = unwind("tickId");
@@ -65,10 +67,8 @@ public class TicksRepositoryImpl implements UpdateTicksRepository {
     @Getter
     @EqualsAndHashCode
     @ToString
-    class RedundantTick {
+    static class RedundantTick {
 
-        private String id;
-        @Id
         private String tickId;
     }
 }

@@ -11,7 +11,6 @@ import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.ContentType
 import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
-import org.awaitility.Duration
 import org.awaitility.kotlin.*
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
@@ -23,6 +22,8 @@ import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
+import java.time.Duration
+import java.time.Duration.ofSeconds
 import java.util.*
 
 class App(profile: String) {
@@ -54,7 +55,7 @@ class App(profile: String) {
 
     private fun waitForAppToBeHealthy() {
         println("Waiting for app($appUrl) to be healthy...")
-        await withPollInterval (Duration.ONE_SECOND) atMost (Duration.FIVE_MINUTES) until { isAppHealthy() }
+        await withPollInterval (ofSeconds(1)) atMost (Duration.ofMinutes(5)) until { isAppHealthy() }
     }
 
     fun reset() {
@@ -133,7 +134,7 @@ class App(profile: String) {
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
-        await atMost (Duration.FIVE_SECONDS) untilAsserted {
+        await atMost (ofSeconds(5)) untilAsserted {
             assertThat(getAllClocks(), matcher)
         }
     }
