@@ -12,6 +12,10 @@ restore-app-image: &restore-app-image
     name: Restore app image
     command: docker load -i app-image.tar
 
+java-docker: &java-docker
+  docker:
+    - image: circleci/openjdk:11
+
 jobs:
   checkout:
     <<: *defaults
@@ -25,8 +29,7 @@ jobs:
 
   dashboard-pack:
     <<: *defaults
-    docker:
-      - image: circleci/node:12
+    <<: *java-docker
     steps:
       - *attach-workspace
       - run: .circleci/get-dashboard.sh
@@ -36,8 +39,7 @@ jobs:
 
   backend-install:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - *attach-workspace
       - restore_cache:
@@ -53,8 +55,7 @@ jobs:
 
   backend-build:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - *attach-workspace
       - setup_remote_docker
@@ -155,8 +156,7 @@ jobs:
 
   heroku-deploy:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - setup_remote_docker
       - *attach-workspace
@@ -171,8 +171,7 @@ jobs:
 
   dockerhub-publish-master:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - setup_remote_docker
       - *attach-workspace
@@ -184,7 +183,7 @@ jobs:
   dockerhub-publish:
     <<: *defaults
     docker:
-      - image: circleci/openjdk:8
+      - image: circleci/openjdk:11
     steps:
       - setup_remote_docker
       - *attach-workspace
