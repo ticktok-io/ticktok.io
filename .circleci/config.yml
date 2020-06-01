@@ -100,7 +100,9 @@ jobs:
     steps:
       - *attach-workspace
       - *restore-app-image
-      - run: java -version
+      - run:
+        name: Install Java 11
+        command: .circleci/install_java11.sh
       - run:
           name: Start app
           command: .circleci/run_compose.sh up -d
@@ -132,6 +134,7 @@ jobs:
           path: dashoard/test-results
       - store_artifacts:
           path: dashoard/screenshots
+
   sandbox-tests:
     <<: *defaults
     machine: true
@@ -141,6 +144,9 @@ jobs:
     steps:
       - *attach-workspace
       - *restore-app-image
+      - run:
+          name: Install Java 11
+          command: .circleci/install_java11.sh
       - run:
           name: Start as sandbox
           command: .circleci/run_compose_sandbox.sh up -d app
