@@ -100,6 +100,7 @@ jobs:
     steps:
       - *attach-workspace
       - *restore-app-image
+      - run: java -version
       - run:
           name: Start app
           command: .circleci/run_compose.sh up -d
