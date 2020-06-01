@@ -24,8 +24,8 @@ plugins {
 }
 
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 bootJar {
     mainClassName = 'io.ticktok.server.Application'
@@ -70,7 +70,6 @@ dependencies {
     compile "javax.validation:validation-api:2.0.1.Final"
 
     compile "com.google.code.gson:gson:2.8.2"
-
 
 
     implementation "org.cache2k:cache2k-api:${cache2kVersion}"

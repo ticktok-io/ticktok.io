@@ -22,7 +22,7 @@ public class TickScheduler {
             @Value("${schedules.lookahead:5}") String lookaheadInSeconds,
             SchedulesRepository schedulesRepository,
             TicksRepository ticksRepository) {
-        this.lookaheadInMillis = Long.valueOf(lookaheadInSeconds) * SECOND;
+        this.lookaheadInMillis = Long.parseLong(lookaheadInSeconds) * SECOND;
         this.schedulesRepository = schedulesRepository;
         this.ticksRepository = ticksRepository;
     }
