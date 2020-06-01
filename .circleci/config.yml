@@ -29,7 +29,8 @@ jobs:
 
   dashboard-pack:
     <<: *defaults
-    <<: *java-docker
+    docker:
+      - image: circleci/node:12
     steps:
       - *attach-workspace
       - run: .circleci/get-dashboard.sh
