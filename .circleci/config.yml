@@ -88,9 +88,6 @@ jobs:
     steps:
       - *attach-workspace
       - run:
-          name: Start mongo & rabbit
-          command: .circleci/run_compose.sh up -d mongo rabbit
-      - run:
           name: Server's UT & IT
           command: ./gradlew test --tests test.*
       - store_test_results:
