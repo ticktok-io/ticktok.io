@@ -102,6 +102,7 @@ jobs:
       - run:
           name: Install Java 11
           command: .circleci/install_java11.sh
+      - run: java -version
       - run:
           name: Start app
           command: .circleci/run_compose.sh up -d
