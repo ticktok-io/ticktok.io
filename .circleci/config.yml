@@ -12,9 +12,6 @@ restore-app-image: &restore-app-image
     name: Restore app image
     command: docker load -i app-image.tar
 
-java-docker: &java-docker
-  docker:
-    - image: circleci/openjdk:11
 
 jobs:
   checkout:
@@ -40,7 +37,8 @@ jobs:
 
   backend-install:
     <<: *defaults
-    <<: *java-docker
+    docker:
+      - image: circleci/openjdk:11
     steps:
       - *attach-workspace
       - restore_cache:
@@ -56,7 +54,8 @@ jobs:
 
   backend-build:
     <<: *defaults
-    <<: *java-docker
+    docker:
+      - image: circleci/openjdk:11
     steps:
       - *attach-workspace
       - setup_remote_docker
@@ -101,8 +100,8 @@ jobs:
       - *attach-workspace
       - *restore-app-image
       - run:
-        name: Install Java 11
-        command: .circleci/install_java11.sh
+          name: Install Java 11
+          command: .circleci/install_java11.sh
       - run:
           name: Start app
           command: .circleci/run_compose.sh up -d
@@ -164,7 +163,8 @@ jobs:
 
   heroku-deploy:
     <<: *defaults
-    <<: *java-docker
+    docker:
+      - image: circleci/openjdk:11
     steps:
       - setup_remote_docker
       - *attach-workspace
@@ -179,7 +179,8 @@ jobs:
 
   dockerhub-publish-master:
     <<: *defaults
-    <<: *java-docker
+    docker:
+      - image: circleci/openjdk:11
     steps:
       - setup_remote_docker
       - *attach-workspace
