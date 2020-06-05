@@ -88,9 +88,6 @@ jobs:
     steps:
       - *attach-workspace
       - run:
-          name: Install Java 11
-          command: .circleci/install_java11.sh
-      - run:
           name: Start mongo & rabbit
           command: .circleci/run_compose.sh up -d mongo rabbit
       - run:
