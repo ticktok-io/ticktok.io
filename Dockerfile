@@ -12,7 +12,7 @@ ADD build/libs/ticktok-io.jar /opt/app/app.jar
 ADD entrypoint.sh /opt/app
 RUN chmod +x /opt/app/entrypoint.sh
 
-WORKDIR /opt/ap
+WORKDIR /opt/app
 
 EXPOSE 9643
 
