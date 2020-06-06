@@ -126,7 +126,6 @@ jobs:
       - run:
           name: Install node@v12.14.0
           command: .circleci/upgrade_node.sh
-      - run: mkdir dashboard/test-results && mkdir dashboard/test-results/mocha
       - run:
           name: Start app
           command: TICKTOK_IMAGE=app docker-compose -f dashboard/docker-compose.yml up -d
@@ -137,9 +136,9 @@ jobs:
           name: Dashboard tests
           command: HOST=http://localhost:9643 npm run spec --prefix dashboard
       - store_test_results:
-          path: dashoard/test-results
+          path: dashboard/test-results
       - store_artifacts:
-          path: dashoard/screenshots
+          path: dashboard/screenshots
 
   sandbox-tests:
     <<: *defaults
