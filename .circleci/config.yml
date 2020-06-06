@@ -162,7 +162,7 @@ jobs:
           command: ./gradlew test -Ptags=http-broker-tests -DstartApp=no --scan
       - run:
           name: Collect app logs
-          command: .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
+          command: mkdir /tmp/ticktok-artifacts && .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
           when: on_fail
       - store_artifacts:
           path: /tmp/ticktok-artifacts
