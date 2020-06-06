@@ -13,5 +13,5 @@ check_health() {
 }
 
 HEROKU_APP=ticktok-io-dev
-heroku deploy:jar build/libs/*.jar --app $HEROKU_APP -o "--server.port=\$PORT"
+heroku deploy:jar build/libs/*.jar --app $HEROKU_APP --jdk 11 -o "--server.port=\$PORT"
 check_health https://$HEROKU_APP.herokuapp.com
