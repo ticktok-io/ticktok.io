@@ -156,7 +156,7 @@ jobs:
           command: .circleci/install_java11.sh
       - run:
           name: Start as sandbox
-          command: .circleci/run_compose_sandbox.sh up -d app
+          command: .circleci/run_compose_sandbox.sh up -d app && sleep 10
       - run:
           name: Sandbox sanity testing
           command: ./gradlew test -Ptags=http-broker-tests -DstartApp=no --scan
