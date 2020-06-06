@@ -126,7 +126,7 @@ jobs:
       - run:
           name: Install node@v12.14.0
           command: .circleci/upgrade_node.sh
-      - run: pwd && mkdir dashboard/test-results
+      - run: mkdir dashboard/test-results && mkdir dashboard/test-results/mocha
       - run:
           name: Start app
           command: TICKTOK_IMAGE=app docker-compose -f dashboard/docker-compose.yml up -d
