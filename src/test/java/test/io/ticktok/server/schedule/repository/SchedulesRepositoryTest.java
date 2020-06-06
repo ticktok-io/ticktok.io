@@ -15,10 +15,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.io.ticktok.server.support.IntegrationTest;
 import test.io.ticktok.server.support.RepositoryCleanupExtension;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -82,9 +84,9 @@ class SchedulesRepositoryTest {
 
     @Test
     void findSchedulesWithNextTickUpUntilTime() {
-        schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, asList("111")));
-        schedulesRepository.save(new Schedule("every.9.seconds", now() + SECOND, asList("111")));
-        schedulesRepository.save(new Schedule("every.10.seconds", now() + 3000, asList("222")));
+        schedulesRepository.save(new Schedule("every.8.seconds", now() - SECOND, singletonList("111")));
+        schedulesRepository.save(new Schedule("every.9.seconds", now() + SECOND, singletonList("111")));
+        schedulesRepository.save(new Schedule("every.10.seconds", now() + 3000, singletonList("222")));
         List<Schedule> schedules = schedulesRepository.findActiveSchedulesByNextTickLesserThan(now() + 2000);
         assertThat(schedules.size(), is(2));
         assertThat(schedules.get(0).getSchedule(), is("every.8.seconds"));
@@ -108,7 +110,7 @@ class SchedulesRepositoryTest {
     void deleteNonActiveClocks() {
         schedulesRepository.save(new Schedule("every.8.seconds", 0));
         schedulesRepository.save(new Schedule("every.7.seconds", 0, emptyList()));
-        schedulesRepository.save(new Schedule("every.10.seconds", 0, asList("222")));
+        schedulesRepository.save(new Schedule("every.10.seconds", 0, singletonList("222")));
         schedulesRepository.deleteNonActiveSchedules();
         List<Schedule> leftSchedules = schedulesRepository.findAll();
         assertThat(leftSchedules, hasSize(1));

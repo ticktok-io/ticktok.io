@@ -12,6 +12,11 @@ restore-app-image: &restore-app-image
     name: Restore app image
     command: docker load -i app-image.tar
 
+java-docker: &java-docker
+  docker:
+    - image: circleci/openjdk:11
+
+
 jobs:
   checkout:
     <<: *defaults
@@ -36,8 +41,7 @@ jobs:
 
   backend-install:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - *attach-workspace
       - restore_cache:
@@ -54,7 +58,7 @@ jobs:
   backend-build:
     <<: *defaults
     docker:
-      - image: circleci/openjdk:8
+      - image: circleci/openjdk:11
     steps:
       - *attach-workspace
       - setup_remote_docker
@@ -73,15 +77,17 @@ jobs:
 
   backend-unit-tests:
     <<: *defaults
-    machine: true
+    docker:
+      - image: circleci/openjdk:11
+      - image: rabbitmq:3-management-alpine
+        hostname: ticktok-rabbit
+      - image: mongo:3.6
+        command: --storageEngine ephemeralForTest
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
       - *attach-workspace
-      - run:
-          name: Start mongo & rabbit
-          command: .circleci/run_compose.sh up -d mongo rabbit
       - run:
           name: Server's UT & IT
           command: ./gradlew test --tests test.*
@@ -99,6 +105,9 @@ jobs:
       - *attach-workspace
       - *restore-app-image
       - run:
+          name: Install Java 11
+          command: .circleci/install_java11.sh
+      - run:
           name: Start app
           command: .circleci/run_compose.sh up -d
       - run:
@@ -109,7 +118,8 @@ jobs:
 
   dashboard-tests:
     <<: *defaults
-    machine: true
+    machine:
+      image: ubuntu-1604:201903-01
     steps:
       - *attach-workspace
       - *restore-app-image
@@ -126,12 +136,14 @@ jobs:
           name: Dashboard tests
           command: HOST=http://localhost:9643 npm run spec --prefix dashboard
       - store_test_results:
-          path: dashoard/test-results
+          path: dashboard/test-results
       - store_artifacts:
-          path: dashoard/screenshots
+          path: dashboard/screenshots
+
   sandbox-tests:
     <<: *defaults
-    machine: true
+    machine:
+      image: ubuntu-1604:201903-01
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
@@ -139,14 +151,17 @@ jobs:
       - *attach-workspace
       - *restore-app-image
       - run:
+          name: Install Java 11
+          command: .circleci/install_java11.sh
+      - run:
           name: Start as sandbox
-          command: .circleci/run_compose_sandbox.sh up -d app
+          command: .circleci/run_compose_sandbox.sh up -d app && sleep 10
       - run:
           name: Sandbox sanity testing
           command: ./gradlew test -Ptags=http-broker-tests -DstartApp=no --scan
       - run:
           name: Collect app logs
-          command: .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
+          command: mkdir /tmp/ticktok-artifacts && .circleci/run_compose.sh logs > /tmp/ticktok-artifacts/compose.logs
           when: on_fail
       - store_artifacts:
           path: /tmp/ticktok-artifacts
@@ -155,8 +170,7 @@ jobs:
 
   heroku-deploy:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - setup_remote_docker
       - *attach-workspace
@@ -171,8 +185,7 @@ jobs:
 
   dockerhub-publish-master:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - setup_remote_docker
       - *attach-workspace
@@ -183,8 +196,7 @@ jobs:
 
   dockerhub-publish:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:8
+    <<: *java-docker
     steps:
       - setup_remote_docker
       - *attach-workspace

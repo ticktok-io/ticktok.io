@@ -5,7 +5,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,10 +34,18 @@ public class AccessTokenAuthenticationManager implements AuthenticationManager {
         try {
             MessageDigest msdDigest = MessageDigest.getInstance("SHA-1");
             msdDigest.update(input.getBytes(StandardCharsets.UTF_8), 0, input.length());
-            sha1 = DatatypeConverter.printHexBinary(msdDigest.digest());
+            sha1 = byteArrayToHexString(msdDigest.digest());
         } catch (NoSuchAlgorithmException e) {
             //ignore
         }
         return sha1;
+    }
+
+    public static String byteArrayToHexString(byte[] b) {
+        StringBuilder result = new StringBuilder();
+        for (byte value : b) {
+            result.append(Integer.toString((value & 0xff) + 0x100, 16).substring(1));
+        }
+        return result.toString();
     }
 }
