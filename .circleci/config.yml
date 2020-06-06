@@ -16,6 +16,7 @@ java-docker: &java-docker
   docker:
     - image: circleci/openjdk:11
 
+
 jobs:
   checkout:
     <<: *defaults
