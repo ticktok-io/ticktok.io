@@ -6,7 +6,7 @@ services:
     ports:
       - 9643:9643
     environment:
-      - RABBIT_URI=amqp://rabbit
+      - RABBIT_URI=amqp://guest:guest@rabbit
       - MONGO_URI=mongodb://mongo/e2e-test
       - ACCESS_TOKEN=${E2E_ACCESS_TOKEN}
       - RABBIT_CONSUMERURI=amqp://localhost
