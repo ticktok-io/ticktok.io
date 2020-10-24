@@ -13,6 +13,3 @@ services:
     command: --storageEngine ephemeralForTest
     ports:
       - 27017:27017
-
-
-
