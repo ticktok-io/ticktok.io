@@ -23,8 +23,10 @@ abstract class CommonAppE2ETest {
     }
 
     @Test
-    fun retrieveScheduledMessage() {
+    fun retrieveScheduledTicks() {
+        // Given
         val clock = app().registeredAClock("kuku", Client.CLOCK_EXPR)
+        // Expect
         Client.receivedTicksFor(clock)
     }
 
