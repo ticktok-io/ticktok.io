@@ -89,7 +89,7 @@ jobs:
       - *attach-workspace
       - run:
           name: Server's UT & IT
-          command: sleep 5 && ./gradlew test --tests "test.*"
+          command: sleep 10 && ./gradlew test --tests "test.*"
       - store_test_results:
           path: build/test-results
 
