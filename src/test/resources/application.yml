@@ -1,5 +1,5 @@
 rabbit:
-  uri: amqp://localhost:5672
+  uri: amqp://guest:guest@localhost:5672
   queue:
     ttl: 1000
 
