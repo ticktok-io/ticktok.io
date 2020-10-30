@@ -80,7 +80,7 @@ jobs:
       - image: circleci/openjdk:11.0.3-jdk-stretch
       - image: rabbitmq:3-management-alpine
         volumes:
-          - rabbit_log:/var/log/rabbitmq/log
+          - ~/rabbit_log:/var/log/rabbitmq/log
       - image: mongo:3.6
         command: --storageEngine ephemeralForTest
     environment:
