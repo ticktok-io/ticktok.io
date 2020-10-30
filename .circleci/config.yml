@@ -91,7 +91,7 @@ jobs:
           command: docker-compose up -d
       - run:
           name: Server's UT & IT
-          command: sleep 5 && ./gradlew test --tests "test.*"
+          command: sleep 15 && ./gradlew test --tests "test.*"
       - store_test_results:
           path: build/test-results
 
