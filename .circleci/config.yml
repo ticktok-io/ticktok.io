@@ -86,7 +86,7 @@ jobs:
       - run:
           name: Install Java 11
           command: .circleci/install_java11.sh
-       - run:
+      - run:
           name: Start tools
           command: docker-compose up -d
       - run:
