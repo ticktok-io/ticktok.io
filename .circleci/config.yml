@@ -76,22 +76,22 @@ jobs:
 
   backend-unit-tests:
     <<: *defaults
-    docker:
-      - image: circleci/openjdk:11.0.3-jdk-stretch
-      - image: rabbitmq:latest
-        ports:
-          - "15672:15672"
-          - "5672:5672"
-      - image: mongo:3.6
-        command: --storageEngine ephemeralForTest
+    machine:
+      image: ubuntu-1604:201903-01
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
       - *attach-workspace
       - run:
+          name: Install Java 11
+          command: .circleci/install_java11.sh
+       - run:
+          name: Start tools
+          command: docker-compose up -d
+      - run:
           name: Server's UT & IT
-          command: ./gradlew test --tests "test.*"
+          command: sleep 5 && ./gradlew test --tests "test.*"
       - store_test_results:
           path: build/test-results
 
