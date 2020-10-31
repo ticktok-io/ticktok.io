@@ -3,7 +3,6 @@ package test.io.ticktok.server.tick.repository;
 import io.ticktok.server.schedule.Schedule;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.repository.TicksRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,10 +21,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
@@ -56,14 +53,13 @@ class TicksRepositoryTest {
     void updateTickStatus() {
         Tick savedTick = repository.save(TICK);
         repository.updateTickStatus(savedTick.getId(), Tick.PUBLISHED);
-        assertThat(repository.findById(savedTick.getId()).get().getStatus(), is(Tick.PUBLISHED));
+        assertThat(repository.findById(savedTick.getId()).get().getStatus()).isEqualTo(Tick.PUBLISHED);
     }
 
     @Test
     void failWhenUpdatingAnAlreadyExistStatus() {
         Tick savedTick = repository.save(TICK);
-        assertThrows(TicksRepository.UnableToUpdateStatusException.class,
-                () -> repository.updateTickStatus(savedTick.getId(), Tick.PENDING));
+        assertThatExceptionOfType(TicksRepository.UnableToUpdateStatusException.class).isThrownBy(() -> repository.updateTickStatus(savedTick.getId(), Tick.PENDING));
     }
 
     @Test
@@ -71,7 +67,7 @@ class TicksRepositoryTest {
         repository.save(new Tick(null, "every.1.seconds", 111, Tick.PENDING));
         repository.save(new Tick(null, "every.2.seconds", 111, Tick.IN_PROGRESS));
         repository.deletePublishedExceptLastPerSchedule(1);
-        assertThat(repository.findAll(), hasSize(2));
+        assertThat(repository.findAll()).hasSize(2);
     }
 
     @Test
@@ -81,9 +77,9 @@ class TicksRepositoryTest {
         Tick tick3 = new Tick(null, "every.1.seconds", 333, Tick.PUBLISHED);
         repository.saveAll(asList(tick1, tick2, tick3));
         repository.deletePublishedExceptLastPerSchedule(2);
-        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").doesNotContain(tick1);
+        assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").doesNotContain(tick1);
         repository.deletePublishedExceptLastPerSchedule(1);
-        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").containsOnly(tick3);
+        assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").containsOnly(tick3);
     }
 
     @Test
@@ -93,6 +89,6 @@ class TicksRepositoryTest {
         Tick tick2 = new Tick(null, "every.2.seconds", 222, Tick.PUBLISHED);
         repository.saveAll(asList(tick1, tick12, tick2));
         repository.deletePublishedExceptLastPerSchedule(1);
-        Assertions.assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").containsOnly(tick12, tick2);
+        assertThat(repository.findAll()).usingElementComparatorIgnoringFields("id").containsOnly(tick12, tick2);
     }
 }
