@@ -47,7 +47,7 @@ class CachedClocksFinderTest {
     @Test
     void shouldExpireCache() throws InterruptedException {
         cachedClocksFinder.findBy(PARAMS);
-        Thread.sleep(TTL * 1000 + 100);
+        Thread.sleep(TTL * 1000 + 200);
         cachedClocksFinder.findBy(PARAMS);
         verify(clocksFinder, times(2)).findBy(PARAMS);
     }
