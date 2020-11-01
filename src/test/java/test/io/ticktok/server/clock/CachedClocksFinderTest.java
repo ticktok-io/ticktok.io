@@ -8,14 +8,16 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class CachedClocksFinderTest {
 
-    static final List<Clock> CLOCKS = Arrays.asList(new Clock("lala", "every.12.seconds"));
+    static final List<Clock> CLOCKS = singletonList(new Clock("lala", "every.12.seconds"));
     static final ImmutableMap<String, String> PARAMS = ImmutableMap.of("name", "lala");
     private static final int TTL = 1;
 
@@ -47,7 +49,7 @@ class CachedClocksFinderTest {
     @Test
     void shouldExpireCache() throws InterruptedException {
         cachedClocksFinder.findBy(PARAMS);
-        Thread.sleep(TTL * 1000 + 200);
+        Thread.sleep(TTL * 1000 + 1100);
         cachedClocksFinder.findBy(PARAMS);
         verify(clocksFinder, times(2)).findBy(PARAMS);
     }

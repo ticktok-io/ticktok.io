@@ -37,7 +37,9 @@ public class RabbitConfiguration {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        return new CachingConnectionFactory(URI.create(rabbitProperties.getUri()));
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+        connectionFactory.setUri(URI.create(rabbitProperties.getUri()));
+        return connectionFactory;
     }
 
     @Bean
