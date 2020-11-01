@@ -19,10 +19,10 @@ public class CachedClocksFinder implements ClocksFinder {
 
     private Cache<Map<String, String>, List<Clock>> createCache(int ttl) {
         return new Cache2kBuilder<Map<String, String>, List<Clock>>() {}
-            .expireAfterWrite(ttl, TimeUnit.SECONDS)
-            .resilienceDuration(30, TimeUnit.SECONDS)
-            .loader(this::findClocks)
-            .build();
+                .expireAfterWrite(ttl, TimeUnit.SECONDS)
+                .resilienceDuration(30, TimeUnit.SECONDS)
+                .loader(this::findClocks)
+                .build();
     }
 
     private List<Clock> findClocks(Map<String, String> params) {

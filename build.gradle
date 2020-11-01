@@ -1,7 +1,7 @@
 buildscript {
     ext.kotlinVersion = '1.4.10'
-    ext.cache2kVersion = '1.2.4.Final'
-    ext.swaggerVersion = '2.8.0'
+    ext.cache2kVersion = '1.6.0.Final'
+    ext.swaggerVersion = '2.9.2'
     ext.lombokVersion = '1.18.16'
     repositories {
         mavenCentral()

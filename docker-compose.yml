@@ -9,10 +9,7 @@ services:
     hostname: ticktok-rabbit
 
   mongo:
-    image: mongo:3.6
+    image: mongo:4.4
     command: --storageEngine ephemeralForTest
     ports:
       - 27017:27017
-
-
-
