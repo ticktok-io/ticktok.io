@@ -26,7 +26,6 @@ public class CachedClocksFinder implements ClocksFinder {
     }
 
     private List<Clock> findClocks(Map<String, String> params) {
-        System.out.println("<=>");
         return clocksFinder.findBy(params);
     }
 
