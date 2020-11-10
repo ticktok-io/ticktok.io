@@ -40,7 +40,7 @@ public class RabbitTickPublisher implements TickPublisher {
         rabbitOperations.convertAndSend(new QueueNameCreator(clock).create(), tickMessageFor(clock.getSchedule()));
     }
 
-    private class TicktokMessagePostProcessor implements MessagePostProcessor {
+    private static class TicktokMessagePostProcessor implements MessagePostProcessor {
 
         private final int ttl;
 

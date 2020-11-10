@@ -17,7 +17,7 @@ import java.time.Duration.ofSeconds
 import java.util.*
 
 
-object Client {
+object RabbitClient {
 
     const val CLOCK_EXPR = "every.2.seconds"
     private val listeners = hashMapOf<String, TickListener>()
@@ -38,7 +38,7 @@ object Client {
         }
     }
 
-    fun reset() {
+    private fun reset() {
         listeners.values.forEach { v -> v.clear() }
     }
 
@@ -49,7 +49,7 @@ object Client {
         }
     }
 
-    fun createListenerFor(clock: Clock): TickListener {
+    private fun createListenerFor(clock: Clock): TickListener {
         return when (clock.channel!!.type) {
             "rabbit" -> RabbitTickListener(clock)
             "http" -> HttpTickListener(clock)

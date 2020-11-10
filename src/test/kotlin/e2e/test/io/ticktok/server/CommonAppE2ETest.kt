@@ -11,10 +11,12 @@ abstract class CommonAppE2ETest {
     @AfterEach
     open fun resetApp() {
         app().reset()
-        Client.stop()
+        client().stop()
     }
 
     abstract fun app(): App
+
+    abstract fun client(): Client
 
     @AfterAll
     open fun purgeApp() {
@@ -26,8 +28,8 @@ abstract class CommonAppE2ETest {
     fun retrieveScheduledTicks() {
         // Given
         val clock = app().registeredAClock("kuku", Client.CLOCK_EXPR)
+        client().addClock(clock)
         // Expect
-        Client.receivedTicksFor(clock)
+        client().receivedTicksFor(clock)
     }
-
 }

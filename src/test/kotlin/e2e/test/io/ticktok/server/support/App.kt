@@ -35,7 +35,7 @@ class App(profile: String) {
         var startApp = System.getProperty("startApp", "yes") != "no"
         private var appInstance: App? = null
 
-        fun instance(profile: String): App {
+        fun instance(profile: String = ""): App {
             if (appInstance == null) {
                 appInstance = App(profile)
                 if (startApp) {
