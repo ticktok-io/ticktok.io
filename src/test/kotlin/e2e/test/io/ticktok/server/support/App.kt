@@ -98,7 +98,6 @@ class App(profile: String) {
     private fun startListenOn(clock: Clock) {
         if (clock.channel != null) {
             validateTickChannelType(clock)
-            Client.startListenTo(clock)
         }
     }
 

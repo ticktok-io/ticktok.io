@@ -1,76 +1,80 @@
-package e2e.test.io.ticktok.server
+package e2e.io.ticktok.server
 
-import e2e.test.io.ticktok.server.support.*
-import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsClock
-import e2e.test.io.ticktok.server.support.App.ClockMatcher.Companion.containsOnly
-import e2e.test.io.ticktok.server.support.RabbitClient.CLOCK_EXPR
-import org.assertj.core.api.Assertions.assertThat
-import org.hamcrest.Matchers.not
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.RepeatedTest
-import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.Test
-import java.lang.Thread.sleep
+import spock.lang.Specification
+import spock.lang.Unroll
 
-@Tag("core-tests")
-class ApiE2ETest : CommonAppE2ETest() {
+class ApiSpec extends CommonSpec {
 
-    override fun app(): App {
-        return App.instance("rabbit")
+    @Override
+    AppDriver app() {
+        return AppDriver.instance('http')
     }
 
-    override fun client(): Client {
-        return AnyClient()
+    @Override
+    Client client() {
+        return new Client()
     }
 
-    @Test
-    fun registerNewClock() {
-        app().registeredAClock("kuku", RabbitClient.CLOCK_EXPR)
-        app().retrievedRegisteredClock("kuku", CLOCK_EXPR)
+    def "register a new clock"() {
+        given:
+        app().registeredAClock("kuku", "every.5.seconds")
+
+        expect:
+        app().retrievedRegisteredClock("kuku", "every.5.seconds")
     }
 
-    @Test
-    fun shouldBeHealthy() {
+    def "should be healthy"() {
+        expect:
         app().isHealthy()
     }
 
-    @Test
-    fun failWhenTokenNotProvided() {
+    def "fail when token not provided"() {
+        when:
         app().isAccessedWithoutAToken()
+
+        then:
         app().retrieveAuthError()
     }
 
-    @Test
-    fun retrieveConfiguredClocks() {
+    def "retrieve configured clocks"() {
+        given:
         val clock1 = app().registeredAClock("kuku6", "every.6.seconds")
         val clock2 = app().registeredAClock("popo10", "every.10.seconds")
 
+        expect:
         app().clocks(containsClock(clock1.copy(status = Clock.ACTIVE)))
         app().clocks(containsClock(clock2.copy(status = Clock.ACTIVE)))
     }
 
-    @Test
-    fun purgeClocksWithNoConsumers() {
+    def "purge clocks with bo consumers"() {
+        given:
         val clock = app().registeredAClock("purger", CLOCK_EXPR)
         sleep(1500)
+
+        expect:
         app().clocks(not(containsClock(clock)))
     }
 
-    @Test
-    fun failOnInValidSchedule() {
+    def "fail on in valid schedule"() {
+        when:
         app().registeredAClock("kuku", "non-valid")
+
+        then:
         app().retrievedUserError()
     }
 
-    @RepeatedTest(value = 2, name = "handleConcurrentClockRequests {currentRepetition}/{totalRepetitions}")
-    fun handleConcurrentClockRequests() {
+    @Unroll("test repeated 2 times")
+    def "handle concurrent clock requests"() {
+        when:
         app().purge()
         sleep(500)
         invokeMultipleClockRequestsInParallel()
+
+        then:
         app().allInteractionsSucceeded()
     }
 
-    private fun invokeMultipleClockRequestsInParallel() {
+    private def invokeMultipleClockRequestsInParallel() {
         val threads = (0..5).map {
             Thread { app().registeredAClock("popo", "every.1.seconds") }
         }
@@ -78,41 +82,57 @@ class ApiE2ETest : CommonAppE2ETest() {
         threads.forEach { it.join() }
     }
 
-    @Test
-    fun retrieveNotFoundOnNonExistingClock() {
+    def "retrieve not found on non existing clock"() {
+        when:
         app().fetchUnknownClock()
+
+        then:
         app().retrievedNotFoundError()
     }
 
-    @Test
-    fun stopTicksOnClockPause() {
+    def "stop ticks on clock pause"() {
+        given:
         var clock = app().registeredAClock("to-be-disabled", "every.2.seconds")
         client().addClock(clock)
+
+        when:
         clock = app().pauseClock(clock)
+
+        then:
         client().receivesNoMoreTicks()
         assertThat(clock.status).isEqualTo("PAUSED")
         app().pauseActionIsNotAvailableFor(clock)
     }
 
-    @Test
-    fun failOnUnknownClockAction() {
+    def "fail on unknown clock action"() {
+        given:
         val clock = app().registeredAClock("stam", "every.1.seconds")
+
+        when:
         app().invokeUnknownActionOn(clock)
+
+        then:
         app().retrievedNotFoundError()
     }
 
-    @Test
-    fun retrieveAllClocksByName() {
+    def "retrieve all clocks by name"() {
+        given:
         app().registeredAClock("hop", "every.1.minutes")
         val clock = app().registeredAClock("lala", "every.1.minutes")
-        app().clocks(mapOf("name" to "lala"), containsOnly(clock));
+
+        expect:
+        false //app().clocks(mapOf("name" to "lala"), containsOnly(clock));
     }
 
-    @Test
-    fun sendTickToAnExistingClock() {
+    def "send tick to an existing clock"() {
+        given:
         val clock = app().registeredAClock("disabled", "@never")
         client().addClock(clock)
+
+        when:
         app().tick(clock)
+
+        then:
         client().receivedTicksFor(clock)
     }
 }
