@@ -1,6 +1,6 @@
 package e2e.io.ticktok.server
 
-import spock.lang.Specification
+
 import spock.lang.Unroll
 
 class ApiSpec extends CommonSpec {
