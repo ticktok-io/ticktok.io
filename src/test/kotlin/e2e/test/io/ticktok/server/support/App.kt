@@ -16,13 +16,12 @@ import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.core.Is.`is`
+import org.hamcrest.core.IsEqual.equalTo
 import org.hamcrest.core.IsNull
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.lang.Thread.sleep
-import java.time.Duration
 import java.time.Duration.ofMinutes
 import java.time.Duration.ofSeconds
 import java.util.*
@@ -93,7 +92,8 @@ class App(profile: String) {
                 .toString()
     }
 
-    private inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
+    private inline fun <reified T> Gson.fromJson(json: String) =
+            this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
     private fun startListenOn(clock: Clock) {
         if (clock.channel != null) {
@@ -103,7 +103,7 @@ class App(profile: String) {
     }
 
     private fun validateTickChannelType(clock: Clock) {
-        assertThat(clock.channel!!.type, `is`(currentProfile))
+        assertThat(clock.channel!!.type, equalTo(currentProfile))
     }
 
     fun isHealthy() {
@@ -131,7 +131,7 @@ class App(profile: String) {
     }
 
     fun retrieveAuthError() {
-        assertThat(lastResponses[0].statusLine.statusCode, `is`(HttpStatus.SC_FORBIDDEN))
+        assertThat(statusOf(lastResponses.first()), equalTo(HttpStatus.SC_FORBIDDEN))
     }
 
     fun clocks(matcher: Matcher<List<Clock>>) {
@@ -151,36 +151,38 @@ class App(profile: String) {
     }
 
     fun retrievedRegisteredClock(name: String, clockExpr: String) {
-        assertThat(lastResponses[0].statusLine.statusCode, `is`(HttpStatus.SC_CREATED))
+        assertThat(statusOf(lastResponses.first()), equalTo(HttpStatus.SC_CREATED))
         validateRetrievedBody(name, clockExpr)
         validateRetrievedLocation()
     }
 
+    private fun statusOf(response: HttpResponse) = response.statusLine.statusCode
+
     private fun validateRetrievedLocation() {
         val lastResponseBody = lastResponseBody()
         val url = lastResponseLocation()
-        assertThat(getAsClock(url), `is`(toClock(lastResponseBody).copy(status = Clock.ACTIVE)))
+        assertThat(getAsClock(url), equalTo(toClock(lastResponseBody).copy(status = Clock.ACTIVE)))
     }
 
     private fun lastResponseBody(): JsonObject {
-        val respBody = EntityUtils.toString(lastResponses[0].entity)
+        val respBody = EntityUtils.toString(lastResponses.first().entity)
         return Gson().fromJson(respBody, JsonObject::class.java)
     }
 
     private fun validateRetrievedBody(name: String, clockExpr: String) {
         val lastResponseBody = lastResponseBody()
-        assertThat(lastResponseBody.get("name").asString, `is`(name))
-        assertThat(lastResponseBody.get("schedule").asString, `is`(clockExpr))
+        assertThat(lastResponseBody.get("name").asString, equalTo(name))
+        assertThat(lastResponseBody.get("schedule").asString, equalTo(clockExpr))
     }
 
     private fun lastResponseLocation(): String {
-        val location = lastResponses[0].getFirstHeader("Location").value
+        val location = lastResponses.first().getFirstHeader("Location").value
         Assertions.assertFalse(location.isNullOrEmpty(), "Location header is empty")
         return location
     }
 
     private fun getAsClock(url: String): Clock {
-        return Gson().fromJson<Clock>(
+        return Gson().fromJson(
                 Request.Get(url).execute().returnContent().asString(),
                 Clock::class.java)
     }
@@ -190,7 +192,7 @@ class App(profile: String) {
     }
 
     fun retrievedUserError() {
-        assertThat(lastResponses.last().statusLine.statusCode, `is`(HttpStatus.SC_BAD_REQUEST))
+        assertThat(statusOf(lastResponses.last()), equalTo(HttpStatus.SC_BAD_REQUEST))
     }
 
     fun purge() {
@@ -206,10 +208,10 @@ class App(profile: String) {
 
     fun allInteractionsSucceeded() {
         val failedRequestsCount = lastResponses
-                .map { r -> r.statusLine.statusCode }
+                .map { r -> statusOf(r) }
                 .filter { sc -> sc !in 200..299 }
                 .count()
-        assertThat(failedRequestsCount, `is`(0))
+        assertThat(failedRequestsCount, equalTo(0))
     }
 
     fun pauseClock(clock: Clock): Clock {
@@ -219,8 +221,8 @@ class App(profile: String) {
     private fun dispatchActionOn(action: String, clock: Clock): Clock {
         val pauseUrl = clock.linkFor(action)
         val response = Request.Put(withAccessToken(pauseUrl!!)).execute().returnResponse()
-        assertThat(response.statusLine.statusCode, `is`(200))
-        return Gson().fromJson<Clock>(bodyOf(response))
+        assertThat(statusOf(response), equalTo(200))
+        return Gson().fromJson(bodyOf(response))
     }
 
     private fun withAccessToken(url: String): String {
@@ -239,7 +241,7 @@ class App(profile: String) {
     }
 
     fun retrievedNotFoundError() {
-        assertThat(lastResponses.last().statusLine.statusCode, `is`(404))
+        assertThat(statusOf(lastResponses.last()), equalTo(404))
     }
 
     fun invokeUnknownActionOn(clock: Clock) {
@@ -250,9 +252,8 @@ class App(profile: String) {
 
     fun shutdown() {
         if (startApp) {
-            assertThat(
-                    Request.Post("$appUrl/mgmt/shutdown")
-                            .execute().returnResponse().statusLine.statusCode, `is`(200))
+            val response = Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse()
+            assertThat(statusOf(response), equalTo(200))
         }
         appInstance = null
         currentProfile = ""
