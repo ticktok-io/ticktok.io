@@ -38,7 +38,7 @@ object Client {
         }
     }
 
-    fun reset() {
+    private fun reset() {
         listeners.values.forEach { v -> v.clear() }
     }
 
@@ -49,7 +49,7 @@ object Client {
         }
     }
 
-    fun createListenerFor(clock: Clock): TickListener {
+    private fun createListenerFor(clock: Clock): TickListener {
         return when (clock.channel!!.type) {
             "rabbit" -> RabbitTickListener(clock)
             "http" -> HttpTickListener(clock)
@@ -96,7 +96,7 @@ object Client {
             var channel: Channel? = null
         }
 
-        var consumerTag: String = ""
+        private var consumerTag: String = ""
 
         override fun listenOn(clock: Clock) {
             createConnectionIfNeeded()
@@ -132,7 +132,7 @@ object Client {
 
     class HttpTickListener(clock: Clock) : TickListener(clock) {
 
-        var listenerTimer: Timer = Timer(true);
+        private var listenerTimer: Timer = Timer(true)
 
         override fun listenOn(clock: Clock) {
             val task = object : TimerTask() {

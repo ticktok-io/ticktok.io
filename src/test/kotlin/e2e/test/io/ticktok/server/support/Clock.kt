@@ -12,7 +12,7 @@ data class Clock(
         const val ACTIVE = "ACTIVE"
     }
 
-    // This is here so it wont be included in comparision
+    // This is here so it wont be included in comparison
     var channel: ClockChannel? = null
 
     constructor(id: String,

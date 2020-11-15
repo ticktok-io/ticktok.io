@@ -106,7 +106,7 @@ class CoreE2ETest : CommonAppE2ETest() {
         fun retrieveAllClocksByName() {
             app().registeredAClock("hop", "every.1.minutes")
             val clock = app().registeredAClock("lala", "every.1.minutes")
-            app().clocks(mapOf("name" to "lala"), containsOnly(clock));
+            app().clocks(mapOf("name" to "lala"), containsOnly(clock))
         }
 
         @Test
