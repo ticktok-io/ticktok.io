@@ -102,7 +102,7 @@ class App(profile: String) {
     }
 
     private fun validateTickChannelType(clock: Clock) {
-        assertThat(clock.channel!!.type, `is`(currentProfile))
+        assertThat(clock.channel!!.type, equalTo(currentProfile))
     }
 
     fun isHealthy() {

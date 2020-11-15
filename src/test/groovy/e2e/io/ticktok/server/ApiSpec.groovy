@@ -1,7 +1,10 @@
 package e2e.io.ticktok.server
 
-
+import org.hamcrest.Matchers
 import spock.lang.Unroll
+
+import static e2e.io.ticktok.server.AppDriver.ClockMatcher.containsClock
+import static org.hamcrest.Matchers.contains
 
 class ApiSpec extends CommonSpec {
 
@@ -13,6 +16,14 @@ class ApiSpec extends CommonSpec {
     @Override
     Client client() {
         return new Client()
+    }
+
+    def "test"() {
+        given:
+        def a = []
+
+        expect:
+        a contains("4")
     }
 
     def "register a new clock"() {
@@ -30,7 +41,7 @@ class ApiSpec extends CommonSpec {
 
     def "fail when token not provided"() {
         when:
-        app().isAccessedWithoutAToken()
+        app().accessedWithoutAToken()
 
         then:
         app().retrieveAuthError()
@@ -38,12 +49,13 @@ class ApiSpec extends CommonSpec {
 
     def "retrieve configured clocks"() {
         given:
-        val clock1 = app().registeredAClock("kuku6", "every.6.seconds")
-        val clock2 = app().registeredAClock("popo10", "every.10.seconds")
+        def clock1 = app().registeredAClock("kuku6", "every.6.seconds")
+        def clock2 = app().registeredAClock("popo10", "every.10.seconds")
 
         expect:
-        app().clocks(containsClock(clock1.copy(status = Clock.ACTIVE)))
-        app().clocks(containsClock(clock2.copy(status = Clock.ACTIVE)))
+        def clocks = app().clocks()
+        app().clocks(containsClock(clock1))
+        clocks containsClock(clock2)
     }
 
     def "purge clocks with bo consumers"() {
@@ -52,7 +64,7 @@ class ApiSpec extends CommonSpec {
         sleep(1500)
 
         expect:
-        app().clocks(not(containsClock(clock)))
+        app().clocks() not(containsClock(clock))
     }
 
     def "fail on in valid schedule"() {
