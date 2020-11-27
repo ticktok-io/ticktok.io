@@ -131,6 +131,9 @@ test {
         if (project.hasProperty('tags')) {
             includeTags project.getProperties()['tags'] as String
         }
+        if (project.hasProperty('exclude-tags')) {
+            excludeTags project.getProperties()['tags'] as String
+        }
     }
 }
 

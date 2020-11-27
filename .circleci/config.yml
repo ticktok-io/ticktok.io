@@ -110,7 +110,7 @@ jobs:
           command: .circleci/run_compose.sh up -d
       - run:
           name: E2E tests against dockered app
-          command: ./gradlew test -Ptags=rabbit-broker -DstartApp=no --scan
+          command: ./gradlew test -Pexclude-tags=http-broker -DstartApp=no --scan
       - store_test_results:
           path: build/test-results
 
