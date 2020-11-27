@@ -4,7 +4,6 @@ import e2e.test.io.ticktok.server.support.AppDriver.Companion.HTTP
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 
-@DisabledIfSystemProperty(named = "scope", matches = "core")
 @Tag("http-broker")
 class HttpBrokerE2ETest : CommonBrokerTest() {
 

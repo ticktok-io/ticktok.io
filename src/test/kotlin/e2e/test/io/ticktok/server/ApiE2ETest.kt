@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.lang.Thread.sleep
 
+@Tag("rabbit-broker")
 class ApiE2ETest : CommonAppE2ETest() {
 
     override fun appProfile(): String {
