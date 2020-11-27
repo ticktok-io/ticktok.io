@@ -29,8 +29,7 @@ class Client(private val listener: TickConsumer = NullTickConsumer()) {
 
     fun receivedTicksFor(clock: Clock) {
         await atMost ofSeconds(10) until {
-            println(">>> $messages")
-            messages.isNotEmpty() // && messages[clock.id]!!
+            messages.isNotEmpty() && messages[clock.id]!!
         }
     }
 
@@ -50,7 +49,6 @@ class Client(private val listener: TickConsumer = NullTickConsumer()) {
     }
 
     private val onTickHandler = { ticks: Map<String, JsonObject> ->
-        println("Got ticks $ticks")
         for (id in ticks.keys) {
             messages[id] = true
         }

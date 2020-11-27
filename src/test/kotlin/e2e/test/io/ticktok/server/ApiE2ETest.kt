@@ -1,8 +1,8 @@
 package e2e.test.io.ticktok.server
 
-import e2e.test.io.ticktok.server.support.*
-import e2e.test.io.ticktok.server.support.App.Companion.RABBIT
+import e2e.test.io.ticktok.server.support.AppDriver.Companion.RABBIT
 import e2e.test.io.ticktok.server.support.Client.Companion.CLOCK_EXPR
+import e2e.test.io.ticktok.server.support.Clock
 import e2e.test.io.ticktok.server.support.ClockMatcher.Companion.containsClock
 import e2e.test.io.ticktok.server.support.ClockMatcher.Companion.containsOnly
 import org.assertj.core.api.Assertions.assertThat
@@ -17,10 +17,6 @@ class ApiE2ETest : CommonAppE2ETest() {
 
     override fun appProfile(): String {
         return RABBIT
-    }
-
-    override fun tickConsumer(): TickConsumer {
-        return AnyTickConsumer()
     }
 
     @Test

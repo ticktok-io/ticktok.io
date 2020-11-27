@@ -28,7 +28,37 @@ import java.util.*
 
 
 interface AppDriver {
-    fun start()
+    companion object {
+        const val HTTP = "http"
+        const val RABBIT = "rabbit"
+        const val NULL = "null"
+
+        var startApp = System.getProperty("startApp", "yes") != "no"
+        private var appInstance: AppDriver = NullApp()
+
+        /*fun instance(profile: String = NULL): AppDriver {
+            println("Starting: $profile")
+            startApp(profile)
+            return appInstance
+        }
+
+        private fun shutdownApp() {
+            if(startApp) {
+                appInstance.shutdown()
+                appInstance = NullApp()
+            }
+        }
+
+        private fun startApp(profile: String) {
+            appInstance = App(profile)
+            if (startApp) {
+                appInstance.start()
+            }
+            appInstance.waitForAppToBeHealthy()
+        }*/
+    }
+
+    fun start(profile: String)
     fun reset()
     fun purge()
     fun shutdown()
@@ -47,50 +77,27 @@ interface AppDriver {
     fun invokeUnknownActionOn(clock: Clock)
     fun tick(clock: Clock)
     fun retrievedUserError()
+    fun waitForAppToBeHealthy()
 
-    val currentProfile: String
 }
 
-class App(profile: String) : AppDriver {
+class App : AppDriver {
 
     companion object {
         const val ACCESS_TOKEN = "ct-auth-token"
-        const val ANY = "any"
-        const val HTTP = "http"
-        const val RABBIT = "rabbit"
-        const val NULL = "null"
-
         var appUrl = System.getenv("APP_URL") ?: "http://localhost:9643"
-        var startApp = System.getProperty("startApp", "yes") != "no"
-        private var appInstance: AppDriver = NullApp()
-
-        fun instance(profile: String = NULL): AppDriver {
-            if (shouldCreateAppFor(profile)) {
-                startApp(profile)
-            }
-            return appInstance
-        }
-
-        private fun shouldCreateAppFor(profile: String) = (profile != NULL && appInstance is NullApp) ||
-                (profile != ANY && profile != appInstance.currentProfile)
-
-        private fun startApp(profile: String) {
-            appInstance = App(if (profile == ANY) RABBIT else profile)
-            if (startApp) {
-                appInstance.start()
-            }
-            (appInstance as App).waitForAppToBeHealthy()
-        }
     }
 
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
-    override var currentProfile: String = profile
+    var startApp = System.getProperty("startApp", "yes") != "no"
 
-    override fun start() {
-        Application.main("--spring.profiles.active=$currentProfile")
+    override fun start(profile: String) {
+        if(startApp)
+            Application.main("--spring.profiles.active=$profile")
+            waitForAppToBeHealthy()
     }
 
-    private fun waitForAppToBeHealthy() {
+    override fun waitForAppToBeHealthy() {
         println("Waiting for app($appUrl) to be healthy...")
         await withPollInterval ofSeconds(1) atMost ofMinutes(5) until { isAppHealthy() }
     }
@@ -279,8 +286,6 @@ class App(profile: String) : AppDriver {
             val response = Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse()
             assertThat(statusOf(response), equalTo(200))
         }
-        appInstance = NullApp()
-        currentProfile = ""
     }
 
     override fun pauseActionIsNotAvailableFor(clock: Clock) {
@@ -317,7 +322,7 @@ class ClockMatcher(private val clock: Clock, private val exclusive: Boolean = fa
 
 
 class NullApp : AppDriver {
-    override fun start() {
+    override fun start(profile: String) {
         TODO("Not yet implemented")
     }
 
@@ -330,7 +335,7 @@ class NullApp : AppDriver {
     }
 
     override fun shutdown() {
-        TODO("Not yet implemented")
+
     }
 
     override fun registeredAClock(name: String, schedule: String): Clock {
@@ -393,5 +398,7 @@ class NullApp : AppDriver {
         TODO("Not yet implemented")
     }
 
-    override val currentProfile: String = App.NULL
+    override fun waitForAppToBeHealthy() {
+        TODO("Not yet implemented")
+    }
 }
