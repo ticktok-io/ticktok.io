@@ -1,6 +1,6 @@
 package e2e.test.io.ticktok.server
 
-import e2e.test.io.ticktok.server.support.AppDriver.Companion.RABBIT
+import e2e.test.io.ticktok.server.support.App.Companion.RABBIT
 import e2e.test.io.ticktok.server.support.Client.Companion.CLOCK_EXPR
 import e2e.test.io.ticktok.server.support.Clock
 import e2e.test.io.ticktok.server.support.ClockMatcher.Companion.containsClock

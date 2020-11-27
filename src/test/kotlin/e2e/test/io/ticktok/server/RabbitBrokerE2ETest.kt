@@ -1,8 +1,6 @@
 package e2e.test.io.ticktok.server
 
-import e2e.test.io.ticktok.server.support.AppDriver.Companion.RABBIT
-import e2e.test.io.ticktok.server.support.RabbitTickConsumer
-import e2e.test.io.ticktok.server.support.TickConsumer
+import e2e.test.io.ticktok.server.support.App.Companion.RABBIT
 import org.junit.jupiter.api.Tag
 
 @Tag("rabbit-broker")

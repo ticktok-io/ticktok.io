@@ -27,63 +27,13 @@ import java.time.Duration.ofSeconds
 import java.util.*
 
 
-interface AppDriver {
+class App {
+
     companion object {
         const val HTTP = "http"
         const val RABBIT = "rabbit"
         const val NULL = "null"
 
-        var startApp = System.getProperty("startApp", "yes") != "no"
-        private var appInstance: AppDriver = NullApp()
-
-        /*fun instance(profile: String = NULL): AppDriver {
-            println("Starting: $profile")
-            startApp(profile)
-            return appInstance
-        }
-
-        private fun shutdownApp() {
-            if(startApp) {
-                appInstance.shutdown()
-                appInstance = NullApp()
-            }
-        }
-
-        private fun startApp(profile: String) {
-            appInstance = App(profile)
-            if (startApp) {
-                appInstance.start()
-            }
-            appInstance.waitForAppToBeHealthy()
-        }*/
-    }
-
-    fun start(profile: String)
-    fun reset()
-    fun purge()
-    fun shutdown()
-    fun registeredAClock(name: String, schedule: String): Clock
-    fun retrievedRegisteredClock(name: String, schedule: String)
-    fun isHealthy()
-    fun isAccessedWithoutAToken()
-    fun retrieveAuthError()
-    fun clocks(matcher: Matcher<List<Clock>>)
-    fun clocks(filter: Map<String, String>, matcher: Matcher<List<Clock>>)
-    fun allInteractionsSucceeded()
-    fun fetchUnknownClock()
-    fun retrievedNotFoundError()
-    fun pauseClock(clock: Clock): Clock
-    fun pauseActionIsNotAvailableFor(clock: Clock)
-    fun invokeUnknownActionOn(clock: Clock)
-    fun tick(clock: Clock)
-    fun retrievedUserError()
-    fun waitForAppToBeHealthy()
-
-}
-
-class App : AppDriver {
-
-    companion object {
         const val ACCESS_TOKEN = "ct-auth-token"
         var appUrl = System.getenv("APP_URL") ?: "http://localhost:9643"
     }
@@ -91,22 +41,22 @@ class App : AppDriver {
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
     var startApp = System.getProperty("startApp", "yes") != "no"
 
-    override fun start(profile: String) {
-        if(startApp)
+    fun start(profile: String) {
+        if (startApp)
             Application.main("--spring.profiles.active=$profile")
-            waitForAppToBeHealthy()
+        waitForAppToBeHealthy()
     }
 
-    override fun waitForAppToBeHealthy() {
+    fun waitForAppToBeHealthy() {
         println("Waiting for app($appUrl) to be healthy...")
         await withPollInterval ofSeconds(1) atMost ofMinutes(5) until { isAppHealthy() }
     }
 
-    override fun reset() {
+    fun reset() {
         lastResponses.clear()
     }
 
-    override fun registeredAClock(name: String, schedule: String): Clock {
+    fun registeredAClock(name: String, schedule: String): Clock {
         val response = requestClock(name, schedule)
         lastResponses.add(response)
         return Gson().fromJson(bodyOf(response))
@@ -137,7 +87,7 @@ class App : AppDriver {
     private inline fun <reified T> Gson.fromJson(json: String) =
             this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
-    override fun isHealthy() {
+    fun isHealthy() {
         assertTrue(isAppHealthy())
     }
 
@@ -155,23 +105,23 @@ class App : AppDriver {
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 
-    override fun isAccessedWithoutAToken() {
+    fun isAccessedWithoutAToken() {
         lastResponses.add(Request.Post("$appUrl/api/v1/clocks")
                 .bodyString(createClockRequestFor("no-token", "in.1.minute"), ContentType.APPLICATION_JSON)
                 .execute().returnResponse())
     }
 
-    override fun retrieveAuthError() {
+    fun retrieveAuthError() {
         assertThat(statusOf(lastResponses.first()), equalTo(HttpStatus.SC_FORBIDDEN))
     }
 
-    override fun clocks(matcher: Matcher<List<Clock>>) {
+    fun clocks(matcher: Matcher<List<Clock>>) {
         await atMost (ofSeconds(5)) untilAsserted {
             assertThat(getAllClocks(), matcher)
         }
     }
 
-    override fun clocks(filter: Map<String, String>, matcher: Matcher<List<Clock>>) {
+    fun clocks(filter: Map<String, String>, matcher: Matcher<List<Clock>>) {
         assertThat(getAllClocks(filter), matcher)
     }
 
@@ -181,7 +131,7 @@ class App : AppDriver {
         return Gson().fromJson(response, Array<Clock>::class.java).asList()
     }
 
-    override fun retrievedRegisteredClock(name: String, schedule: String) {
+    fun retrievedRegisteredClock(name: String, schedule: String) {
         assertThat(statusOf(lastResponses.first()), equalTo(HttpStatus.SC_CREATED))
         validateRetrievedBody(name, schedule)
         validateRetrievedLocation()
@@ -222,11 +172,11 @@ class App : AppDriver {
         return Gson().fromJson(clockJson, Clock::class.java)
     }
 
-    override fun retrievedUserError() {
+    fun retrievedUserError() {
         assertThat(statusOf(lastResponses.last()), equalTo(HttpStatus.SC_BAD_REQUEST))
     }
 
-    override fun purge() {
+    fun purge() {
         resumeAllPausedClocks()
         sleep(1500)
     }
@@ -237,7 +187,7 @@ class App : AppDriver {
         }
     }
 
-    override fun allInteractionsSucceeded() {
+    fun allInteractionsSucceeded() {
         val failedRequestsCount = lastResponses
                 .map { r -> statusOf(r) }
                 .filter { sc -> sc !in 200..299 }
@@ -245,7 +195,7 @@ class App : AppDriver {
         assertThat(failedRequestsCount, equalTo(0))
     }
 
-    override fun pauseClock(clock: Clock): Clock {
+    fun pauseClock(clock: Clock): Clock {
         return dispatchActionOn("pause", clock)
     }
 
@@ -266,34 +216,34 @@ class App : AppDriver {
         return Gson().fromJson(result, Clock::class.java)
     }
 
-    override fun fetchUnknownClock() {
+    fun fetchUnknownClock() {
         val response = Request.Get(createAuthenticatedUrlFor("/api/v1/clocks/unknown-id")).execute().returnResponse()
         lastResponses.add(response)
     }
 
-    override fun retrievedNotFoundError() {
+    fun retrievedNotFoundError() {
         assertThat(statusOf(lastResponses.last()), equalTo(404))
     }
 
-    override fun invokeUnknownActionOn(clock: Clock) {
+    fun invokeUnknownActionOn(clock: Clock) {
         val response = Request.Put(createAuthenticatedUrlFor("/api/v1/clocks/${clock.id}/unknown"))
                 .execute().returnResponse()
         lastResponses.add(response)
     }
 
-    override fun shutdown() {
+    fun shutdown() {
         if (startApp) {
             val response = Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse()
             assertThat(statusOf(response), equalTo(200))
         }
     }
 
-    override fun pauseActionIsNotAvailableFor(clock: Clock) {
+    fun pauseActionIsNotAvailableFor(clock: Clock) {
         val updatedClock = clock(clock.id)
         assertThat(updatedClock.linkFor("pause"), IsNull())
     }
 
-    override fun tick(clock: Clock) {
+    fun tick(clock: Clock) {
         dispatchActionOn("tick", clock)
     }
 
@@ -317,88 +267,5 @@ class ClockMatcher(private val clock: Clock, private val exclusive: Boolean = fa
         fun containsOnly(clock: Clock): ClockMatcher {
             return ClockMatcher(clock, true)
         }
-    }
-}
-
-
-class NullApp : AppDriver {
-    override fun start(profile: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun reset() {
-        TODO("Not yet implemented")
-    }
-
-    override fun purge() {
-        TODO("Not yet implemented")
-    }
-
-    override fun shutdown() {
-
-    }
-
-    override fun registeredAClock(name: String, schedule: String): Clock {
-        TODO("Not yet implemented")
-    }
-
-    override fun retrievedRegisteredClock(name: String, schedule: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun isHealthy() {
-        TODO("Not yet implemented")
-    }
-
-    override fun isAccessedWithoutAToken() {
-        TODO("Not yet implemented")
-    }
-
-    override fun retrieveAuthError() {
-        TODO("Not yet implemented")
-    }
-
-    override fun clocks(matcher: Matcher<List<Clock>>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun clocks(filter: Map<String, String>, matcher: Matcher<List<Clock>>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun allInteractionsSucceeded() {
-        TODO("Not yet implemented")
-    }
-
-    override fun fetchUnknownClock() {
-        TODO("Not yet implemented")
-    }
-
-    override fun retrievedNotFoundError() {
-        TODO("Not yet implemented")
-    }
-
-    override fun pauseClock(clock: Clock): Clock {
-        TODO("Not yet implemented")
-    }
-
-    override fun pauseActionIsNotAvailableFor(clock: Clock) {
-        TODO("Not yet implemented")
-    }
-
-    override fun invokeUnknownActionOn(clock: Clock) {
-        TODO("Not yet implemented")
-    }
-
-    override fun tick(clock: Clock) {
-        TODO("Not yet implemented")
-    }
-
-    override fun retrievedUserError() {
-        TODO("Not yet implemented")
-    }
-
-    override fun waitForAppToBeHealthy() {
-        TODO("Not yet implemented")
     }
 }

@@ -11,7 +11,7 @@ abstract class CommonAppE2ETest {
     companion object {
         var client: Client = Client()
     }
-    var app: AppDriver = App()
+    var app: App = App()
 
     @BeforeAll
     fun startApp() {
