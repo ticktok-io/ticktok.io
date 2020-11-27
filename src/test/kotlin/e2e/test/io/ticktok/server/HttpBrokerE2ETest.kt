@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty
 
 @DisabledIfSystemProperty(named = "scope", matches = "core")
-@Tag("http-broker-tests")
+@Tag("http-broker")
 class HttpBrokerE2ETest : CommonBrokerTest() {
 
     override fun appProfile(): String {
