@@ -32,14 +32,13 @@ class App {
     companion object {
         const val HTTP = "http"
         const val RABBIT = "rabbit"
-        const val NULL = "null"
 
         const val ACCESS_TOKEN = "ct-auth-token"
-        var appUrl = System.getenv("APP_URL") ?: "http://localhost:9643"
+        var APP_URL = System.getenv("APP_URL") ?: "http://localhost:9643"
     }
 
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
-    var startApp = System.getProperty("startApp", "yes") != "no"
+    private var startApp = System.getProperty("startApp", "yes") != "no"
 
     fun start(profile: String) {
         if (startApp)
@@ -47,8 +46,8 @@ class App {
         waitForAppToBeHealthy()
     }
 
-    fun waitForAppToBeHealthy() {
-        println("Waiting for app($appUrl) to be healthy...")
+    private fun waitForAppToBeHealthy() {
+        println("Waiting for app($APP_URL) to be healthy...")
         await withPollInterval ofSeconds(1) atMost ofMinutes(5) until { isAppHealthy() }
     }
 
@@ -71,7 +70,7 @@ class App {
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
 
     private fun createAuthenticatedUrlFor(slag: String, params: Map<String, String> = mapOf()): String {
-        return URIBuilder(appUrl)
+        return URIBuilder(APP_URL)
                 .setPath(slag)
                 .setParameters(params.map { BasicNameValuePair(it.key, it.value) })
                 .setParameter("access_token", ACCESS_TOKEN).build().toString()
@@ -101,12 +100,12 @@ class App {
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("$appUrl/mgmt/health").execute().returnContent().asString()
+        val health = Request.Get("$APP_URL/mgmt/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 
     fun isAccessedWithoutAToken() {
-        lastResponses.add(Request.Post("$appUrl/api/v1/clocks")
+        lastResponses.add(Request.Post("$APP_URL/api/v1/clocks")
                 .bodyString(createClockRequestFor("no-token", "in.1.minute"), ContentType.APPLICATION_JSON)
                 .execute().returnResponse())
     }
@@ -233,7 +232,7 @@ class App {
 
     fun shutdown() {
         if (startApp) {
-            val response = Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse()
+            val response = Request.Post("$APP_URL/mgmt/shutdown").execute().returnResponse()
             assertThat(statusOf(response), equalTo(200))
         }
     }

@@ -4,19 +4,23 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.rabbitmq.client.*
+import org.apache.http.HttpResponse
 import org.apache.http.client.fluent.Request
+import org.apache.http.entity.ContentType
 import org.apache.http.util.EntityUtils
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
+import org.awaitility.kotlin.withAlias
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.collection.IsMapWithSize.aMapWithSize
 import java.lang.Thread.sleep
 import java.nio.charset.Charset
 import java.time.Duration.ofSeconds
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
+import kotlin.concurrent.thread
 
 
 class Client(private val listener: TickConsumer = NullTickConsumer()) {
@@ -27,17 +31,24 @@ class Client(private val listener: TickConsumer = NullTickConsumer()) {
 
     private val messages = ConcurrentHashMap<String, Boolean>()
 
-    fun receivedTicksFor(clock: Clock) {
-        await atMost ofSeconds(10) until {
-            messages.isNotEmpty() && messages[clock.id]!!
+    fun receivedTicksFor(vararg clocks: Clock) {
+        await atMost ofSeconds(3) withAlias "No ticks for: ${describeClock(clocks)}" until {
+            messages.isNotEmpty() && clocks.all { c -> messages[c.id] ?: false }
         }
     }
+
+    private fun describeClock(clocks: Array<out Clock>) =
+            clocks.joinToString { "[id: ${it.id}, name: ${it.name}, schedule: ${it.schedule}]" }
 
     fun receivesNoMoreTicks() {
         sleep(2000)
         reset()
         sleep(2000)
-        MatcherAssert.assertThat("No new messages", messages, aMapWithSize(0))
+        receivedNoTicks()
+    }
+
+    fun receivedNoTicks() {
+        assertThat("No new messages", messages, aMapWithSize(0))
     }
 
     private fun reset() {
@@ -48,10 +59,8 @@ class Client(private val listener: TickConsumer = NullTickConsumer()) {
         listener.register(arrayOf(*clocks), onTickHandler)
     }
 
-    private val onTickHandler = { ticks: Map<String, JsonObject> ->
-        for (id in ticks.keys) {
-            messages[id] = true
-        }
+    private val onTickHandler = { clockId: String, tick: JsonObject ->
+        messages[clockId] = true
     }
 
     fun stop() {
@@ -62,7 +71,7 @@ class Client(private val listener: TickConsumer = NullTickConsumer()) {
 interface TickConsumer {
     fun stop()
 
-    fun register(clocks: Array<Clock>, callback: (ticks: Map<String, JsonObject>) -> Unit)
+    fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit)
 }
 
 class NullTickConsumer : TickConsumer {
@@ -70,7 +79,7 @@ class NullTickConsumer : TickConsumer {
         throw NotImplementedError()
     }
 
-    override fun register(clocks: Array<Clock>, callback: (ticks: Map<String, JsonObject>) -> Unit) {
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
         throw NotImplementedError()
     }
 }
@@ -78,9 +87,9 @@ class NullTickConsumer : TickConsumer {
 
 class AnyTickConsumer : TickConsumer {
 
-    var consumer: TickConsumer? = null
+    private var consumer: TickConsumer? = null
 
-    override fun register(clocks: Array<Clock>, callback: (ticks: Map<String, JsonObject>) -> Unit) {
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
         consumer = createListenerFor(clocks[0])
         consumer?.register(clocks, callback)
     }
@@ -103,12 +112,12 @@ class HttpTickConsumer : TickConsumer {
 
     private var listenerTimer: Timer = Timer(true)
 
-    override fun register(clocks: Array<Clock>, callback: (ticks: Map<String, JsonObject>) -> Unit) {
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
         val task = object : TimerTask() {
             override fun run() {
                 val tick = getTicksFrom(clocks[0].channel!!.details["url"]!!)
                 tick?.let {
-                    callback(mapOf(clocks[0].id to tick))
+                    callback(clocks[0].id, tick)
                 }
             }
         }
@@ -146,13 +155,13 @@ class RabbitTickConsumer : TickConsumer {
     private var consumerTag: String = ""
 
 
-    override fun register(clocks: Array<Clock>, callback: (ticks: Map<String, JsonObject>) -> Unit) {
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
         createConnectionIfNeeded(clocks[0])
         val consumer = object : DefaultConsumer(channel) {
             override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
                                         properties: AMQP.BasicProperties?, body: ByteArray?) {
                 val bodyStr = body?.toString(Charset.forName("UTF-8"))
-                callback(mapOf(clocks[0].id to Gson().fromJson(bodyStr, JsonObject::class.java)))
+                callback(clocks[0].id, Gson().fromJson(bodyStr, JsonObject::class.java))
             }
         }
         consumerTag = channel!!.basicConsume(clocks[0].channel!!.details["queue"], true, consumer)
@@ -178,3 +187,51 @@ class RabbitTickConsumer : TickConsumer {
         }
     }
 }
+
+class LongPollConsumer(private val domain: String, private val token: String) : TickConsumer {
+
+    private var running = false
+
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
+        for (i in 0..clocks.size) {
+            val ticks = getTicksFor(clocks)
+            invokeCallbackOnTicks(callback, ticks)
+        }
+    }
+
+    private fun invokeCallbackOnTicks(
+            callback: (clockId: String, tick: JsonObject) -> Unit, ticks: JsonArray) {
+        for (tick in ticks) {
+            val jsonTick = tick.asJsonObject
+            callback(jsonTick.get("clockId").asString, jsonTick)
+        }
+    }
+
+    private fun getTicksFor(clocks: Array<Clock>): JsonArray {
+        val clockIds = clocks.map { it.id }
+
+        val response = pollTicksFor(clockIds)
+        val content = EntityUtils.toString(response.entity)
+        return if (response.statusLine.statusCode != 200) {
+            println("Error: $content")
+            JsonArray()
+        } else {
+            Gson().fromJson(content, JsonArray::class.java)
+        }
+    }
+
+    private fun pollTicksFor(clockIds: List<String?>): HttpResponse {
+        return Request.Post("${domain}/api/v1/ticks/poll?access_token=${token}")
+                .bodyString(Gson().toJson(mapOf("clocks" to clockIds)), ContentType.APPLICATION_JSON)
+                .execute().returnResponse()
+    }
+
+    override fun stop() {
+        running = false
+    }
+
+}
+
+
+
+

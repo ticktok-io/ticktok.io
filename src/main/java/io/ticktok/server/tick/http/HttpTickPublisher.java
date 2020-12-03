@@ -15,7 +15,7 @@ public class HttpTickPublisher implements TickPublisher {
 
     @Override
     public void publish(Tick tick) {
-        queuesRepository.push(new TickMessage(tick.getSchedule()));
+        queuesRepository.push(new TickMessage(tick.getSchedule(), null));
     }
 
     @Override
