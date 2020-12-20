@@ -12,15 +12,14 @@ import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
 import org.awaitility.kotlin.withAlias
-import org.hamcrest.MatcherAssert
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.collection.IsMapWithSize.aMapWithSize
+import java.lang.Exception
 import java.lang.Thread.sleep
 import java.nio.charset.Charset
 import java.time.Duration.ofSeconds
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.concurrent.thread
 
 
 class Client(private val listener: TickConsumer = NullTickConsumer()) {
@@ -38,7 +37,7 @@ class Client(private val listener: TickConsumer = NullTickConsumer()) {
     }
 
     private fun describeClock(clocks: Array<out Clock>) =
-            clocks.joinToString { "[id: ${it.id}, name: ${it.name}, schedule: ${it.schedule}]" }
+        clocks.joinToString { "[id: ${it.id}, name: ${it.name}, schedule: ${it.schedule}]" }
 
     fun receivesNoMoreTicks() {
         sleep(2000)
@@ -158,8 +157,10 @@ class RabbitTickConsumer : TickConsumer {
     override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
         createConnectionIfNeeded(clocks[0])
         val consumer = object : DefaultConsumer(channel) {
-            override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
-                                        properties: AMQP.BasicProperties?, body: ByteArray?) {
+            override fun handleDelivery(
+                consumerTag: String?, envelope: Envelope?,
+                properties: AMQP.BasicProperties?, body: ByteArray?
+            ) {
                 val bodyStr = body?.toString(Charset.forName("UTF-8"))
                 callback(clocks[0].id, Gson().fromJson(bodyStr, JsonObject::class.java))
             }
@@ -193,14 +194,15 @@ class LongPollConsumer(private val domain: String, private val token: String) : 
     private var running = false
 
     override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
-        for (i in 0..clocks.size) {
+        clocks.forEach {
             val ticks = getTicksFor(clocks)
             invokeCallbackOnTicks(callback, ticks)
         }
     }
 
     private fun invokeCallbackOnTicks(
-            callback: (clockId: String, tick: JsonObject) -> Unit, ticks: JsonArray) {
+        callback: (clockId: String, tick: JsonObject) -> Unit, ticks: JsonArray
+    ) {
         for (tick in ticks) {
             val jsonTick = tick.asJsonObject
             callback(jsonTick.get("clockId").asString, jsonTick)
@@ -208,9 +210,9 @@ class LongPollConsumer(private val domain: String, private val token: String) : 
     }
 
     private fun getTicksFor(clocks: Array<Clock>): JsonArray {
-        val clockIds = clocks.map { it.id }
+        val url = clocks.map { it.channel!!.details["id"] }
 
-        val response = pollTicksFor(clockIds)
+        val response = pollTicksFor(url)
         val content = EntityUtils.toString(response.entity)
         return if (response.statusLine.statusCode != 200) {
             println("Error: $content")
@@ -220,9 +222,9 @@ class LongPollConsumer(private val domain: String, private val token: String) : 
         }
     }
 
-    private fun pollTicksFor(clockIds: List<String?>): HttpResponse {
+    private fun pollTicksFor(channelIds: List<String?>): HttpResponse {
         return Request.Post("${domain}/api/v1/ticks/poll?access_token=${token}")
-                .bodyString(Gson().toJson(mapOf("clocks" to clockIds)), ContentType.APPLICATION_JSON)
+                .bodyString(Gson().toJson(mapOf("channels" to channelIds)), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
     }
 
@@ -231,7 +233,4 @@ class LongPollConsumer(private val domain: String, private val token: String) : 
     }
 
 }
-
-
-
 

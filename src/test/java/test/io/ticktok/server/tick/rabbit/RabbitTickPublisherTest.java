@@ -2,7 +2,7 @@ package test.io.ticktok.server.tick.rabbit;
 
 import com.google.gson.Gson;
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.QueueNameCreator;
+import io.ticktok.server.tick.QueueName;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RabbitTickPublisherTest {
 
     public static final Clock CLOCK = new Clock("koko", "every.999.seconds");
-    public static final String QUEUE_NAME = new QueueNameCreator(CLOCK).create();
+    public static final String QUEUE_NAME = QueueName.createNameFor(CLOCK);
     public static final Queue QUEUE = new Queue(QUEUE_NAME, false, false, true);
     @Autowired
     private RabbitTemplate rabbitTemplate;

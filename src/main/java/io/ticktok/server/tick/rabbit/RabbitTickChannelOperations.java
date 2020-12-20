@@ -2,7 +2,7 @@ package io.ticktok.server.tick.rabbit;
 
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.QueueNameCreator;
+import io.ticktok.server.tick.QueueName;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.TickChannelOperations;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class RabbitTickChannelOperations implements TickChannelOperations {
     }
 
     private String nameFor(Clock clock) {
-        return new QueueNameCreator(clock).create();
+        return QueueName.createNameFor(clock);
     }
 
     @Override

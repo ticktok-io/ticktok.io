@@ -1,7 +1,7 @@
 package test.io.ticktok.server.tick.http;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.QueueNameCreator;
+import io.ticktok.server.tick.QueueName;
 import io.ticktok.server.tick.TickChannel;
 import io.ticktok.server.tick.http.HttpQueue;
 import io.ticktok.server.tick.http.HttpQueuesRepository;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import static io.ticktok.server.tick.http.HttpConfiguration.POP_PATH;
 import static io.ticktok.server.tick.http.HttpTickChannelOperations.URL_PARAM;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.*;
 
 class HttpTickChannelOperationsTest {
@@ -25,12 +26,12 @@ class HttpTickChannelOperationsTest {
         HttpQueue httpQueue = HttpQueue.builder().id("1212").externalId("32415").build();
         when(queuesRepository.createQueue(queueName())).thenReturn(httpQueue);
         TickChannel tickChannel = tickChannelExplorer.create(CLOCK);
-        assertThat(tickChannel.getDetails().get(URL_PARAM)).isEqualTo(
-                "{domain}" + POP_PATH.replaceAll("\\{id}", httpQueue.getExternalId()));
+        assertThat(tickChannel.getDetails()).contains(entry(URL_PARAM,
+                "{domain}" + POP_PATH.replaceAll("\\{id}", httpQueue.getExternalId())));
     }
 
     private String queueName() {
-        return new QueueNameCreator(CLOCK).create();
+        return QueueName.createNameFor(CLOCK);
     }
 
     @Test

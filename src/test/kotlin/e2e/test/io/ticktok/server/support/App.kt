@@ -32,6 +32,7 @@ class App {
     companion object {
         const val HTTP = "http"
         const val RABBIT = "rabbit"
+        const val HTTP_LONG = "http-long"
 
         const val ACCESS_TOKEN = "ct-auth-token"
         var APP_URL = System.getenv("APP_URL") ?: "http://localhost:9643"

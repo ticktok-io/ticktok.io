@@ -105,7 +105,7 @@ class ApiE2ETest : CommonAppE2ETest() {
     }
 
     @Test
-    fun sendTickToAnExistingClock() {
+    fun tickAnExistingClock() {
         val clock = app.registeredAClock("disabled", "@never")
         client.startListenTo(clock)
         app.tick(clock)

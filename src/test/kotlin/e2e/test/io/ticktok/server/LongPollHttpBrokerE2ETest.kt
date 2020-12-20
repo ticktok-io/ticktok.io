@@ -1,10 +1,11 @@
 package e2e.test.io.ticktok.server
 
-import e2e.test.io.ticktok.server.support.App
+import e2e.test.io.ticktok.server.support.*
+import e2e.test.io.ticktok.server.support.App.Companion.APP_URL
 import e2e.test.io.ticktok.server.support.App.Companion.HTTP
-import e2e.test.io.ticktok.server.support.Client
-import e2e.test.io.ticktok.server.support.LongPollConsumer
-import e2e.test.io.ticktok.server.support.TickConsumer
+import e2e.test.io.ticktok.server.support.App.Companion.HTTP_LONG
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test
 class LongPollHttpBrokerE2ETest : CommonAppE2ETest() {
 
     override fun appProfile(): String {
-        return HTTP
+        return HTTP_LONG
     }
 
     override fun tickConsumer(): TickConsumer {

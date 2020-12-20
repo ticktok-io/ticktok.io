@@ -9,7 +9,7 @@ import java.util.List;
 public interface HttpQueuesRepository {
     List<TickMessage> pop(String externalId);
 
-    void push(TickMessage tickMessage);
+    void push(String schedule);
 
     void push(String queueName, TickMessage tickMessage);
 
