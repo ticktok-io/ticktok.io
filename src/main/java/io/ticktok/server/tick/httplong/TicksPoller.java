@@ -13,7 +13,7 @@ public class TicksPoller {
     }
 
     public TickMessage poll(List<String> channelIds) {
-        channelsRepository.updateLastPollTime(channelIds, 0L);
+        channelsRepository.updateLastPollTime(channelIds);
         return null;
     }
 
