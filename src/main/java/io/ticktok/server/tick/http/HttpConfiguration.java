@@ -40,8 +40,4 @@ public class HttpConfiguration {
         return new MongoHttpQueuesRepository(queueTTL, mongoOperations);
     }
 
-    @Bean
-    public ChannelsRepository channelsRepository() {
-        return new MongoChannelsRepository();
-    }
 }

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
-class TickChannelCreatorTest {
+class ChannelConnectionInfoCreatorTest {
 
     private final TickChannelOperations channelExplorer = mock(TickChannelOperations.class);
 

@@ -5,6 +5,10 @@ import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickPublisher;
 
 public class LongPollTickPublisher implements TickPublisher  {
+
+    public LongPollTickPublisher() {
+    }
+
     @Override
     public void publish(Tick tick) {
 

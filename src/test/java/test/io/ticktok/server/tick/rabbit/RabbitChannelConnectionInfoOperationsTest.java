@@ -1,7 +1,7 @@
 package test.io.ticktok.server.tick.rabbit;
 
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.ChannelConnectionInfo;
 import io.ticktok.server.tick.rabbit.RabbitConfiguration;
 import io.ticktok.server.tick.rabbit.RabbitProperties;
 import io.ticktok.server.tick.rabbit.RabbitTickChannelOperations;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EnableConfigurationProperties(RabbitProperties.class)
 @SpringBootTest(properties = {"rabbit.queue.ttl=500"})
 @IntegrationTest
-class RabbitTickChannelOperationsTest {
+class RabbitChannelConnectionInfoOperationsTest {
 
     public static final Clock CLOCK = new Clock("kuku", "every.111.seconds");
     public static final String TICK_MSG = "hello";
@@ -40,7 +40,7 @@ class RabbitTickChannelOperationsTest {
     @Autowired
     private Exchange exchange;
 
-    private TickChannel channel;
+    private ChannelConnectionInfo channel;
 
     @BeforeEach
     void createChannel() {

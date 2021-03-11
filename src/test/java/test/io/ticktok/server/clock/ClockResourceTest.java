@@ -3,7 +3,7 @@ package test.io.ticktok.server.clock;
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.control.ClockResource;
-import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.ChannelConnectionInfo;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +39,7 @@ class ClockResourceTest {
         return ClockResource.builder()
                 .domain(DOMAIN)
                 .clock(new Clock())
-                .channel(TickChannel.builder().details(ImmutableMap.of(key, value)).build())
+                .channel(ChannelConnectionInfo.builder().details(ImmutableMap.of(key, value)).build())
                 .build();
     }
 
@@ -51,7 +51,7 @@ class ClockResourceTest {
 
     @Test
     void shouldDelegateAllChannelDetails() {
-        final TickChannel channel = TickChannel.builder()
+        final ChannelConnectionInfo channel = ChannelConnectionInfo.builder()
                 .type("rabbit")
                 .queue("q1")
                 .uri("amqp://uri")

@@ -3,7 +3,7 @@ package io.ticktok.server.tick.rabbit;
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.tick.QueueName;
-import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.ChannelConnectionInfo;
 import io.ticktok.server.tick.TickChannelOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
@@ -40,7 +40,7 @@ public class RabbitTickChannelOperations implements TickChannelOperations {
     }
 
     @Override
-    public TickChannel create(Clock clock) {
+    public ChannelConnectionInfo create(Clock clock) {
         log.info("Creating a queue for [name: {}, schedule: {}]", clock.getName(), clock.getSchedule());
         Queue queue = queueFor(clock);
         rabbitAdmin.declareQueue(queue);
@@ -59,9 +59,9 @@ public class RabbitTickChannelOperations implements TickChannelOperations {
         return BindingBuilder.bind(queueFor(clock)).to(exchange).with(clock.getSchedule());
     }
 
-    private TickChannel createTickChannelFor(Queue queue) {
-        return TickChannel.builder()
-                .type(TickChannel.RABBIT)
+    private ChannelConnectionInfo createTickChannelFor(Queue queue) {
+        return ChannelConnectionInfo.builder()
+                .type(ChannelConnectionInfo.RABBIT)
                 .uri(consumerRabbitUri)
                 .queue(queue.getName())
                 .details(ImmutableMap.of("uri", consumerRabbitUri, "queue", queue.getName()))

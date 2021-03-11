@@ -5,7 +5,7 @@ import io.ticktok.server.clock.Clock;
 public interface TickChannelOperations {
     boolean isExists(Clock clock);
 
-    TickChannel create(Clock clock);
+    ChannelConnectionInfo create(Clock clock);
 
     void disable(Clock clock);
 

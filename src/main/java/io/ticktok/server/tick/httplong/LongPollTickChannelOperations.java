@@ -2,17 +2,18 @@ package io.ticktok.server.tick.httplong;
 
 import com.google.common.collect.ImmutableMap;
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.QueueName;
-import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.ChannelConnectionInfo;
 import io.ticktok.server.tick.TickChannelOperations;
-import io.ticktok.server.tick.http.HttpQueue;
-import io.ticktok.server.tick.http.HttpQueuesRepository;
-
-import static io.ticktok.server.tick.http.HttpConfiguration.popPathForId;
 
 
 public class LongPollTickChannelOperations implements TickChannelOperations {
 
+
+    private final ChannelsRepository channelsRepository;
+
+    public LongPollTickChannelOperations(ChannelsRepository channelsRepository) {
+        this.channelsRepository = channelsRepository;
+    }
 
     @Override
     public boolean isExists(Clock clock) {
@@ -20,10 +21,11 @@ public class LongPollTickChannelOperations implements TickChannelOperations {
     }
 
     @Override
-    public TickChannel create(Clock clock) {
-        return new TickChannel(
+    public ChannelConnectionInfo create(Clock clock) {
+        TicksChannel channel = channelsRepository.createFor(clock.getId(), clock.getSchedule());
+        return new ChannelConnectionInfo(
                 "http-long",
-                ImmutableMap.of("channelId", "123"),
+                ImmutableMap.of("channelId", channel.getKey()),
                 "",
                 ""
         );

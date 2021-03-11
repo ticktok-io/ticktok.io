@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 public class TickChannelCreator {
     private final TickChannelOperations channelExplorer;
 
-    public TickChannel createFor(Clock clock) {
-        TickChannel tickChannel = channelExplorer.create(clock);
+    public ChannelConnectionInfo createFor(Clock clock) {
+        ChannelConnectionInfo channelConnectionInfo = channelExplorer.create(clock);
         enableClockIfNeeded(clock);
-        return tickChannel;
+        return channelConnectionInfo;
     }
 
     private void enableClockIfNeeded(Clock clock) {
