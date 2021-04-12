@@ -78,8 +78,8 @@ class MongoHttpQueuesRepositoryTest {
     @Test
     void retrievePushedTicks() {
         repository.updateQueueSchedule(QUEUE_NAME, SCHEDULE);
-        repository.push(TICK_MESSAGE);
-        repository.push(TICK_MESSAGE);
+        repository.push(SCHEDULE);
+        repository.push(SCHEDULE);
         assertThat(repository.pop(queue.getExternalId())).containsExactly(
                 new TickMessage(SCHEDULE), new TickMessage(SCHEDULE));
     }
@@ -98,7 +98,7 @@ class MongoHttpQueuesRepositoryTest {
     @Test
     void popShouldClearQueue() {
         repository.updateQueueSchedule(QUEUE_NAME, SCHEDULE);
-        repository.push(new TickMessage(SCHEDULE));
+        repository.push(SCHEDULE);
         assertThat(repository.pop(queue.getExternalId())).hasSize(1);
         assertThat(repository.pop(queue.getExternalId())).hasSize(0);
     }
@@ -111,7 +111,7 @@ class MongoHttpQueuesRepositoryTest {
     @Test
     void shouldAlterAssignedSchedule() {
         repository.updateQueueSchedule(QUEUE_NAME, "");
-        repository.push(TICK_MESSAGE);
+        repository.push(null);
         assertThat(repository.pop(queue.getExternalId())).isEmpty();
     }
 

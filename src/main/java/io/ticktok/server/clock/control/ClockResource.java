@@ -2,14 +2,12 @@ package io.ticktok.server.clock.control;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.ChannelConnectionInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
-import org.springframework.hateoas.server.core.WebHandler;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -26,11 +24,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @ToString
 public class ClockResource extends RepresentationModel<ClockResource> {
 
-    private String clockId;
-    private String name;
-    private String schedule;
-    private String status;
-    private TickChannel channel;
+    private final String clockId;
+    private final String name;
+    private final String schedule;
+    private final String status;
+    private final ChannelConnectionInfo channel;
 
     @JsonProperty("id")
     public String getClockId() {
@@ -43,7 +41,7 @@ public class ClockResource extends RepresentationModel<ClockResource> {
 
     public static class ClockResourceBuilder {
         private Clock clock;
-        private TickChannel channel;
+        private ChannelConnectionInfo channel;
         private String domain;
         private List<String> actions;
 
@@ -52,7 +50,7 @@ public class ClockResource extends RepresentationModel<ClockResource> {
             return this;
         }
 
-        public ClockResourceBuilder channel(TickChannel channel) {
+        public ClockResourceBuilder channel(ChannelConnectionInfo channel) {
             this.channel = channel;
             return this;
         }
@@ -94,11 +92,11 @@ public class ClockResource extends RepresentationModel<ClockResource> {
             return linkTo(ClockController.class, clock.getId()).slash(a).withRel(a);
         }
 
-        private TickChannel createChannel() {
+        private ChannelConnectionInfo createChannel() {
             if (channel == null) {
                 return null;
             }
-            return TickChannel.builder()
+            return ChannelConnectionInfo.builder()
                     .type(channel.getType())
                     .uri(channel.getUri())
                     .queue(channel.getQueue())

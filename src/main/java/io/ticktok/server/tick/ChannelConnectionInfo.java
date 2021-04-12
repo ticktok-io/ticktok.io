@@ -11,7 +11,7 @@ import java.util.Map;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class TickChannel {
+public class ChannelConnectionInfo {
 
     public static final String RABBIT = "rabbit";
     public static final String HTTP = "http";

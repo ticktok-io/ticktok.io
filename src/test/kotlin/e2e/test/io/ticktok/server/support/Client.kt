@@ -6,166 +6,231 @@ import com.google.gson.JsonObject
 import com.rabbitmq.client.*
 import org.apache.http.HttpResponse
 import org.apache.http.client.fluent.Request
+import org.apache.http.entity.ContentType
 import org.apache.http.util.EntityUtils
-import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
+import org.awaitility.kotlin.withAlias
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.collection.IsMapWithSize.aMapWithSize
+import java.lang.Exception
 import java.lang.Thread.sleep
 import java.nio.charset.Charset
 import java.time.Duration.ofSeconds
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 
-object Client {
+class Client(private val listener: TickConsumer = NullTickConsumer()) {
 
-    const val CLOCK_EXPR = "every.2.seconds"
-    private val listeners = hashMapOf<String, TickListener>()
+    companion object {
+        const val CLOCK_EXPR = "every.2.seconds"
+    }
 
-    fun receivedTicksFor(clock: Clock) {
-        await atMost ofSeconds(4) until {
-            listeners[clock.id]?.messages?.isNotEmpty()!! &&
-                    listeners[clock.id]?.messages?.filter { m -> m.get("schedule").asString == clock.schedule }!!.any()
+    private val messages = ConcurrentHashMap<String, Boolean>()
+
+    fun receivedTicksFor(vararg clocks: Clock) {
+        await atMost ofSeconds(3) withAlias "No ticks for: ${describeClock(clocks)}" until {
+            messages.isNotEmpty() && clocks.all { c -> messages[c.id] ?: false }
         }
     }
+
+    private fun describeClock(clocks: Array<out Clock>) =
+        clocks.joinToString { "[id: ${it.id}, name: ${it.name}, schedule: ${it.schedule}]" }
 
     fun receivesNoMoreTicks() {
         sleep(2000)
         reset()
         sleep(2000)
-        listeners.values.forEach { v ->
-            assertThat(v.messages).`as`("received ticks for %s", v.name()).isEmpty()
-        }
+        receivedNoTicks()
+    }
+
+    fun receivedNoTicks() {
+        assertThat("No new messages", messages, aMapWithSize(0))
     }
 
     private fun reset() {
-        listeners.values.forEach { v -> v.clear() }
+        messages.clear()
     }
 
-    fun startListenTo(clock: Clock) {
-        if (!listeners.contains(clock.id)) {
-            listeners[clock.id] = createListenerFor(clock)
-            listeners[clock.id]?.start()
-        }
+    fun startListenTo(vararg clocks: Clock) {
+        listener.register(arrayOf(*clocks), onTickHandler)
     }
 
-    private fun createListenerFor(clock: Clock): TickListener {
-        return when (clock.channel!!.type) {
-            "rabbit" -> RabbitTickListener(clock)
-            "http" -> HttpTickListener(clock)
-            else -> NoTickListener(clock)
-        }
+    private val onTickHandler = { clockId: String, tick: JsonObject ->
+        messages[clockId] = true
     }
 
     fun stop() {
-        stopAllListeners()
+        listener.stop()
+    }
+}
+
+interface TickConsumer {
+    fun stop()
+
+    fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit)
+}
+
+class NullTickConsumer : TickConsumer {
+    override fun stop() {
+        throw NotImplementedError()
     }
 
-    private fun stopAllListeners() {
-        listeners.values.forEach { v -> v.stop() }
-        listeners.clear()
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
+        throw NotImplementedError()
+    }
+}
+
+
+class AnyTickConsumer : TickConsumer {
+
+    private var consumer: TickConsumer? = null
+
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
+        consumer = createListenerFor(clocks[0])
+        consumer?.register(clocks, callback)
     }
 
-    abstract class TickListener(val clock: Clock) {
-        val messages: MutableList<JsonObject> = Collections.synchronizedList(mutableListOf())
-        val errors: MutableList<String> = Collections.synchronizedList(mutableListOf())
-
-        fun start() {
-            listenOn(clock)
-        }
-
-        abstract fun listenOn(clock: Clock)
-
-        open fun name(): String {
-            return "${clock.id} - ${clock.name} - ${clock.schedule}"
-        }
-
-        open fun stop() {
-            // do nothing by default
-        }
-
-        fun clear() {
-            messages.clear()
+    private fun createListenerFor(clock: Clock): TickConsumer {
+        return when (clock.channel!!.type) {
+            "rabbit" -> RabbitTickConsumer()
+            "http" -> HttpTickConsumer()
+            else -> throw NotImplementedError()
         }
     }
 
-    class RabbitTickListener(clock: Clock) : TickListener(clock) {
+    override fun stop() {
+        consumer?.stop()
+    }
+}
 
-        companion object {
-            var connection: Connection? = null
-            var channel: Channel? = null
-        }
 
-        private var consumerTag: String = ""
+class HttpTickConsumer : TickConsumer {
 
-        override fun listenOn(clock: Clock) {
-            createConnectionIfNeeded()
-            val consumer = object : DefaultConsumer(channel) {
-                override fun handleDelivery(consumerTag: String?, envelope: Envelope?,
-                                            properties: AMQP.BasicProperties?, body: ByteArray?) {
-                    val bodyStr = body?.toString(Charset.forName("UTF-8"))
-                    messages.add(Gson().fromJson(bodyStr, JsonObject::class.java))
+    private var listenerTimer: Timer = Timer(true)
+
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
+        val task = object : TimerTask() {
+            override fun run() {
+                val tick = getTicksFrom(clocks[0].channel!!.details["url"]!!)
+                tick?.let {
+                    callback(clocks[0].id, tick)
                 }
             }
-            consumerTag = channel!!.basicConsume(clock.channel!!.details["queue"], true, consumer)
         }
+        listenerTimer.schedule(task, 0, 1000)
+    }
 
-        private fun createConnectionIfNeeded() {
-            if (connection == null) {
-                connection = createConnection(clock.channel)
-                channel = connection!!.createChannel()
+    private fun getTicksFrom(url: String): JsonObject? {
+        var tick: JsonObject? = null
+        val response = Request.Get(url).execute().returnResponse()
+        val content = EntityUtils.toString(response.entity)
+        if (response.statusLine.statusCode != 200) {
+            println("Error: $content")
+
+        } else {
+            val ticksJson = Gson().fromJson(content, JsonArray::class.java)
+            if (ticksJson.size() > 0)
+                tick = ticksJson[0].asJsonObject
+        }
+        return tick
+    }
+
+    override fun stop() {
+        listenerTimer.cancel()
+    }
+}
+
+
+class RabbitTickConsumer : TickConsumer {
+
+    companion object {
+        var connection: Connection? = null
+        var channel: Channel? = null
+    }
+
+    private var consumerTag: String = ""
+
+
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
+        createConnectionIfNeeded(clocks[0])
+        val consumer = object : DefaultConsumer(channel) {
+            override fun handleDelivery(
+                consumerTag: String?, envelope: Envelope?,
+                properties: AMQP.BasicProperties?, body: ByteArray?
+            ) {
+                val bodyStr = body?.toString(Charset.forName("UTF-8"))
+                callback(clocks[0].id, Gson().fromJson(bodyStr, JsonObject::class.java))
             }
         }
+        consumerTag = channel!!.basicConsume(clocks[0].channel!!.details["queue"], true, consumer)
 
-        private fun createConnection(channel: ClockChannel?): Connection {
-            val factory = ConnectionFactory()
-            factory.setUri(channel?.details!!["uri"])
-            return factory.newConnection()
-        }
+    }
 
-        override fun stop() {
-            if (consumerTag.isNotEmpty()) {
-                channel!!.basicCancel(consumerTag)
-            }
+    private fun createConnectionIfNeeded(clock: Clock) {
+        if (connection == null) {
+            connection = createConnection(clock.channel)
+            channel = connection!!.createChannel()
         }
     }
 
-    class HttpTickListener(clock: Clock) : TickListener(clock) {
+    private fun createConnection(channel: ClockChannel?): Connection {
+        val factory = ConnectionFactory()
+        factory.setUri(channel?.details!!["uri"])
+        return factory.newConnection()
+    }
 
-        private var listenerTimer: Timer = Timer(true)
-
-        override fun listenOn(clock: Clock) {
-            val task = object : TimerTask() {
-                override fun run() {
-                    val url = clock.channel!!.details["url"]
-                    actOnPopResponse(Request.Get(url).execute().returnResponse())
-                }
-            }
-            listenerTimer.schedule(task, 0, 1000)
+    override fun stop() {
+        if (consumerTag.isNotEmpty()) {
+            channel!!.basicCancel(consumerTag)
         }
+    }
+}
 
-        fun actOnPopResponse(response: HttpResponse) {
-            val content = EntityUtils.toString(response.entity)
-            if (response.statusLine.statusCode != 200) {
-                println("Error: $content")
-                errors.add("Error: ${response.statusLine.statusCode} [$content]")
-            } else {
-                val ticksJson = Gson().fromJson(content, JsonArray::class.java)
-                val ticks = ticksJson.asJsonArray
-                ticks.forEach { t -> messages.add(t.asJsonObject) }
-            }
-        }
+class LongPollConsumer(private val domain: String, private val token: String) : TickConsumer {
 
-        override fun stop() {
-            listenerTimer.cancel()
+    private var running = false
+
+    override fun register(clocks: Array<Clock>, callback: (clockId: String, tick: JsonObject) -> Unit) {
+        clocks.forEach {
+            val ticks = getTicksFor(clocks)
+            invokeCallbackOnTicks(callback, ticks)
         }
     }
 
-    class NoTickListener(clock: Clock) : TickListener(clock) {
-
-        override fun listenOn(clock: Clock) {
-            throw NotImplementedError()
+    private fun invokeCallbackOnTicks(
+        callback: (clockId: String, tick: JsonObject) -> Unit, ticks: JsonArray
+    ) {
+        for (tick in ticks) {
+            val jsonTick = tick.asJsonObject
+            callback(jsonTick.get("clockId").asString, jsonTick)
         }
+    }
+
+    private fun getTicksFor(clocks: Array<Clock>): JsonArray {
+        val url = clocks.map { it.channel!!.details["id"] }
+
+        val response = pollTicksFor(url)
+        val content = EntityUtils.toString(response.entity)
+        return if (response.statusLine.statusCode != 200) {
+            println("Error: $content")
+            JsonArray()
+        } else {
+            Gson().fromJson(content, JsonArray::class.java)
+        }
+    }
+
+    private fun pollTicksFor(channelIds: List<String?>): HttpResponse {
+        return Request.Post("${domain}/api/v1/ticks/poll?access_token=${token}")
+                .bodyString(Gson().toJson(mapOf("channels" to channelIds)), ContentType.APPLICATION_JSON)
+                .execute().returnResponse()
+    }
+
+    override fun stop() {
+        running = false
     }
 
 }
+

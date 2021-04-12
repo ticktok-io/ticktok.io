@@ -26,35 +26,29 @@ import java.time.Duration.ofMinutes
 import java.time.Duration.ofSeconds
 import java.util.*
 
-class App(profile: String) {
+
+class App {
 
     companion object {
-        const val ACCESS_TOKEN = "ct-auth-token"
-        var appUrl = System.getenv("APP_URL") ?: "http://localhost:9643"
-        var startApp = System.getProperty("startApp", "yes") != "no"
-        private var appInstance: App? = null
+        const val HTTP = "http"
+        const val RABBIT = "rabbit"
+        const val HTTP_LONG = "http-long"
 
-        fun instance(profile: String): App {
-            if (appInstance == null) {
-                appInstance = App(profile)
-                if (startApp) {
-                    appInstance?.start()
-                }
-                appInstance?.waitForAppToBeHealthy()
-            }
-            return appInstance as App
-        }
+        const val ACCESS_TOKEN = "ct-auth-token"
+        var APP_URL = System.getenv("APP_URL") ?: "http://localhost:9643"
     }
 
     private val lastResponses: MutableList<HttpResponse> = Collections.synchronizedList(ArrayList())
-    private var currentProfile: String = profile
+    private var startApp = System.getProperty("startApp", "yes") != "no"
 
-    fun start() {
-        Application.main("--spring.profiles.active=$currentProfile")
+    fun start(profile: String) {
+        if (startApp)
+            Application.main("--spring.profiles.active=$profile")
+        waitForAppToBeHealthy()
     }
 
     private fun waitForAppToBeHealthy() {
-        println("Waiting for app($appUrl) to be healthy...")
+        println("Waiting for app($APP_URL) to be healthy...")
         await withPollInterval ofSeconds(1) atMost ofMinutes(5) until { isAppHealthy() }
     }
 
@@ -62,12 +56,10 @@ class App(profile: String) {
         lastResponses.clear()
     }
 
-    fun registeredAClock(name: String, timeExpr: String): Clock {
-        val response = requestClock(name, timeExpr)
+    fun registeredAClock(name: String, schedule: String): Clock {
+        val response = requestClock(name, schedule)
         lastResponses.add(response)
-        val clock = Gson().fromJson<Clock>(bodyOf(response))
-        startListenOn(clock)
-        return clock
+        return Gson().fromJson(bodyOf(response))
     }
 
     private fun requestClock(name: String, timeExpr: String): HttpResponse {
@@ -79,7 +71,7 @@ class App(profile: String) {
     private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
 
     private fun createAuthenticatedUrlFor(slag: String, params: Map<String, String> = mapOf()): String {
-        return URIBuilder(appUrl)
+        return URIBuilder(APP_URL)
                 .setPath(slag)
                 .setParameters(params.map { BasicNameValuePair(it.key, it.value) })
                 .setParameter("access_token", ACCESS_TOKEN).build().toString()
@@ -95,17 +87,6 @@ class App(profile: String) {
     private inline fun <reified T> Gson.fromJson(json: String) =
             this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
-    private fun startListenOn(clock: Clock) {
-        if (clock.channel != null) {
-            validateTickChannelType(clock)
-            Client.startListenTo(clock)
-        }
-    }
-
-    private fun validateTickChannelType(clock: Clock) {
-        assertThat(clock.channel!!.type, equalTo(currentProfile))
-    }
-
     fun isHealthy() {
         assertTrue(isAppHealthy())
     }
@@ -120,12 +101,12 @@ class App(profile: String) {
     }
 
     private fun getHealthStatus(): String {
-        val health = Request.Get("$appUrl/mgmt/health").execute().returnContent().asString()
+        val health = Request.Get("$APP_URL/mgmt/health").execute().returnContent().asString()
         return Gson().fromJson(health, JsonObject::class.java).get("status").asString
     }
 
     fun isAccessedWithoutAToken() {
-        lastResponses.add(Request.Post("$appUrl/api/v1/clocks")
+        lastResponses.add(Request.Post("$APP_URL/api/v1/clocks")
                 .bodyString(createClockRequestFor("no-token", "in.1.minute"), ContentType.APPLICATION_JSON)
                 .execute().returnResponse())
     }
@@ -150,9 +131,9 @@ class App(profile: String) {
         return Gson().fromJson(response, Array<Clock>::class.java).asList()
     }
 
-    fun retrievedRegisteredClock(name: String, clockExpr: String) {
+    fun retrievedRegisteredClock(name: String, schedule: String) {
         assertThat(statusOf(lastResponses.first()), equalTo(HttpStatus.SC_CREATED))
-        validateRetrievedBody(name, clockExpr)
+        validateRetrievedBody(name, schedule)
         validateRetrievedLocation()
     }
 
@@ -252,11 +233,9 @@ class App(profile: String) {
 
     fun shutdown() {
         if (startApp) {
-            val response = Request.Post("$appUrl/mgmt/shutdown").execute().returnResponse()
+            val response = Request.Post("$APP_URL/mgmt/shutdown").execute().returnResponse()
             assertThat(statusOf(response), equalTo(200))
         }
-        appInstance = null
-        currentProfile = ""
     }
 
     fun pauseActionIsNotAvailableFor(clock: Clock) {
@@ -268,24 +247,25 @@ class App(profile: String) {
         dispatchActionOn("tick", clock)
     }
 
-    class ClockMatcher(private val clock: Clock, private val exclusive: Boolean = false) : BaseMatcher<List<Clock>>() {
-        override fun describeTo(description: Description?) {
-            description?.appendText(clock.toString())
+}
+
+class ClockMatcher(private val clock: Clock, private val exclusive: Boolean = false) : BaseMatcher<List<Clock>>() {
+    override fun describeTo(description: Description?) {
+        description?.appendText(clock.toString())
+    }
+
+    override fun matches(item: Any?): Boolean {
+        val clockCount = (item as List<*>).groupBy { clock.copy(status = (it as Clock).status) }.count()
+        return (!exclusive && clockCount > 0) || (clockCount == 1 && item.size == 1)
+    }
+
+    companion object {
+        fun containsClock(clock: Clock): ClockMatcher {
+            return ClockMatcher(clock)
         }
 
-        override fun matches(item: Any?): Boolean {
-            val clockCount = (item as List<*>).groupBy { clock.copy(status = (it as Clock).status) }.count()
-            return (!exclusive && clockCount > 0) || (clockCount == 1 && item.size == 1)
-        }
-
-        companion object {
-            fun containsClock(clock: Clock): ClockMatcher {
-                return ClockMatcher(clock)
-            }
-
-            fun containsOnly(clock: Clock): ClockMatcher {
-                return ClockMatcher(clock, true)
-            }
+        fun containsOnly(clock: Clock): ClockMatcher {
+            return ClockMatcher(clock, true)
         }
     }
 }

@@ -13,9 +13,14 @@ import org.springframework.data.mongodb.core.MongoOperations;
 public class HttpConfiguration {
 
     public static final String POP_PATH = "/api/v1/queues/{id}/pop";
+    public static final String POLL_PATH = "/api/v1/channels/{id}/poll";
 
     public static String popPathForId(String id) {
        return POP_PATH.replaceAll("\\{id}", id);
+    }
+
+    public static String pollPathForId(String id) {
+        return POP_PATH.replaceAll("\\{id}", id);
     }
 
     @Bean
@@ -32,4 +37,5 @@ public class HttpConfiguration {
     public HttpQueuesRepository queuesRepository(@Value("${queues.ttl}") String queueTTL, MongoOperations mongoOperations) {
         return new MongoHttpQueuesRepository(queueTTL, mongoOperations);
     }
+
 }

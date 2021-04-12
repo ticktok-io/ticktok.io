@@ -76,9 +76,9 @@ public class MongoHttpQueuesRepository implements HttpQueuesRepository {
     }
 
     @Override
-    public void push(TickMessage tickMessage) {
-        mongo.updateMulti(query(where(SCHEDULE).is(tickMessage.getSchedule())),
-                updateForTick(tickMessage), HttpQueue.class);
+    public void push(String schedule) {
+        mongo.updateMulti(query(where(SCHEDULE).is(schedule)),
+                updateForTick(new TickMessage(schedule)), HttpQueue.class);
     }
 
     private Update updateForTick(TickMessage tickMessage) {

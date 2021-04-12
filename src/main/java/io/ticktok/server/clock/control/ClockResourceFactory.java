@@ -2,7 +2,7 @@ package io.ticktok.server.clock.control;
 
 import io.ticktok.server.clock.Clock;
 import io.ticktok.server.clock.actions.ClockActionFactory;
-import io.ticktok.server.tick.TickChannel;
+import io.ticktok.server.tick.ChannelConnectionInfo;
 
 import static io.ticktok.server.clock.control.HttpRequestUtil.host;
 
@@ -26,7 +26,7 @@ public class ClockResourceFactory {
                 .actions(clockActionFactory.availableActionsFor(clock));
     }
 
-    public ClockResource createWithChannel(Clock clock, TickChannel channel) {
+    public ClockResource createWithChannel(Clock clock, ChannelConnectionInfo channel) {
         return createClockResourceBuilderFor(clock)
                 .channel(channel)
                 .build();

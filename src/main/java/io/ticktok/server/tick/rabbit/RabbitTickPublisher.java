@@ -2,7 +2,7 @@ package io.ticktok.server.tick.rabbit;
 
 import com.google.gson.Gson;
 import io.ticktok.server.clock.Clock;
-import io.ticktok.server.tick.QueueNameCreator;
+import io.ticktok.server.tick.QueueName;
 import io.ticktok.server.tick.Tick;
 import io.ticktok.server.tick.TickMessage;
 import io.ticktok.server.tick.TickPublisher;
@@ -37,7 +37,7 @@ public class RabbitTickPublisher implements TickPublisher {
 
     @Override
     public void publishForClock(Clock clock) {
-        rabbitOperations.convertAndSend(new QueueNameCreator(clock).create(), tickMessageFor(clock.getSchedule()));
+        rabbitOperations.convertAndSend(QueueName.createNameFor(clock), tickMessageFor(clock.getSchedule()));
     }
 
     private class TicktokMessagePostProcessor implements MessagePostProcessor {
