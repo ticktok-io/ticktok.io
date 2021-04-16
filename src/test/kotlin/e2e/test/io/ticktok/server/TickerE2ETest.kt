@@ -17,4 +17,5 @@ class TickerE2ETest : CommonAppE2ETest() {
         app.tick(clock)
         ticker.receivedTickFor(clock)
     }
+
 }
