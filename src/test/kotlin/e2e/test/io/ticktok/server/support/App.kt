@@ -33,6 +33,7 @@ class App {
         const val HTTP = "http"
         const val RABBIT = "rabbit"
         const val HTTP_LONG = "http-long"
+        const val WEBSOCKET = "websocket"
 
         const val ACCESS_TOKEN = "ct-auth-token"
         var APP_URL = System.getenv("APP_URL") ?: "http://localhost:9643"
@@ -56,7 +57,7 @@ class App {
         lastResponses.clear()
     }
 
-    fun registeredAClock(name: String, schedule: String): Clock {
+    fun registeredAClock(name: String, schedule: String, ticker: String = ""): Clock {
         val response = requestClock(name, schedule)
         lastResponses.add(response)
         return Gson().fromJson(bodyOf(response))
@@ -245,6 +246,10 @@ class App {
 
     fun tick(clock: Clock) {
         dispatchActionOn("tick", clock)
+    }
+
+    fun registerTicker(name: String): TickerConnectionDetails {
+        return TickerConnectionDetails("", "")
     }
 
 }
