@@ -33,6 +33,8 @@ data class Clock(
         return linksForAction.single()["href"] as String?
 
     }
+
+    fun describe() = "[id: ${this.id}, name: ${this.name}, schedule: ${this.schedule}]"
 }
 
 data class ClockChannel(

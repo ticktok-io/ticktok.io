@@ -37,7 +37,7 @@ class Client(private val listener: TickConsumer = NullTickConsumer()) {
     }
 
     private fun describeClock(clocks: Array<out Clock>) =
-        clocks.joinToString { "[id: ${it.id}, name: ${it.name}, schedule: ${it.schedule}]" }
+        clocks.joinToString { it.describe() }
 
     fun receivesNoMoreTicks() {
         sleep(2000)

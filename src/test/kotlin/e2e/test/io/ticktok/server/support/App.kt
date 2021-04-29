@@ -2,14 +2,12 @@ package e2e.test.io.ticktok.server.support
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import io.ticktok.server.Application
 import org.apache.http.HttpResponse
 import org.apache.http.HttpStatus
 import org.apache.http.client.fluent.Request
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.ContentType
-import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import org.awaitility.kotlin.*
 import org.hamcrest.BaseMatcher
@@ -32,10 +30,8 @@ class App {
     companion object {
         const val HTTP = "http"
         const val RABBIT = "rabbit"
-        const val HTTP_LONG = "http-long"
         const val WEBSOCKET = "websocket"
 
-        const val ACCESS_TOKEN = "ct-auth-token"
         var APP_URL = System.getenv("APP_URL") ?: "http://localhost:9643"
     }
 
@@ -58,35 +54,24 @@ class App {
     }
 
     fun registeredAClock(name: String, schedule: String, ticker: String = ""): Clock {
-        val response = requestClock(name, schedule)
+        val response = requestClock(name, schedule, ticker)
         lastResponses.add(response)
         return Gson().fromJson(bodyOf(response))
     }
 
-    private fun requestClock(name: String, timeExpr: String): HttpResponse {
+    private fun requestClock(name: String, timeExpr: String, ticker: String): HttpResponse {
         return Request.Post(createAuthenticatedUrlFor("/api/v1/clocks"))
-                .bodyString(createClockRequestFor(name, timeExpr), ContentType.APPLICATION_JSON)
+                .bodyString(createClockRequestFor(name, timeExpr, ticker), ContentType.APPLICATION_JSON)
                 .execute().returnResponse()
     }
 
-    private fun bodyOf(response: HttpResponse) = EntityUtils.toString(response.entity)
-
-    private fun createAuthenticatedUrlFor(slag: String, params: Map<String, String> = mapOf()): String {
-        return URIBuilder(APP_URL)
-                .setPath(slag)
-                .setParameters(params.map { BasicNameValuePair(it.key, it.value) })
-                .setParameter("access_token", ACCESS_TOKEN).build().toString()
-    }
-
-    private fun createClockRequestFor(name: String, timeExpr: String): String {
+    private fun createClockRequestFor(name: String, timeExpr: String, ticker: String = ""): String {
         return JSONObject()
                 .put("schedule", timeExpr)
                 .put("name", name)
+                .put("ticker", ticker)
                 .toString()
     }
-
-    private inline fun <reified T> Gson.fromJson(json: String) =
-            this.fromJson<T>(json, object : TypeToken<T>() {}.type)!!
 
     fun isHealthy() {
         assertTrue(isAppHealthy())
@@ -246,10 +231,6 @@ class App {
 
     fun tick(clock: Clock) {
         dispatchActionOn("tick", clock)
-    }
-
-    fun registerTicker(name: String): TickerConnectionDetails {
-        return TickerConnectionDetails("", "")
     }
 
 }

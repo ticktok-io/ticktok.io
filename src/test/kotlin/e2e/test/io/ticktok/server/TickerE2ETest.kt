@@ -12,7 +12,7 @@ class TickerE2ETest : CommonAppE2ETest() {
 
     @Test
     fun receiveTickForSpecificTicker() {
-        val ticker = Ticker.register(app.registerTicker("over-the-top"))
+        val ticker = Ticker.create("my-ticker")
         val clock = app.registeredAClock("kuku", "@never", "over-the-top")
         app.tick(clock)
         ticker.receivedTickFor(clock)
