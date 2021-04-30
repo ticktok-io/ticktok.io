@@ -37,7 +37,7 @@ class Ticker(registrationInfo: TickerRegistrationInfo) {
     private val receivedTicks = mutableListOf<Tick>()
 
     init {
-        val client = HttpClient() {
+        val client = HttpClient {
             install(WebSockets)
         }
         GlobalScope.launch {
@@ -64,7 +64,5 @@ class Ticker(registrationInfo: TickerRegistrationInfo) {
 data class Tick(
         val name: String,
         val schedule: String
-) {
-
-}
+)
 

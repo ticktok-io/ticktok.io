@@ -2,8 +2,10 @@ package e2e.test.io.ticktok.server;
 
 import e2e.test.io.ticktok.server.support.App.Companion.WEBSOCKET
 import e2e.test.io.ticktok.server.support.Ticker
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test;
 
+@Tag("websocket-broker")
 class TickerE2ETest : CommonAppE2ETest() {
 
     override fun appProfile(): String {

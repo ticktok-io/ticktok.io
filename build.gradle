@@ -134,7 +134,7 @@ test {
     systemProperty "startApp", System.getProperty("startApp")
     useJUnitPlatform {
         if (project.hasProperty('tags')) {
-            includeTags project.getProperties()['tags'] as String
+            includeTags project.getProperties()['tags'].tokenize(',') as String[]
         }
     }
 }
