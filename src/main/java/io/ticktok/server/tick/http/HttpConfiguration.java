@@ -2,6 +2,8 @@ package io.ticktok.server.tick.http;
 
 import io.ticktok.server.tick.TickChannelOperations;
 import io.ticktok.server.tick.TickPublisher;
+import io.ticktok.server.tick.httplong.ChannelsRepository;
+import io.ticktok.server.tick.httplong.MongoChannelsRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
